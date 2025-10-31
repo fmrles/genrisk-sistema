@@ -1,5 +1,5 @@
 package com.genrisk.sistema.interfaces;
 
-public class Query {
+public interface Query {
     
 }
