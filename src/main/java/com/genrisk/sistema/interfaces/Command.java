@@ -1,5 +1,7 @@
 package com.genrisk.sistema.interfaces;
 
-public interface Command {
-    
+import org.springframework.http.ResponseEntity;
+
+public interface Command <I, O>{
+    ResponseEntity<O> execute (I input);
 }
