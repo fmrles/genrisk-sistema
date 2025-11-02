@@ -19,7 +19,7 @@ public class Genotipificacion{
     private Integer idGenotipificacion;
 
     @Column(name = "paciente_id")
-    private Integer pacienteID;
+    private String pacienteID;
 
     @Column(name = "muestra_nro")
     private Integer muestraNRO;

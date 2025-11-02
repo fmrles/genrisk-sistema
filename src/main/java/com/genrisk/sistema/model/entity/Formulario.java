@@ -28,5 +28,5 @@ public class Formulario{
     private LocalDate fechaFormulario;
 
     @Column(name = "paciente_id", nullable = false, updatable = false)
-    private Integer paciente_id;    
+    private String paciente_id;    
 }

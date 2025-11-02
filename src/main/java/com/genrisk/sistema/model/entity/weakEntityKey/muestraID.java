@@ -12,7 +12,7 @@ import lombok.*;
 
 public class muestraID implements Serializable {
     @Column(name = "paciente_id", nullable = false)
-    private Integer pacienteId;
+    private String pacienteId;
 
     @Column(name = "nro_muestra", nullable = false)
     private Integer nroMuestra;
