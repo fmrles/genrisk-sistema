@@ -17,12 +17,6 @@ public class IngresaDatos {
     @EmbeddedId
     private IngresaDatosID idDatos;
 
-    @Column(name = "formulario_id", nullable = true, updatable = true)
-    private Integer formularioID;
-
-    @Column(name = "miembro_id", nullable = true, updatable = true)
-    private Integer miembroID;
-
     @Column(name = "campo")
     private String campo;
 
