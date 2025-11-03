@@ -28,5 +28,9 @@ public class Formulario{
     private LocalDate fechaFormulario;
 
     @Column(name = "paciente_id", nullable = false, updatable = false)
-    private String paciente_id;    
+    private String paciente_id;  
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="paciente_id", updatable = false)
+    private Paciente paciente;
 }
