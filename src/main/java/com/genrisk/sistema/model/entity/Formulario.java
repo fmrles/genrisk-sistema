@@ -1,5 +1,6 @@
 package com.genrisk.sistema.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -26,8 +27,13 @@ public class Formulario{
 
     @Column(name = "fecha_formulario", nullable = true, updatable = true)
     private LocalDate fechaFormulario;
+
+    @Column(name = "paciente_id", insertable = false, updatable = false)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String paciente_id;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="paciente_id", updatable = false)
+    @JoinColumn(name = "paciente_id", nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Paciente paciente;
 }
