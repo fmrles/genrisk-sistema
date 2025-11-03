@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 
 @Table(name ="datos_generales")
-public class DatosGenericos{
+public class DatosGenerales{
 
     @EmbeddedId
     private DatosGeneralesID idDatosGen;
