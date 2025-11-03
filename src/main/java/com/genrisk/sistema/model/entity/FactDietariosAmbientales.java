@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 
-@Table(name ="fact_dietario_ambienta")
+@Table(name ="fact_dietario_ambiental")
 public class FactDietariosAmbientales{
 
     @EmbeddedId

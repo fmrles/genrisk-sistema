@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 
-@Table(name = "hispatologia")
+@Table(name = "histopatologia")
 public class Histopatologia {
 
     @EmbeddedId 

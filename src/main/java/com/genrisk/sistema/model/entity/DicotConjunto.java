@@ -13,6 +13,12 @@ public class DicotConjunto {
     @Column(name = "id_dicotconjunto")
     private Integer idDicotConjunto;
 
+    @Column(name = "nombre")
+    private String nombre;
+
+    @Column(name = "descripcion")
+    private String descripcion;
+
     @Column(name = "nombre_dicot_conjunto")
     private String nombreDicotConjunto;
 

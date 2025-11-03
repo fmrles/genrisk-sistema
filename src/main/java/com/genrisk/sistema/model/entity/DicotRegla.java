@@ -1,5 +1,7 @@
 package com.genrisk.sistema.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,6 +37,12 @@ public class DicotRegla {
     @Column(name = "operador", nullable = true, updatable = true)
     private String operador;
 
-    @Column(name = "dicotconjunto_id")
-    private Integer dicotConjuntoID;
+    @Column(name = "dicotconjunto_id", insertable = false, updatable = false)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Integer dicotConjuntoID; 
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dicotconjunto_id")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private DicotConjunto dicotConjunto; 
 }
