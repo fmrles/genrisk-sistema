@@ -168,6 +168,82 @@ public class ExportacionesController {
         }
     }
 
+    @GetMapping("/datos-clinicos/word")
+    public ResponseEntity<byte[]> exportarDatosClinicosWord() {
+        try {
+            byte[] wordBytes2 = wordExportService.exportarDatosClinicosAWord();
+            
+            HttpHeaders headers2 = new HttpHeaders();
+            headers2.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers2.setContentDispositionFormData("attachment", 
+                "datos_clinicos_" + getTimestamp() + ".docx");
+            headers2.setContentLength(wordBytes2.length);
+
+            return new ResponseEntity<>(wordBytes2, headers2, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/habitos-pacientes/word")
+    public ResponseEntity<byte[]> exportarHabitosPacientesWord() {
+        try {
+            byte[] wordBytes = wordExportService.exportarHabitosPacienteAWord();
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", 
+                "habitos_pacientes_" + getTimestamp() + ".docx");
+            headers.setContentLength(wordBytes.length);
+
+            return new ResponseEntity<>(wordBytes, headers, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/fact-dietarios-ambientales/word")
+    public ResponseEntity<byte[]> exportarFactDietariosAmbientalesWord() {
+        try {
+            byte[] wordBytes = wordExportService.exportarFactDietarioAmbientalAWord();
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", 
+                "fact_dietario_ambiental" + getTimestamp() + ".docx");
+            headers.setContentLength(wordBytes.length);
+
+            return new ResponseEntity<>(wordBytes, headers, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/histopatologias/word")
+    public ResponseEntity<byte[]> exportarHistopatologiasWord() {
+        try {
+            byte[] wordBytes = wordExportService.exportarHistopatologiaAWord();
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", 
+                "histopatologia" + getTimestamp() + ".docx");
+            headers.setContentLength(wordBytes.length);
+
+            return new ResponseEntity<>(wordBytes, headers, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     // =============== MÉTODOS AUXILIARES ===============
 
     private String getTimestamp() {

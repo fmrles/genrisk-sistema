@@ -31,6 +31,12 @@ public class WordExpServices {
     @Autowired
     private HabitosPacienteRepository habitosPacienteRepository;
 
+    @Autowired 
+    private FactDietariosAmbientalesRepository factDietariosAmbientalesRepository; 
+
+    @Autowired 
+    private HistopatologiaRepository histopatologiaRepository;
+
     /**
      * Exporta un reporte completo de paciente a Word
      */
@@ -176,6 +182,226 @@ public class WordExpServices {
         }
     }
 
+    public byte[] exportarDatosClinicosAWord() throws Exception {
+        XWPFDocument document = new XWPFDocument();
+        
+        try {
+            agregarTitulo(document, "Datos Clinicos de Pacientes");
+            agregarSaltoLinea(document);
+
+            List<DatosClinicos> datosClinicos = datosClinicosRepository.findAll();
+            
+            // Crear tabla
+            XWPFTable table = document.createTable(datosClinicos.size() + 1, 11);
+            table.setWidth("100%");
+
+            // Encabezados
+            XWPFTableRow headerRow = table.getRow(0);
+            configurarCeldaEncabezado(headerRow.getCell(0), "Form ID");
+            configurarCeldaEncabezado(headerRow.getCell(1), "AdenoGástrico");
+            configurarCeldaEncabezado(headerRow.getCell(2), "FechaAdeGást");
+            configurarCeldaEncabezado(headerRow.getCell(3), "AntFamCánGást");
+            configurarCeldaEncabezado(headerRow.getCell(4), "Medicamentos");
+            configurarCeldaEncabezado(headerRow.getCell(5), "Enfermedades");
+            configurarCeldaEncabezado(headerRow.getCell(6), "AntFamCáncer");
+            configurarCeldaEncabezado(headerRow.getCell(7), "CirugiaGásPrevia");
+            configurarCeldaEncabezado(headerRow.getCell(8), "HPyloriPrueba");
+            configurarCeldaEncabezado(headerRow.getCell(9), "Resultado");
+            configurarCeldaEncabezado(headerRow.getCell(10), "TiempoTest");
+
+            // Datos
+            int rowIndex = 1;
+            for (DatosClinicos dc : datosClinicos) {
+                XWPFTableRow row = table.getRow(rowIndex);
+                configurarCeldaDatos(row.getCell(0), String.valueOf(dc.getIdDatosCli().getFormularioId()));
+                configurarCeldaDatos(row.getCell(1), String.valueOf(dc.getAdenoGastrico()));
+                configurarCeldaDatos(row.getCell(2), String.valueOf(dc.getFechaAdenoGastrico()));
+                configurarCeldaDatos(row.getCell(3), (dc.getAntFamOtroCancer()));
+                configurarCeldaDatos(row.getCell(4), (dc.getMedicamentos()));
+                configurarCeldaDatos(row.getCell(5), (dc.getOtrasEnfermedades()));
+                configurarCeldaDatos(row.getCell(6), String.valueOf(dc.getAntFamOtroCancer()));
+                configurarCeldaDatos(row.getCell(7), String.valueOf(dc.getCirugiaGastricaPrevia()));
+                configurarCeldaDatos(row.getCell(8), dc.getHpyloriPrueba());
+                configurarCeldaDatos(row.getCell(9), dc.getHpyloriResultado());
+                configurarCeldaDatos(row.getCell(10), dc.getHpyloriTiempoTest());
+                rowIndex++;
+            }
+
+            agregarSaltoLinea(document);
+            agregarPiePagina(document);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            document.write(baos);
+            return baos.toByteArray();
+
+        } finally {
+            document.close();
+        }
+    }
+
+    public byte[] exportarHabitosPacienteAWord() throws Exception {
+        XWPFDocument document = new XWPFDocument();
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            agregarTitulo(document, "Hábitos de Pacientes");
+            agregarSaltoLinea(document);
+
+            List<HabitosPaciente> list = habitosPacienteRepository.findAll();
+
+         // Columnas que vamos a mostrar
+            String[] headers = new String[] {
+                "Formulario ID", "Estado Consumo Tabaco", "Edad Inicio Tabaco",
+                "Cant Prom Tabaco", "Tiempo Tabaco (meses)", "Ex Consumidor Tabaco",
+                "Estado Consumo Alcohol", "Frecuencia Alcohol", "Cantidad Alcohol",
+                "Años Consumo Alcohol", "Ex Consumidor Alcohol", "Ejercicio", "Frecuencia Ejercicio"
+            };
+
+            int rows = Math.max(1, (list != null ? list.size() : 0)) + 1; // +1 para encabezado
+            XWPFTable table = document.createTable(rows, headers.length);
+            table.setWidth("100%");
+
+            // Encabezados
+            XWPFTableRow headerRow = table.getRow(0);
+            for (int i = 0; i < headers.length; i++) {
+                configurarCeldaEncabezado(headerRow.getCell(i), headers[i]);
+            }
+
+        // Datos
+        if (list != null && !list.isEmpty()) {
+            int rowIndex = 1;
+            for (HabitosPaciente h : list) {
+                XWPFTableRow row = table.getRow(rowIndex++);
+                configurarCeldaDatos(row.getCell(0), String.valueOf(h.getIdHabPaciente().getFormularioId()));
+                configurarCeldaDatos(row.getCell(1), h.getEstadoConsumoTabaco());
+                configurarCeldaDatos(row.getCell(2), h.getEdadInicioTabaco() != null ? String.valueOf(h.getEdadInicioTabaco()) : "N/A");
+                configurarCeldaDatos(row.getCell(3), h.getCantPromTabaco() != null ? String.valueOf(h.getCantPromTabaco()) : "N/A");
+                configurarCeldaDatos(row.getCell(4), h.getTiempoTabaco() != null ? String.valueOf(h.getTiempoTabaco()) : "N/A");
+                configurarCeldaDatos(row.getCell(5), h.getExConsumidorTabaco() != null ? String.valueOf(h.getExConsumidorTabaco()) : "N/A");
+                configurarCeldaDatos(row.getCell(6), h.getEstadoConsumoAlcohol());
+                configurarCeldaDatos(row.getCell(7), h.getFrecuenciaAlcohol());
+                configurarCeldaDatos(row.getCell(8), h.getCantidadAlcohol() != null ? String.valueOf(h.getCantidadAlcohol()) : "N/A");
+                configurarCeldaDatos(row.getCell(9), h.getAniosConsumoAlcohol() != null ? String.valueOf(h.getAniosConsumoAlcohol()) : "N/A");
+                configurarCeldaDatos(row.getCell(10), h.getExConsumidorAlcohol() != null ? String.valueOf(h.getExConsumidorAlcohol()) : "N/A");
+                configurarCeldaDatos(row.getCell(11), h.getEjercicio());
+                configurarCeldaDatos(row.getCell(12), h.getFrecuenciaEjercicio());
+            }
+        } else {
+            // Si no hay registros, dejar mensaje en la primera celda de la fila de datos
+            XWPFTableRow row = table.getRow(1);
+            configurarCeldaDatos(row.getCell(0), "Sin registros");
+        }
+
+        agregarSaltoLinea(document);
+        agregarPiePagina(document);
+
+        document.write(baos);
+        return baos.toByteArray();
+        } finally {
+            document.close();
+        }
+
+    
+    }
+
+    public byte[] exportarFactDietarioAmbientalAWord() throws Exception {
+    XWPFDocument document = new XWPFDocument();
+    try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+        agregarTitulo(document, "Factores Dietario / Ambientales");
+        agregarSaltoLinea(document);
+
+        List<FactDietariosAmbientales> list = factDietariosAmbientalesRepository.findAll();
+
+        String[] headers = new String[] {
+            "formulario_id", "trabajo_zona_rural", "agua_consumo_zona",
+            "tratamiento_agua", "fumigaciones", "exposicion_pesticidas",
+            "combus_lena_diario", "exposicion_quimicos", "dieta_agregasal",
+            "dieta_frutas_verduras", "dieta_frituras", "dieta_carnes_cecinas"
+        };
+
+        int rows = Math.max(1, list != null ? list.size() : 0) + 1;
+        XWPFTable table = document.createTable(rows, headers.length);
+        table.setWidth("100%");
+
+        XWPFTableRow headerRow = table.getRow(0);
+        for (int i = 0; i < headers.length; i++) {
+            configurarCeldaEncabezado(headerRow.getCell(i), headers[i]);
+        }
+
+        if (list != null && !list.isEmpty()) {
+            int r = 1;
+            for (FactDietariosAmbientales f : list) {
+                XWPFTableRow row = table.getRow(r++);
+                configurarCeldaDatos(row.getCell(0), f.getIdFact().getFormularioId()!= null ? String.valueOf(f.getIdFact().getFormularioId()) : "N/A");
+                configurarCeldaDatos(row.getCell(1), (f.getTrabajoZonaRural()));
+                configurarCeldaDatos(row.getCell(2), (f.getAguaConsumoRural()));
+                configurarCeldaDatos(row.getCell(3), (f.getTratamientoAgua()));
+                configurarCeldaDatos(row.getCell(4), (f.getFumigaciones()));
+                configurarCeldaDatos(row.getCell(5), (f.getExposicionPesticidas()));
+                configurarCeldaDatos(row.getCell(6), (f.getCombusLenaDiario()));
+                configurarCeldaDatos(row.getCell(7), (f.getExposicionQuimicos()));
+                configurarCeldaDatos(row.getCell(8), (f.getDietaAgregaSal()));
+                configurarCeldaDatos(row.getCell(9), (f.getDietaFrutasVerduras()));
+                configurarCeldaDatos(row.getCell(10), (f.getDietaFrituras()));
+                configurarCeldaDatos(row.getCell(11), (f.getDietaCarnesCecinas()));
+            }
+        } else {
+            configurarCeldaDatos(table.getRow(1).getCell(0), "Sin registros");
+        }
+
+        agregarSaltoLinea(document);
+        agregarPiePagina(document);
+
+        document.write(baos);
+        return baos.toByteArray();
+        } finally {
+            document.close();
+        }
+    }
+
+    public byte[] exportarHistopatologiaAWord() throws Exception {
+        XWPFDocument document = new XWPFDocument();
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            agregarTitulo(document, "Histopatología");
+            agregarSaltoLinea(document);
+
+            List<Histopatologia> list = histopatologiaRepository.findAll();
+
+            String[] headers = new String[] { "formulario_id", "tipo", "estado_clinico", "locali_tumoral" };
+
+            int rows = Math.max(1, list != null ? list.size() : 0) + 1;
+            XWPFTable table = document.createTable(rows, headers.length);
+            table.setWidth("100%");
+
+            XWPFTableRow headerRow = table.getRow(0);
+            for (int i = 0; i < headers.length; i++) {
+                configurarCeldaEncabezado(headerRow.getCell(i), headers[i]);
+            }
+
+            if (list != null && !list.isEmpty()) {
+              int r = 1;
+                for (Histopatologia h : list) {
+                    XWPFTableRow row = table.getRow(r++);
+                    configurarCeldaDatos(row.getCell(0), h.getHistoID().getFormularioId()!= null ? String.valueOf(h.getHistoID().getFormularioId()) : "N/A");
+                    configurarCeldaDatos(row.getCell(1), (h.getTipo()));
+                    configurarCeldaDatos(row.getCell(2), (h.getEstadoClinico()));
+                    configurarCeldaDatos(row.getCell(3), (h.getLocaliTumor()));
+                }
+            } else {
+                configurarCeldaDatos(table.getRow(1).getCell(0), "Sin registros");
+            }
+
+            agregarSaltoLinea(document);
+            agregarPiePagina(document);
+
+            document.write(baos);
+            return baos.toByteArray();
+        } finally {
+            document.close();
+        }
+    }
+
+
+
+
     // ============= MÉTODOS AUXILIARES =============
 
     private void agregarTitulo(XWPFDocument document, String titulo) {
@@ -244,6 +470,10 @@ public class WordExpServices {
         // Hábitos
         habitosPacienteRepository.findByIdHabPaciente_FormularioId(formulario.getIdFormulario())
             .ifPresent(hp -> agregarHabitos(document, hp));
+
+        //Factores Dietarios Ambientales 
+        factDietariosAmbientalesRepository.findByIdFact_FormularioId(formulario.getIdFormulario()) 
+            .ifPresent(fda -> agregarFactoresDietariosAmbientales(document, fda));        
     }
 
     private void agregarDatosGenerales(XWPFDocument document, DatosGenerales dg) {
@@ -263,25 +493,73 @@ public class WordExpServices {
     private void agregarDatosClinicos(XWPFDocument document, DatosClinicos dc) {
         agregarTextoNegrita(document, "Datos Clínicos:");
         
-        agregarTexto(document, String.format("Adenocarcinoma Gástrico: %s", 
-            dc.getAdenoGastrico() != null ? dc.getAdenoGastrico() : "N/A"));
+        agregarTexto(document, String.format("Adenocarcinoma Gástrico: %s | Fecha Adeno Gástrico: %s", 
+            dc.getAdenoGastrico() != null ? dc.getAdenoGastrico() : "N/A", dc.getFechaAdenoGastrico() != null ? dc.getFechaAdenoGastrico() : "N/A"));
+         agregarTexto(document, String.format("Cirugía Gástrica Previa: %s", 
+            dc.getCirugiaGastricaPrevia()));
         agregarTexto(document, String.format("Antecedentes Fam. Cáncer Gástrico: %s", 
             dc.getAntFamCancerGast()));
-        agregarTexto(document, String.format("H. Pylori - Prueba: %s | Resultado: %s", 
-            dc.getHpyloriPrueba(), dc.getHpyloriResultado()));
+        agregarTexto(document, String.format("H. Pylori - Prueba: %s | Resultado: %s | Tiempo(meses): %s", 
+            dc.getHpyloriPrueba(), dc.getHpyloriResultado(), dc.getHpyloriTiempoTest()));
         agregarTexto(document, String.format("Medicamentos: %s", 
             dc.getMedicamentos()));
+        agregarTexto(document, String.format("Antecedentes Fam. Cáncer: %s", 
+            dc.getAntFamOtroCancer()));
+        agregarTexto(document, String.format("Otras Enfermedades: %s", 
+            dc.getOtrasEnfermedades()));
         agregarSaltoLinea(document);
     }
 
     private void agregarHabitos(XWPFDocument document, HabitosPaciente hp) {
         agregarTextoNegrita(document, "Hábitos del Paciente:");
-        
-        agregarTexto(document, String.format("Consumo Tabaco: %s | Frecuencia: %s", 
-            hp.getEstadoConsumoTabaco(), hp.getCantPromTabaco()));
+        agregarSaltoLinea(document);
+
+
+        agregarSubtitulo(document,"Tabaco" ); 
+
+        agregarTexto(document, String.format("Estado de Consumo: %s | Edad de Inicio: %s", 
+            hp.getEstadoConsumoTabaco(), hp.getEdadInicioTabaco()));
+        agregarTexto(document, String.format("Cantidad Promedio (unidades): %s | Tiempo en Consumo (meses): %s", 
+            hp.getCantPromTabaco(), hp.getTiempoTabaco())); 
+        agregarTexto(document, String.format("Tiempo sin consumir (meses): %s", 
+            hp.getExConsumidorTabaco())); 
+
+        agregarSaltoLinea(document);
+        agregarSubtitulo(document,"Alcohol" ); 
+        agregarSaltoLinea(document);
+
+
         agregarTexto(document, String.format("Consumo Alcohol: %s | Frecuencia: %s", 
             hp.getEstadoConsumoAlcohol(), hp.getFrecuenciaAlcohol()));
+        agregarTexto(document, String.format("Cantidad: %s | Frecuencia (meses): %s | Tiempo Sin Consumo (meses): %s", 
+            hp.getCantidadAlcohol(), hp.getAniosConsumoAlcohol(), hp.getExConsumidorAlcohol()));
+
         agregarSaltoLinea(document);
+        agregarSubtitulo(document,"Ejercicio" ); 
+        agregarSaltoLinea(document);
+
+
+        agregarTexto(document, String.format("Ejercicio: %s | Frecuencia: %s", 
+            hp.getEjercicio(), hp.getFrecuenciaEjercicio()));    
+
+        agregarSaltoLinea(document);
+    }
+
+    private void agregarFactoresDietariosAmbientales(XWPFDocument document, FactDietariosAmbientales fda){
+        agregarTextoNegrita(document, "Factores Dietario-Ambiental del Paciente:");
+        agregarSaltoLinea(document);
+
+        agregarTexto(document, String.format("Trabajo Zona Rural: %s | Consumo Agua: %s | Tratamiento Agua: %s", 
+            fda.getTrabajoZonaRural(), fda.getAguaConsumoRural(), fda.getTratamientoAgua()));
+
+        agregarTexto(document, String.format("Fumigaciones: %s | ExposicionPesticidas: %s | CombustiónLeña: %s", 
+            fda.getFumigaciones(), fda.getExposicionPesticidas(), fda.getCombusLenaDiario()));
+
+        agregarTexto(document, String.format("ExposiciónQuímicos: %s | AgregaSal: %s | ConsumoFrutaVerdura: %s", 
+            fda.getExposicionQuimicos(), fda.getDietaAgregaSal(), fda.getDietaFrutasVerduras()));
+
+        agregarTexto(document, String.format("ConsumoFrituras: %s | ConsumoCarnesCecinas: %s | ConsumoRuralAgua: %s", 
+            fda.getDietaFrituras(), fda.getDietaCarnesCecinas(), fda.getAguaConsumoRural()));
     }
 
     private void agregarPiePagina(XWPFDocument document) {
