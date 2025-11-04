@@ -37,6 +37,9 @@ public class DicotRegla {
     @Column(name = "operador", nullable = true, updatable = true)
     private String operador;
 
+    @Column(name = "valor_categoria", nullable = true, updatable = true)
+    private String valorCategoria;
+
     @Column(name = "dicotconjunto_id", insertable = false, updatable = false)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Integer dicotConjuntoID; 
