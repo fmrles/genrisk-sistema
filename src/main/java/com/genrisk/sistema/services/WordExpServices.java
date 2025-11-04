@@ -51,7 +51,7 @@ public class WordExpServices {
             agregarSaltoLinea(document);
 
             // Obtener formularios del paciente
-            List<Formulario> formularios = formularioRepository.findByPaciente_id(idPaciente);
+            List<Formulario> formularios = formularioRepository.findByPacienteIdPaciente(idPaciente);
 
             for (Formulario formulario : formularios) {
                 agregarSeccionFormulario(document, formulario);

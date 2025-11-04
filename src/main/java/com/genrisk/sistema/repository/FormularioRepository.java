@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FormularioRepository extends JpaRepository<Formulario, Integer> {
-    List<Formulario> findByPaciente_id(String pacienteId);
+    List<Formulario> findByPacienteIdPaciente(String pacienteId);
 }
