@@ -1,13 +1,13 @@
 package com.genrisk.sistema.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
 
 @Data
-@Entity 
-
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 
