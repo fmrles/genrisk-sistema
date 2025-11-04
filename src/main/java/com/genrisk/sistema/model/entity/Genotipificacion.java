@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Data
 @Entity
 
@@ -18,12 +20,19 @@ public class Genotipificacion{
     @Column(name = "id_genotipificacion")
     private Integer idGenotipificacion;
 
-    @Column(name = "paciente_id")
+    @Column(name = "paciente_id", nullable = false)
     private String pacienteID;
 
-    @Column(name = "muestra_nro")
+    @Column(name = "muestra_nro", nullable = false)
     private Integer muestraNRO;
 
+    @ManyToOne
+    @JoinColumns({
+        @JoinColumn(name = "paciente_id", referencedColumnName = "id_paciente", insertable = false, updatable = false),
+        @JoinColumn(name = "muestra_nro", referencedColumnName = "nro_muestra", insertable = false, updatable = false)
+    })
+
+    @JsonFormat(pattern = "yyy-MM-dd")
     @Column(name = "fecha_genoti", nullable = true, updatable = true)
     private LocalDate fechaGenoti;
 
