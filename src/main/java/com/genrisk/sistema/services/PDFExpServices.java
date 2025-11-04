@@ -7,8 +7,6 @@ import com.itextpdf.text.pdf.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-
-
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -44,9 +42,6 @@ public class PDFExpServices{
     private static final Font NORMAL_FONT = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL);
     private static final Font BOLD_FONT = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD);
 
-    /**
-     * Exporta un reporte completo de paciente a PDF (incluye todas las tablas relacionadas al/los formulario(s) del paciente)
-     */
     public byte[] exportarPacienteAPDF(String idPaciente) throws Exception {
         Document document = new Document(PageSize.A4.rotate());
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -92,9 +87,6 @@ public class PDFExpServices{
         document.add(titleParagraph);
     }
 
-    /**
-     * Exporta lista de pacientes a PDF (ya existía, la conservamos como exportarPacientesAPDF)
-     */
     public byte[] exportarPacientesAPDF() throws Exception {
         Document document = new Document(PageSize.A4.rotate()); // Horizontal
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -158,9 +150,6 @@ public class PDFExpServices{
         return baos.toByteArray();
     }
 
-    /**
-     * Exporta datos clinicos (nuevo método)
-     */
     public byte[] exportarDatosClinicosAPDF() throws Exception {
         Document document = new Document(PageSize.A4.rotate());
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -184,9 +173,6 @@ public class PDFExpServices{
         return baos.toByteArray();
     }
 
-    /**
-     * Exporta habitos (nuevo método)
-     */
     public byte[] exportarHabitosAPDF() throws Exception {
         Document document = new Document(PageSize.A4.rotate());
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -210,9 +196,6 @@ public class PDFExpServices{
         return baos.toByteArray();
     }
 
-    /**
-     * Exporta factores dietario/ambientales (nuevo método)
-     */
     public byte[] exportarFactDietarioAmbientalAPDF() throws Exception {
         Document document = new Document(PageSize.A4.rotate());
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -236,9 +219,6 @@ public class PDFExpServices{
         return baos.toByteArray();
     }
 
-    /**
-     * Exporta histopatología (nuevo método)
-     */
     public byte[] exportarHistopatologiaAPDF() throws Exception {
         Document document = new Document(PageSize.A4.rotate());
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -262,40 +242,7 @@ public class PDFExpServices{
         return baos.toByteArray();
     }
 
-    // ============= MÉTODOS AUXILIARES (PDF builders por tabla) =============
-
-    private PdfPTable createPdfTableForPacientes() {
-        List<Paciente> pacientes = pacienteRepository.findAll();
-
-        PdfPTable table = new PdfPTable(5);
-        table.setWidthPercentage(100);
-        agregarEncabezadoTabla(table, "id_paciente", "nombre_paciente", "correo_paciente", "direccion_paciente", "tipo_paciente");
-
-        for (Paciente p : pacientes) {
-            agregarCeldaTabla(table, safe(p.getIdPaciente()));
-            agregarCeldaTabla(table, safe(p.getNombrePaciente()));
-            agregarCeldaTabla(table, safe(p.getCorreoPaciente()));
-            agregarCeldaTabla(table, safe(p.getDireccionPaciente()));
-            agregarCeldaTabla(table, safe(p.getTipoPaciente()));
-        }
-        return table;
-    }
-
-    private PdfPTable createPdfTableForFormularios() {
-        List<Formulario> list = formularioRepository.findAll();
-        PdfPTable table = new PdfPTable(5);
-        table.setWidthPercentage(100);
-        agregarEncabezadoTabla(table, "id_formulario", "estado_formulario", "tipo_formulario", "fecha_formulario", "paciente_id");
-        for (Formulario f : list) {
-            agregarCeldaTabla(table, f.getIdFormulario() != null ? String.valueOf(f.getIdFormulario()) : "N/A");
-            agregarCeldaTabla(table, safe(f.getEstadoFormulario()));
-            agregarCeldaTabla(table, safe(f.getTipoFormulario()));
-            agregarCeldaTabla(table, f.getFechaFormulario() != null ? f.getFechaFormulario().toString() : "N/A");
-            agregarCeldaTabla(table, safe(f.getPaciente_id()));
-        }
-        return table;
-    }
-
+    // ============= MÉTODOS AUXILIARES =============
     private PdfPTable createPdfTableForDatosGenerales() {
         List<DatosGenerales> datosGenerales = datosGeneralesRepository.findAll();
         PdfPTable table = new PdfPTable(10);
@@ -305,7 +252,6 @@ public class PDFExpServices{
             "zona_residencial", "anios_resi_actual", "educacion", "ocupacion");
 
         for (DatosGenerales dg : datosGenerales) {
-            // itemformu
             agregarCeldaTabla(table, dg.getIdDatosGen().getFormularioId()!= null ? String.valueOf(dg.getIdDatosGen().getFormularioId()) : "N/A");
             agregarCeldaTabla(table, dg.getEdad() != null ? String.valueOf(dg.getEdad()) : "N/A");
             agregarCeldaTabla(table, safe(dg.getSexo()));
@@ -387,7 +333,6 @@ public class PDFExpServices{
         for (FactDietariosAmbientales f : list) {
             agregarCeldaTabla(table, f.getIdFact().getFormularioId() != null ? String.valueOf(f.getIdFact().getFormularioId()) : "N/A");
             agregarCeldaTabla(table, safe(f.getTrabajoZonaRural()));
-            // según dump el campo es agua_consumo_zona; en tu entidad puede ser getAguaConsumoRural -> probamos ambos en helper
             agregarCeldaTabla(table, safe(f.getAguaConsumoZona()));
             agregarCeldaTabla(table, safe(f.getTratamientoAgua()));
             agregarCeldaTabla(table, safe(f.getFumigaciones()));
@@ -417,7 +362,7 @@ public class PDFExpServices{
         return table;
     }
 
-    // ============= MÉTODOS AUXILIARES (se usan en secciones por formulario) =============
+    // ============= MÉTODOS EXTRA =============
 
     private void agregarSeccionFormulario(Document document, Formulario formulario) throws DocumentException {
         Paragraph subtitle = new Paragraph("Formulario ID: " + formulario.getIdFormulario(), SUBTITLE_FONT);
@@ -463,8 +408,8 @@ public class PDFExpServices{
                     e.printStackTrace();
                 }
             });
-
-        // Histopatologia (si existe)
+        
+         // Histopatologia
         histopatologiaRepository.findByHistoID_FormularioId(formulario.getIdFormulario())
             .ifPresent(h -> {
             try {
@@ -593,7 +538,6 @@ public class PDFExpServices{
         table.addCell(cell);
     }
 
-    // ---------- helpers ----------
     private String safe(String s) {
         return s == null ? "N/A" : s;
     }
