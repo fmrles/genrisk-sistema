@@ -3,7 +3,7 @@ package com.genrisk.sistema.model.entity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -27,7 +27,7 @@ public class IngresaDatos {
     private String valorNuevo;
 
     @Column(name = "fecha_cambio", nullable = true, updatable = true)
-    private LocalDate fechaCambio;
+    private LocalDateTime fechaCambio;
     
     //Relación con Formulario
     @Column(name = "formulario_id", insertable = false, updatable = false)
