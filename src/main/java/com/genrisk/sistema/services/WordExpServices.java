@@ -332,7 +332,7 @@ public class WordExpServices {
                 XWPFTableRow row = table.getRow(r++);
                 configurarCeldaDatos(row.getCell(0), f.getIdFact().getFormularioId()!= null ? String.valueOf(f.getIdFact().getFormularioId()) : "N/A");
                 configurarCeldaDatos(row.getCell(1), (f.getTrabajoZonaRural()));
-                configurarCeldaDatos(row.getCell(2), (f.getAguaConsumoRural()));
+                configurarCeldaDatos(row.getCell(2), (f.getAguaConsumoZona()));
                 configurarCeldaDatos(row.getCell(3), (f.getTratamientoAgua()));
                 configurarCeldaDatos(row.getCell(4), (f.getFumigaciones()));
                 configurarCeldaDatos(row.getCell(5), (f.getExposicionPesticidas()));
@@ -550,7 +550,7 @@ public class WordExpServices {
         agregarSaltoLinea(document);
 
         agregarTexto(document, String.format("Trabajo Zona Rural: %s | Consumo Agua: %s | Tratamiento Agua: %s", 
-            fda.getTrabajoZonaRural(), fda.getAguaConsumoRural(), fda.getTratamientoAgua()));
+            fda.getTrabajoZonaRural(), fda.getAguaConsumoZona(), fda.getTratamientoAgua()));
 
         agregarTexto(document, String.format("Fumigaciones: %s | ExposicionPesticidas: %s | CombustiónLeña: %s", 
             fda.getFumigaciones(), fda.getExposicionPesticidas(), fda.getCombusLenaDiario()));
@@ -594,4 +594,3 @@ public class WordExpServices {
         run.setFontSize(10);
     }
 }
-

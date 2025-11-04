@@ -58,7 +58,7 @@ public class ExportacionesController {
     @GetMapping("/pacientes/pdf")
     public ResponseEntity<byte[]> exportarListaPacientesPDF() {
         try {
-            byte[] pdfBytes = pdfExportService.exportarListaPacientesAPDF();
+            byte[] pdfBytes = pdfExportService.exportarPacientesAPDF();
             
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
@@ -74,10 +74,6 @@ public class ExportacionesController {
         }
     }
 
-    /**
-     * Exporta datos generales a PDF
-     * GET /api/export/datos-generales/pdf
-     */
     @GetMapping("/datos-generales/pdf")
     public ResponseEntity<byte[]> exportarDatosGeneralesPDF() {
         try {
@@ -87,6 +83,82 @@ public class ExportacionesController {
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDispositionFormData("attachment", 
                 "datos_generales_" + getTimestamp() + ".pdf");
+            headers.setContentLength(pdfBytes.length);
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/datos-clinicos/pdf")
+    public ResponseEntity<byte[]> exportarDatosClinicosPDF() {
+        try {
+            byte[] pdfBytes = pdfExportService.exportarDatosClinicosAPDF();
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", 
+                "datos_clinicos_" + getTimestamp() + ".pdf");
+            headers.setContentLength(pdfBytes.length);
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/habitos-pacientes/pdf")
+    public ResponseEntity<byte[]> exportarHabitosAPDF() {
+        try {
+            byte[] pdfBytes = pdfExportService.exportarHabitosAPDF();
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", 
+                "habitos_paciente_" + getTimestamp() + ".pdf");
+            headers.setContentLength(pdfBytes.length);
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/fact-dietarios-ambientales/pdf")
+    public ResponseEntity<byte[]> exportarFactoresAPDF() {
+        try {
+            byte[] pdfBytes = pdfExportService.exportarFactDietarioAmbientalAPDF();
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", 
+                "fact_dietario_ambiental_" + getTimestamp() + ".pdf");
+            headers.setContentLength(pdfBytes.length);
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/histopatologias/pdf")
+    public ResponseEntity<byte[]> exportarHistoAPDF() {
+        try {
+            byte[] pdfBytes = pdfExportService.exportarHistopatologiaAPDF();
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", 
+                "histopatologia" + getTimestamp() + ".pdf");
             headers.setContentLength(pdfBytes.length);
 
             return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);

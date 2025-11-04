@@ -19,8 +19,8 @@ public class FactDietariosAmbientales{
     @Column(name = "trabajo_zona_rural", nullable = true, updatable = true)
     private String trabajoZonaRural;
 
-    @Column(name = "agua_consumo_rural", nullable = true, updatable = true)
-    private String aguaConsumoRural;
+    @Column(name = "agua_consumo_zona", nullable = true, updatable = true)
+    private String aguaConsumoZona;
 
     @Column(name = "tratamiento_agua", nullable = true, updatable = true)
     private String tratamientoAgua;
@@ -48,5 +48,8 @@ public class FactDietariosAmbientales{
 
     @Column(name = "dieta_carnes_cecinas", nullable = true, updatable = true)
     private String dietaCarnesCecinas;
+
+    @Column(name = "agua_consumo_rural", nullable = true, updatable = true)
+    private String aguaConsumoRural;
 
 }
