@@ -26,12 +26,6 @@ public class Genotipificacion{
     @Column(name = "muestra_nro", nullable = false)
     private Integer muestraNRO;
 
-    @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "paciente_id", referencedColumnName = "id_paciente", insertable = false, updatable = false),
-        @JoinColumn(name = "muestra_nro", referencedColumnName = "nro_muestra", insertable = false, updatable = false)
-    })
-
     @JsonFormat(pattern = "yyy-MM-dd")
     @Column(name = "fecha_genoti", nullable = true, updatable = true)
     private LocalDate fechaGenoti;
@@ -56,5 +50,4 @@ public class Genotipificacion{
 
     @Column(name = "TLR9rs187084", nullable = true, updatable = true)
     private String var6;
-
 }
