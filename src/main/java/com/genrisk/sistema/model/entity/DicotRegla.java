@@ -40,6 +40,12 @@ public class DicotRegla {
     @Column(name = "valor_categoria", nullable = true, updatable = true)
     private String valorCategoria;
 
+    @Column(name = "valor_si_cumple")
+    private Integer valorSiCumple;
+
+    @Column(name = "valor_no_cumple")
+    private Integer valorNoCumple;
+
     @Column(name = "dicotconjunto_id", insertable = false, updatable = false)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Integer dicotConjuntoID; 

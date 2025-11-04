@@ -156,22 +156,27 @@ public class DicotomizacionService {
     // Aplica la lógica de la regla (numérica o de texto)
     private Integer aplicarRegla(DicotRegla regla, Object valorAtributo) {
         String operador = regla.getOperador();
+        
+        // Obtengo los valores de resultado definidos por la administradora.
+        // Si no los definió, usamos 1 y 0 por defecto.
+        Integer valorSi = (regla.getValorSiCumple() != null) ? regla.getValorSiCumple() : 1;
+        Integer valorNo = (regla.getValorNoCumple() != null) ? regla.getValorNoCumple() : 0;
 
         // 1. Reglas Cuantitativas 
         if (regla.getValorInf() != null || regla.getValorSup() != null) {
-            if (!(valorAtributo instanceof Number)) return 0; 
+            if (!(valorAtributo instanceof Number)) return valorNo; 
             double valor = ((Number) valorAtributo).doubleValue();
             
             // Lógica Cuantitativa 
             if (">=".equals(operador)) {
-                if (regla.getValorInf() != null && valor >= regla.getValorInf()) return 1;
+                if (regla.getValorInf() != null && valor >= regla.getValorInf()) return valorSi;
             } else if ("<=".equals(operador)) {
-                if (regla.getValorSup() != null && valor <= regla.getValorSup()) return 1;
+                if (regla.getValorSup() != null && valor <= regla.getValorSup()) return valorSi;
             } else if ("=".equals(operador)) {
-                if (regla.getValorInf() != null && valor == regla.getValorInf()) return 1;
+                if (regla.getValorInf() != null && valor == regla.getValorInf()) return valorSi;
             } 
             
-            return 0;
+            return valorNo; // No cumplió ninguna condición
 
         // 2. Reglas Cualitativas (Texto)
         } else if (regla.getValorCategoria() != null) {
@@ -180,15 +185,15 @@ public class DicotomizacionService {
 
             // Lógica Cualitativa
             if ("=".equals(operador) && valor.equalsIgnoreCase(valorRegla)) {
-                return 1;
+                return valorSi;
             } else if ("!=".equals(operador) && !valor.equalsIgnoreCase(valorRegla)) {
-                return 1;
+                return valorSi;
             }
             
-            return 0;
+            return valorNo; // No cumplió la condición
         }
 
-        return 0; // Regla mal definida
+        return valorNo; // Regla mal definida o sin valores
     }
 }
 
