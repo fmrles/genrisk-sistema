@@ -2,6 +2,7 @@ package com.genrisk.sistema.controller;
 
 import com.genrisk.sistema.services.PDFExpServices;
 import com.genrisk.sistema.services.WordExpServices;
+import com.genrisk.sistema.services.ExcelExportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
@@ -25,6 +26,10 @@ public class ExportacionesController {
     @Autowired
     @Lazy
     private WordExpServices wordExportService;
+
+    @Autowired
+    @Lazy
+    private ExcelExportService excelExportService;
 
     // =============== EXPORTACIÓN A PDF ===============
 
@@ -309,6 +314,31 @@ public class ExportacionesController {
             headers.setContentLength(wordBytes.length);
 
             return new ResponseEntity<>(wordBytes, headers, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // --- 3. AÑADIR NUEVO ENDPOINT DE EXCEL ---
+
+    /**
+     * Exporta los datos dicotomizados (formato pivot) a Excel (XLSX).
+     * GET /api/export/dicotomizacion/excel
+     */
+    @GetMapping("/dicotomizacion/excel")
+    public ResponseEntity<byte[]> exportarDicotomizacionExcel() {
+        try {
+            byte[] excelBytes = excelExportService.exportarDicotomizacionAExcel();
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", 
+                "dicotomizacion_export_" + getTimestamp() + ".xlsx"); // IMPORTANTE: .xlsx
+            headers.setContentLength(excelBytes.length);
+
+            return new ResponseEntity<>(excelBytes, headers, HttpStatus.OK);
             
         } catch (Exception e) {
             e.printStackTrace();
