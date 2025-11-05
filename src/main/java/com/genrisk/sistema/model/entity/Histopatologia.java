@@ -22,6 +22,6 @@ public class Histopatologia {
     @Column(name = "estado_clinico", nullable = true, updatable = true)
     private String estadoClinico;
 
-    @Column(name = "locali_tumor", nullable = true, updatable = true)
-    private String localiTumor;
+    @Column(name = "locali_tumoral", nullable = true, updatable = true)
+    private String localiTumoral;
 }

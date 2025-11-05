@@ -17,14 +17,12 @@ import java.util.*;
 @Service
 public class EstadisticaService {
 
-    // 1. Inyectamos TODOS los repositorios que tienen datos numéricos
     private final DatosGeneralesRepository datosGeneralesRepository;
     private final HabitosPacienteRepository habitosPacienteRepository;
     private final DatosClinicosRepository datosClinicosRepository;
     private final GenotipificacionRepository genotipificacionRepository;
-    // Nota: Histopatologia y FactDietariosAmbientales se omiten porque solo tienen Strings.
 
-    // 2. Actualizamos el constructor
+    
     public EstadisticaService(DatosGeneralesRepository datosGeneralesRepository,
                               HabitosPacienteRepository habitosPacienteRepository,
                               DatosClinicosRepository datosClinicosRepository,
@@ -41,10 +39,10 @@ public class EstadisticaService {
      */
     public EstadisticaResultado calcularEstadisticas(String entidadObj, String atributoObj) {
         
-        // 1. Obtener la lista de valores
+        // 1. Obtenengo la lista de valores
         List<Double> valores = obtenerValoresNumericos(entidadObj, atributoObj);
 
-        // 2. Calcular estadísticas
+        // 2. Calculo estadísticas
         EstadisticaResultado resultado = new EstadisticaResultado();
         resultado.setEntidad(entidadObj);
         resultado.setAtributo(atributoObj);
@@ -54,13 +52,13 @@ public class EstadisticaService {
             return resultado; // Devolvemos un objeto vacío si no hay datos
         }
         
-        // Ordenamos la lista para mediana, min y max
+        // Ordeno la lista para mediana, min y max
         Collections.sort(valores);
 
         // 3. Setear los valores calculados
         resultado.setCount(valores.size());
-        resultado.setMin(valores.get(0)); // Cálculo de Min
-        resultado.setMax(valores.get(valores.size() - 1)); // Cálculo de Max
+        resultado.setMin(valores.get(0)); 
+        resultado.setMax(valores.get(valores.size() - 1)); 
         resultado.setMedia(calcularMedia(valores));
         resultado.setMediana(calcularMediana(valores));
         resultado.setModa(calcularModa(valores));
@@ -75,7 +73,7 @@ public class EstadisticaService {
         List<Double> valores = new ArrayList<>();
         
         switch (entidadObj) {
-            case "datos_generales":
+            case "datos_genericos":
                 List<DatosGenerales> datosGen = datosGeneralesRepository.findAll();
                 for (DatosGenerales dato : datosGen) {
                     Object valor = obtenerValorDeEntidad(dato, atributoObj);
@@ -90,8 +88,8 @@ public class EstadisticaService {
                     agregarValorSiEsNumero(valores, valor);
                 }
                 break;
+        
             
-            // --- NUEVO CASE ---
             case "datos_clinicos":
                 List<DatosClinicos> datosCli = datosClinicosRepository.findAll();
                 for (DatosClinicos dato : datosCli) {
@@ -100,7 +98,7 @@ public class EstadisticaService {
                 }
                 break;
 
-            // --- NUEVO CASE ---
+    
             case "genotipificacion":
                 List<Genotipificacion> datosGeno = genotipificacionRepository.findAll();
                 for (Genotipificacion dato : datosGeno) {
@@ -116,18 +114,18 @@ public class EstadisticaService {
     }
 
     /**
-     * Método de Reflection (robusto, con mapeo)
+     * Método de Reflection 
      */
     private Object obtenerValorDeEntidad(Object entidad, String atributoObj) {
         try {
             // Mapeo manual de nombres de BBDD (snake_case) a nombres de Atributos Java (camelCase)
             String nombreAtributoJava = switch (atributoObj) {
                 
-                // --- Mapeos de DatosGenerales ---
+                // Mapeos de DatosGenerales
                 case "zona_residencial" -> "zonaResidencial";
                 case "anios_resi_actual" -> "aniosResiActual";
 
-                // --- Mapeos de HabitosPaciente ---
+                // Mapeos de HabitosPaciente
                 case "estado_consumo_tabaco" -> "estadoConsumoTabaco";
                 case "edad_inicio_tabaco" -> "edadInicioTabaco";
                 case "cant_prom_tabaco" -> "cantPromTabaco";
@@ -140,7 +138,7 @@ public class EstadisticaService {
                 case "ex_consumidor_alcohol" -> "exConsumidorAlcohol";
                 case "frecuencia_ejercicio" -> "frecuenciaEjercicio";
 
-                // --- Mapeos de DatosClinicos ---
+                //Mapeos de DatosClinicos
                 case "adeno_gastrico" -> "adenoGastrico";
                 case "fecha_adeno_gastrico" -> "fechaAdenoGastrico";
                 case "ant_fam_cancer_gast" -> "antFamCancerGast";

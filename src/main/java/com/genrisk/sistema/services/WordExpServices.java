@@ -383,7 +383,7 @@ public class WordExpServices {
                     configurarCeldaDatos(row.getCell(0), h.getHistoID().getFormularioId()!= null ? String.valueOf(h.getHistoID().getFormularioId()) : "N/A");
                     configurarCeldaDatos(row.getCell(1), (h.getTipo()));
                     configurarCeldaDatos(row.getCell(2), (h.getEstadoClinico()));
-                    configurarCeldaDatos(row.getCell(3), (h.getLocaliTumor()));
+                    configurarCeldaDatos(row.getCell(3), (h.getLocaliTumoral()));
                 }
             } else {
                 configurarCeldaDatos(table.getRow(1).getCell(0), "Sin registros");

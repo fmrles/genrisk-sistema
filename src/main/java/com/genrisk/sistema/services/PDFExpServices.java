@@ -357,7 +357,7 @@ public class PDFExpServices{
             agregarCeldaTabla(table, h.getHistoID().getFormularioId() != null ? String.valueOf(h.getHistoID().getFormularioId()) : "N/A");
             agregarCeldaTabla(table, safe(h.getTipo()));
             agregarCeldaTabla(table, safe(h.getEstadoClinico()));
-            agregarCeldaTabla(table, safe(h.getLocaliTumor()));
+            agregarCeldaTabla(table, safe(h.getLocaliTumoral()));
         }
         return table;
     }
@@ -492,7 +492,7 @@ public class PDFExpServices{
         document.add(p);
 
         document.add(new Paragraph(String.format("Tipo: %s | Estado Clínico: %s | Localización Tumoral: %s",
-            safe(hp.getTipo()), safe(hp.getEstadoClinico()), safe(hp.getLocaliTumor())), NORMAL_FONT));
+            safe(hp.getTipo()), safe(hp.getEstadoClinico()), safe(hp.getLocaliTumoral())), NORMAL_FONT));
         document.add(Chunk.NEWLINE);
     }
 

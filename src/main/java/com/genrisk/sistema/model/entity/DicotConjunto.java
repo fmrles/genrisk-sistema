@@ -18,10 +18,4 @@ public class DicotConjunto {
 
     @Column(name = "descripcion")
     private String descripcion;
-
-    @Column(name = "nombre_dicot_conjunto")
-    private String nombreDicotConjunto;
-
-    @Column(name = "descripcion_dicot_conjunto")
-    private String descripcionDicotConjunto;
 }
