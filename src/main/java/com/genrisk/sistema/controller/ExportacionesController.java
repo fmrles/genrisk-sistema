@@ -199,6 +199,25 @@ public class ExportacionesController {
         }
     }
 
+    @GetMapping("/paciente/{id}/word/reclutadores")
+    public ResponseEntity<byte[]> exportarPacienteWordReclutadores(@PathVariable String id) {
+        try {
+            byte[] wordBytes = wordExportService.exportarPacienteAWordReclutador(id);
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", 
+                "paciente_" + id + "_" + getTimestamp() + ".docx");
+            headers.setContentLength(wordBytes.length);
+
+            return new ResponseEntity<>(wordBytes, headers, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     /**
      * Exporta lista de todos los pacientes a Word
      * GET /api/export/pacientes/word
@@ -207,6 +226,25 @@ public class ExportacionesController {
     public ResponseEntity<byte[]> exportarListaPacientesWord() {
         try {
             byte[] wordBytes = wordExportService.exportarListaPacientesAWord();
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", 
+                "lista_pacientes_" + getTimestamp() + ".docx");
+            headers.setContentLength(wordBytes.length);
+
+            return new ResponseEntity<>(wordBytes, headers, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/pacientes/word/reclutadores")
+    public ResponseEntity<byte[]> exportarListaPacientesWordReclutadores() {
+        try {
+            byte[] wordBytes = wordExportService.exportarListaPacientesAWordReclutadores();
             
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
