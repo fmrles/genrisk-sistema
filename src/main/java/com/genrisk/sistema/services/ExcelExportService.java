@@ -22,6 +22,55 @@ public class ExcelExportService {
     @Autowired
     private DicotValorRepository dicotValorRepository;
 
+    private String estandarizarNombreCategoria(String categoria) {
+        return switch (categoria) {
+            // --- DATOS GENERALES ---
+            case "zona", "zona_residencial" -> "zonaResidencial"; 
+            case "anios_resi_actual" -> "aniosResiActual";
+            case "edad" -> "edad";
+            case "sexo" -> "sexo";
+            case "peso" -> "peso";
+            case "imc" -> "imc";
+            case "estatura" -> "estatura";
+            case "educacion" -> "educacion";
+            case "ocupacion" -> "ocupacion";
+
+            // --- HÁBITOS PACIENTE ---
+            case "estado_cons_tabaco", "estado_consumo_tabaco", "estado" -> "estadoConsumoTabaco"; 
+            case "edad_inicio_tabaco" -> "edadInicioTabaco";
+            case "cant_prom_tabaco" -> "cantPromTabaco";
+            case "tiempo_tabaco" -> "tiempoTabaco";
+            case "ex_consumidor_tabaco" -> "exConsumidorTabaco";
+            case "estado_cons_alcohol", "estado_consumo_alcohol" -> "estadoConsumoAlcohol";
+            case "frecuencia_alcohol", "frecuencia" -> "frecuenciaAlcohol"; 
+            case "cantidad_alcohol" -> "cantidadAlcohol";
+            case "anios_consumo_alcohol" -> "aniosConsumoAlcohol";
+            case "ex_consumidor_alcohol" -> "exConsumidorAlcohol";
+            case "frecuencia_ejercicio" -> "frecuenciaEjercicio";
+            
+            // --- DATOS CLÍNICOS ---
+            case "adeno_gastrico" -> "adenoGastrico";
+            case "ant_fam_cancer_gast" -> "antFamCancerGast";
+            case "hpylori_tiempo_test" -> "hpyloriTiempoTest";
+
+            // --- FACTORES DIETARIOS AMBIENTALES ---
+            case "trabajo_zona_rural" -> "trabajoZonaRural";
+            case "agua_consumo_zona" -> "aguaConsumoZona";
+            case "tratamiento_agua" -> "tratamientoAgua";
+            case "fumigaciones" -> "fumigaciones";
+            case "exposicion_pesticidas" -> "exposicionPesticidas";
+            case "combus_lena_diario" -> "combusLenaDiario";
+            case "exposicion_quimicos" -> "exposicionQuimicos";
+            case "dieta_agregasal" -> "dietaAgregaSal";
+            case "dieta_frutas_verduras" -> "dietaFrutasVerduras";
+            case "dieta_frituras" -> "dietaFrituras";
+            case "dieta_carnes_cecinas" -> "dietaCarnesCecinas";
+
+            // Si no está en la lista de inconsistencias, se usa el nombre original.
+            default -> categoria; 
+        };
+    }
+
     public byte[] exportarDicotomizacionAExcel() throws Exception {
         
         // 1. Obtenengo todos los valores dicotomizados
@@ -33,13 +82,13 @@ public class ExcelExportService {
 
         for (DicotValor valor : valores) {
             String pacienteId = valor.getFormulario().getPaciente().getIdPaciente();
-            String categoria = valor.getCategoria();
+            String categoriaEstandarizada = estandarizarNombreCategoria(valor.getCategoria());
             Integer valordicico = valor.getValordicico();
 
-            categorias.add(categoria);
+            categorias.add(categoriaEstandarizada);
 
             Map<String, Integer> pacienteRow = pivotData.computeIfAbsent(pacienteId, k -> new LinkedHashMap<>());
-            pacienteRow.put(categoria, valordicico);
+            pacienteRow.put(categoriaEstandarizada, valordicico);
 
         }
 
@@ -75,11 +124,11 @@ public class ExcelExportService {
                 }
             }
 
-            sheet.createRow(rowNum); 
+            Row adjustmentRow = sheet.createRow(rowNum);
             for (int i = 0; i <= categorias.size(); i++) {
                 sheet.autoSizeColumn(i);
             }
-            sheet.removeRow(sheet.getRow(rowNum)); 
+            sheet.removeRow(adjustmentRow);
 
 
             workbook.write(baos);
