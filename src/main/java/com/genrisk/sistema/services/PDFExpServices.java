@@ -31,7 +31,7 @@ public class PDFExpServices{
 
     public byte[] exportarPacienteAPDF(String idPaciente) throws Exception {
         // Documento en horizontal para más espacio
-        Document document = new Document(PageSize.A4.rotate()); 
+        Document document = new Document(PageSize.A4); 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         try {
@@ -45,6 +45,40 @@ public class PDFExpServices{
             document.add(Chunk.NEWLINE);
 
             agregarSeccionPaciente(document, paciente);
+            document.add(Chunk.NEWLINE);
+
+            List<Formulario> formularios = formularioRepository.findByPacienteIdPaciente(idPaciente);
+
+            for (Formulario formulario : formularios) {
+                agregarSeccionFormulario(document, formulario);
+                document.add(Chunk.NEWLINE);
+            }
+
+            agregarPiePagina(document);
+
+        } finally {
+            document.close();
+        }
+
+        return baos.toByteArray();
+    } 
+
+    public byte[] exportarPacienteAPDFReclutador(String idPaciente) throws Exception {
+        // Documento en horizontal para más espacio
+        Document document = new Document(PageSize.A4); 
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        try {
+            PdfWriter.getInstance(document, baos);
+            document.open();
+
+            Paciente paciente = pacienteRepository.findById(idPaciente)
+                    .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+
+            agregarTitulo(document, "Reporte Detallado de Paciente");
+            document.add(Chunk.NEWLINE);
+
+            agregarSeccionPacienteReclutador(document, paciente);
             document.add(Chunk.NEWLINE);
 
             List<Formulario> formularios = formularioRepository.findByPacienteIdPaciente(idPaciente);
@@ -92,6 +126,37 @@ public class PDFExpServices{
                 agregarCeldaTabla(table, safe(paciente.getNombrePaciente()));
                 agregarCeldaTabla(table, safe(paciente.getCorreoPaciente()));
                 agregarCeldaTabla(table, safe(paciente.getDireccionPaciente()));
+                agregarCeldaTabla(table, safe(paciente.getTipoPaciente()));
+            }
+
+            document.add(table);
+            agregarPiePagina(document);
+
+        } finally {
+            document.close();
+        }
+        return baos.toByteArray();
+    }
+
+     public byte[] exportarPacientesAPDFReclutador() throws Exception {
+        Document document = new Document(PageSize.A4.rotate());
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        try {
+            PdfWriter.getInstance(document, baos);
+            document.open();
+
+            agregarTitulo(document, "Listado General de Pacientes");
+            document.add(Chunk.NEWLINE);
+
+            List<Paciente> pacientes = pacienteRepository.findAll();
+
+            PdfPTable table = new PdfPTable(2);
+            table.setWidthPercentage(100);
+            agregarEncabezadoTabla(table, "ID", "Tipo");
+
+            for (Paciente paciente : pacientes) {
+                agregarCeldaTabla(table, safe(paciente.getIdPaciente()));
                 agregarCeldaTabla(table, safe(paciente.getTipoPaciente()));
             }
 
@@ -185,6 +250,7 @@ public class PDFExpServices{
     }
 
     // ============= MÉTODOS AUXILIARES =============
+
     private PdfPTable createPdfTableForDatosGenerales() {
         List<DatosGenerales> datosGenerales = datosGeneralesRepository.findAll();
         PdfPTable table = new PdfPTable(10);
@@ -452,6 +518,15 @@ public class PDFExpServices{
         document.add(new Paragraph("Nombre: " + safe(paciente.getNombrePaciente()), NORMAL_FONT));
         document.add(new Paragraph("Correo: " + safe(paciente.getCorreoPaciente()), NORMAL_FONT));
         document.add(new Paragraph("Dirección: " + safe(paciente.getDireccionPaciente()), NORMAL_FONT));
+        document.add(new Paragraph("Tipo: " + safe(paciente.getTipoPaciente()), NORMAL_FONT));
+    }
+
+    private void agregarSeccionPacienteReclutador(Document document, Paciente paciente) throws DocumentException {
+        Paragraph subtitle = new Paragraph("Información del Paciente", SUBTITLE_FONT);
+        document.add(subtitle);
+        document.add(Chunk.NEWLINE);
+
+        document.add(new Paragraph("ID: " + safe(paciente.getIdPaciente()), NORMAL_FONT));
         document.add(new Paragraph("Tipo: " + safe(paciente.getTipoPaciente()), NORMAL_FONT));
     }
 

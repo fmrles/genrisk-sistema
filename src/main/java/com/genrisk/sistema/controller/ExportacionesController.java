@@ -56,6 +56,25 @@ public class ExportacionesController {
         }
     }
 
+    @GetMapping("/paciente/{id}/pdf/reclutador")
+    public ResponseEntity<byte[]> exportarPacientePDFReclutador(@PathVariable String id) {
+        try {
+            byte[] pdfBytes = pdfExportService.exportarPacienteAPDFReclutador(id);
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", 
+                "paciente_" + id + "_" + getTimestamp() + ".pdf");
+            headers.setContentLength(pdfBytes.length);
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     /**
      * Exporta lista de todos los pacientes a PDF
      * GET /api/export/pacientes/pdf
@@ -64,6 +83,25 @@ public class ExportacionesController {
     public ResponseEntity<byte[]> exportarListaPacientesPDF() {
         try {
             byte[] pdfBytes = pdfExportService.exportarPacientesAPDF();
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", 
+                "lista_pacientes_" + getTimestamp() + ".pdf");
+            headers.setContentLength(pdfBytes.length);
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/pacientes/pdf/reclutadores")
+    public ResponseEntity<byte[]> exportarListaPacientesPDFReclutadores() {
+        try {
+            byte[] pdfBytes = pdfExportService.exportarPacientesAPDFReclutador();
             
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
