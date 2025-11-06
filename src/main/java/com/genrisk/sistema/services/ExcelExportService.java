@@ -73,13 +73,20 @@ public class ExcelExportService {
         return crearExcel(valores);
     }
 
-    // --- NUEVO MÉTODO PÚBLICO (POR PACIENTE) ---
+    //MÉTODO PÚBLICO (POR PACIENTE) ---
     /**
      * Exporta los valores dicotomizados de UN paciente específico a Excel.
      */
     public byte[] exportarDicotomizacionAExcel(String pacienteId) throws Exception {
         List<DicotValor> valores = dicotValorRepository.findByFormularioPacienteIdPaciente(pacienteId);
         // Si el paciente no tiene valores, el helper creará un Excel vacío (solo cabeceras).
+        return crearExcel(valores);
+    }
+    /**
+     * Exporta los valores dicotomizados de UN conjunto de reglas específico a Excel.
+     */
+    public byte[] exportarDicotomizacionAExcelPorConjunto(Integer conjuntoId) throws Exception {
+        List<DicotValor> valores = dicotValorRepository.findByDicotReglaDicotConjuntoIdDicotConjunto(conjuntoId);
         return crearExcel(valores);
     }
     
