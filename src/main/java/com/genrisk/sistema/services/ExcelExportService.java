@@ -2,7 +2,6 @@ package com.genrisk.sistema.services;
 
 import com.genrisk.sistema.model.entity.DicotValor;
 import com.genrisk.sistema.repository.DicotValorRepository;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -18,36 +17,32 @@ import java.util.TreeSet;
 
 @Service
 public class ExcelExportService {
-    
+
     @Autowired
     private DicotValorRepository dicotValorRepository;
-
+    
+    /**
+     * Estandariza los nombres de las categorías (columnas) para el reporte final de Excel.
+     */
     private String estandarizarNombreCategoria(String categoria) {
         return switch (categoria) {
             // --- DATOS GENERALES ---
-            case "zona", "zona_residencial" -> "zonaResidencial"; 
+            case "zona", "zona_residencial" -> "zonaResidencial";
             case "anios_resi_actual" -> "aniosResiActual";
-            case "edad" -> "edad";
-            case "sexo" -> "sexo";
-            case "peso" -> "peso";
-            case "imc" -> "imc";
-            case "estatura" -> "estatura";
-            case "educacion" -> "educacion";
-            case "ocupacion" -> "ocupacion";
-
+            
             // --- HÁBITOS PACIENTE ---
-            case "estado_cons_tabaco", "estado_consumo_tabaco", "estado" -> "estadoConsumoTabaco"; 
+            case "estado_cons_alcohol", "estado_consumo_alcohol" -> "estadoConsumoAlcohol";
+            case "estado_cons_tabaco", "estado_consumo_tabaco", "estado" -> "estadoConsumoTabaco";
             case "edad_inicio_tabaco" -> "edadInicioTabaco";
             case "cant_prom_tabaco" -> "cantPromTabaco";
             case "tiempo_tabaco" -> "tiempoTabaco";
             case "ex_consumidor_tabaco" -> "exConsumidorTabaco";
-            case "estado_cons_alcohol", "estado_consumo_alcohol" -> "estadoConsumoAlcohol";
-            case "frecuencia_alcohol", "frecuencia" -> "frecuenciaAlcohol"; 
+            case "frecuencia_alcohol", "frecuencia" -> "frecuenciaAlcohol";
             case "cantidad_alcohol" -> "cantidadAlcohol";
             case "anios_consumo_alcohol" -> "aniosConsumoAlcohol";
             case "ex_consumidor_alcohol" -> "exConsumidorAlcohol";
             case "frecuencia_ejercicio" -> "frecuenciaEjercicio";
-            
+
             // --- DATOS CLÍNICOS ---
             case "adeno_gastrico" -> "adenoGastrico";
             case "ant_fam_cancer_gast" -> "antFamCancerGast";
@@ -57,7 +52,6 @@ public class ExcelExportService {
             case "trabajo_zona_rural" -> "trabajoZonaRural";
             case "agua_consumo_zona" -> "aguaConsumoZona";
             case "tratamiento_agua" -> "tratamientoAgua";
-            case "fumigaciones" -> "fumigaciones";
             case "exposicion_pesticidas" -> "exposicionPesticidas";
             case "combus_lena_diario" -> "combusLenaDiario";
             case "exposicion_quimicos" -> "exposicionQuimicos";
@@ -65,18 +59,37 @@ public class ExcelExportService {
             case "dieta_frutas_verduras" -> "dietaFrutasVerduras";
             case "dieta_frituras" -> "dietaFrituras";
             case "dieta_carnes_cecinas" -> "dietaCarnesCecinas";
-
-            // Si no está en la lista de inconsistencias, se usa el nombre original.
+            
             default -> categoria; 
         };
     }
-
+    
+    // --- MÉTODO PÚBLICO (TODOS) ---
+    /**
+     * Exporta los valores dicotomizados de TODOS los pacientes a Excel.
+     */
     public byte[] exportarDicotomizacionAExcel() throws Exception {
-        
-        // 1. Obtenengo todos los valores dicotomizados
         List<DicotValor> valores = dicotValorRepository.findAll();
+        return crearExcel(valores);
+    }
 
-        // 2. Proceso y pivoteo los datos
+    // --- NUEVO MÉTODO PÚBLICO (POR PACIENTE) ---
+    /**
+     * Exporta los valores dicotomizados de UN paciente específico a Excel.
+     */
+    public byte[] exportarDicotomizacionAExcel(String pacienteId) throws Exception {
+        List<DicotValor> valores = dicotValorRepository.findByFormularioPacienteIdPaciente(pacienteId);
+        // Si el paciente no tiene valores, el helper creará un Excel vacío (solo cabeceras).
+        return crearExcel(valores);
+    }
+    
+    // --- HELPER PRIVADO (LÓGICA DE CREACIÓN DE EXCEL) ---
+    /**
+     * Método privado que toma una lista de DicotValor y genera el archivo Excel.
+     */
+    private byte[] crearExcel(List<DicotValor> valores) throws Exception {
+        
+        // 1. Procesar y pivotar los datos
         Map<String, Map<String, Integer>> pivotData = new LinkedHashMap<>();
         Set<String> categorias = new TreeSet<>();
 
@@ -86,36 +99,32 @@ public class ExcelExportService {
             Integer valordicico = valor.getValordicico();
 
             categorias.add(categoriaEstandarizada);
-
             Map<String, Integer> pacienteRow = pivotData.computeIfAbsent(pacienteId, k -> new LinkedHashMap<>());
             pacienteRow.put(categoriaEstandarizada, valordicico);
-
         }
 
-        // 3. Creo el libro de Excel
+        // 2. Crear el libro de Excel
         try (XSSFWorkbook workbook = new XSSFWorkbook(); ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             
             XSSFSheet sheet = workbook.createSheet("Dicotomizacion");
 
-            // 4. Creo la Fila de Cabeceras
+            // 3. Crear la Fila de Cabeceras
             Row headerRow = sheet.createRow(0);
-            Cell headerCell = headerRow.createCell(0);
-            headerCell.setCellValue("paciente_id");
+            headerRow.createCell(0).setCellValue("paciente_id");
 
-            // Creo las cabeceras de categorías
             int colNum = 1;
             for (String categoria : categorias) {
                 headerRow.createCell(colNum++).setCellValue(categoria);
             }
 
-            // 5. Lleno las Filas de Datos
+            // 4. Llenar las Filas de Datos
             int rowNum = 1;
             for (Map.Entry<String, Map<String, Integer>> entry : pivotData.entrySet()) {
                 String pacienteId = entry.getKey();
                 Map<String, Integer> datosFila = entry.getValue();
                 
                 Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(pacienteId); // Columna 1: ID Paciente
+                row.createCell(0).setCellValue(pacienteId); 
 
                 colNum = 1;
                 for (String categoria : categorias) {
@@ -124,6 +133,7 @@ public class ExcelExportService {
                 }
             }
 
+            // 5. Autoajustar el tamaño de las columnas
             Row adjustmentRow = sheet.createRow(rowNum);
             for (int i = 0; i <= categorias.size(); i++) {
                 sheet.autoSizeColumn(i);

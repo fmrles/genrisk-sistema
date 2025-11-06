@@ -346,6 +346,26 @@ public class ExportacionesController {
         }
     }
 
+    @GetMapping("/dicotomizacion/{pacienteId}/excel")
+    public ResponseEntity<byte[]> exportarDicotomizacionExcelPaciente(
+            @PathVariable String pacienteId) {
+        try {
+            byte[] excelBytes = excelExportService.exportarDicotomizacionAExcel(pacienteId);
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", 
+                "dicotomizacion_export_" + pacienteId + "_" + getTimestamp() + ".xlsx");
+            headers.setContentLength(excelBytes.length);
+
+            return new ResponseEntity<>(excelBytes, headers, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     // =============== MÉTODOS AUXILIARES ===============
 
     private String getTimestamp() {
