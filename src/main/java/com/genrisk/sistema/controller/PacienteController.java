@@ -60,4 +60,14 @@ public class PacienteController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/{id}/detallado/reclutador")
+    public ResponseEntity<PacienteDetalladoDTO> getPacienteDetalladoReclutador(@PathVariable String id) {
+        try {
+            PacienteDetalladoDTO datosCompletos = pacienteDetalladoService.obtenerDatosPacienteReclutador(id);
+            return ResponseEntity.ok(datosCompletos);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
