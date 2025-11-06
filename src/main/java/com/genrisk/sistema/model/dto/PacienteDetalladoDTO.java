@@ -7,7 +7,8 @@ import java.util.List;
 @Data
 public class PacienteDetalladoDTO {
     
-    private Paciente paciente;
+    private Object paciente;
+    private PacReclutadorDTO paciente2; 
     private List<Muestra> muestras;
     private List<Genotipificacion> genotipificaciones;
     private List<FormularioDetalladoDTO> formularios;
