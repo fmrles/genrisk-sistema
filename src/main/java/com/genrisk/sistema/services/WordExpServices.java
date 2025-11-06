@@ -72,6 +72,38 @@ public class WordExpServices {
         }
     }
 
+    public byte[] exportarPacienteAWordReclutador(String idPaciente) throws Exception { //Nuevo Método
+        XWPFDocument document = new XWPFDocument();
+        
+        try {
+            Paciente paciente = pacienteRepository.findById(idPaciente)
+                    .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+
+            agregarTitulo(document, "Reporte Detallado de Paciente");
+            agregarSaltoLinea(document);
+
+            agregarSeccionPacienteReclutador(document, paciente);
+            agregarSaltoLinea(document);
+
+            List<Formulario> formularios = formularioRepository.findByPacienteIdPaciente(idPaciente);
+
+            // Se itera sobre todos los formularios del paciente
+            for (Formulario formulario : formularios) {
+                agregarSeccionFormulario(document, formulario);
+                agregarSaltoLinea(document);
+            }
+
+            agregarPiePagina(document);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            document.write(baos);
+            return baos.toByteArray();
+
+        } finally {
+            document.close();
+        }
+    }
+
     /**
      * Exporta lista de pacientes a Word
      */
@@ -103,6 +135,42 @@ public class WordExpServices {
                 configurarCeldaDatos(row.getCell(2), paciente.getCorreoPaciente());
                 configurarCeldaDatos(row.getCell(3), paciente.getDireccionPaciente());
                 configurarCeldaDatos(row.getCell(4), paciente.getTipoPaciente());
+            }
+
+            agregarSaltoLinea(document);
+            agregarPiePagina(document);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            document.write(baos);
+            return baos.toByteArray();
+
+        } finally {
+            document.close();
+        }
+    }
+
+    public byte[] exportarListaPacientesAWordReclutadores() throws Exception {
+        XWPFDocument document = new XWPFDocument();
+        
+        try {
+            agregarTitulo(document, "Listado General de Pacientes");
+            List<Paciente> pacientes = pacienteRepository.findAll();
+            
+            // Crear tabla
+            XWPFTable table = document.createTable(pacientes.size() + 1, 5);
+            table.setWidth("100%"); // **OPTIMIZACIÓN:** Asegura que la tabla no se desborde
+
+            // Encabezados
+            XWPFTableRow headerRow = table.getRow(0);
+            configurarCeldaEncabezado(headerRow.getCell(0), "ID");
+            configurarCeldaEncabezado(headerRow.getCell(1), "Tipo");
+
+            // Datos
+            int rowIndex = 1;
+            for (Paciente paciente : pacientes) {
+                XWPFTableRow row = table.getRow(rowIndex++);
+                configurarCeldaDatos(row.getCell(0), paciente.getIdPaciente());
+                configurarCeldaDatos(row.getCell(1), paciente.getTipoPaciente());
             }
 
             agregarSaltoLinea(document);
@@ -427,6 +495,14 @@ public class WordExpServices {
         agregarTexto(document, "Nombre: " + paciente.getNombrePaciente());
         agregarTexto(document, "Correo: " + paciente.getCorreoPaciente());
         agregarTexto(document, "Dirección: " + paciente.getDireccionPaciente());
+        agregarTexto(document, "Tipo: " + paciente.getTipoPaciente());
+    }
+
+    private void agregarSeccionPacienteReclutador(XWPFDocument document, Paciente paciente) { //Nuevo Método
+        agregarSubtitulo(document, "Información del Paciente");
+        agregarSaltoLinea(document);
+
+        agregarTexto(document, "ID: " + paciente.getIdPaciente());
         agregarTexto(document, "Tipo: " + paciente.getTipoPaciente());
     }
 
