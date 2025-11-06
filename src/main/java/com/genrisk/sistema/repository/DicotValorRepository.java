@@ -8,4 +8,5 @@ import java.util.List;
 @Repository
 public interface DicotValorRepository extends JpaRepository<DicotValor, Integer> {
     List<DicotValor> findByFormularioPacienteIdPaciente(String pacienteId);
+    List<DicotValor> findByDicotReglaDicotConjuntoIdDicotConjunto(Integer conjuntoId);
 }

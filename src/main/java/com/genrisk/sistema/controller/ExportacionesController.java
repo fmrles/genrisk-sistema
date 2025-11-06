@@ -366,6 +366,26 @@ public class ExportacionesController {
         }
     }
 
+    @GetMapping("/dicotomizacion/conjunto/{conjuntoId}/excel")
+    public ResponseEntity<byte[]> exportarDicotomizacionExcelConjunto(
+            @PathVariable Integer conjuntoId) {
+        try {
+            byte[] excelBytes = excelExportService.exportarDicotomizacionAExcelPorConjunto(conjuntoId);
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", 
+                "dicotomizacion_export_conjunto_" + conjuntoId + "_" + getTimestamp() + ".xlsx");
+            headers.setContentLength(excelBytes.length);
+
+            return new ResponseEntity<>(excelBytes, headers, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     // =============== MÉTODOS AUXILIARES ===============
 
     private String getTimestamp() {
