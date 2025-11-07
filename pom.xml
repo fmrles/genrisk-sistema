@@ -49,24 +49,25 @@
 
     <!-- H2 (solo tests) -->
     <dependency>
-        <groupId>com.h2database</groupId>
-        <artifactId>h2</artifactId>
-        <scope>test</scope>
-    </dependency>
+    	<groupId>com.h2database</groupId>
+    	<artifactId>h2</artifactId>
+    	<version>2.4.240</version>
+    	<scope>test</scope>
+	</dependency>
 
     <!-- Lombok -->
     <dependency>
-        <groupId>org.projectlombok</groupId>
-        <artifactId>lombok</artifactId>
-        <optional>true</optional>
-    </dependency>
+    	<groupId>org.projectlombok</groupId>
+   		<artifactId>lombok</artifactId>
+    	<version>1.18.42</version>
+	</dependency>
 
     <!-- Test -->
     <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-test</artifactId>
-        <scope>test</scope>
-    </dependency>
+    	<groupId>org.springframework.boot</groupId>
+    	<artifactId>spring-boot-starter-test</artifactId>
+    	<scope>test</scope>
+	</dependency>
 
 	<!--Apache POI Word-->
 	<dependency>

@@ -1,13 +1,16 @@
 package com.genrisk.sistema.model.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 @Entity
 @Table(name = "paciente")
 @Data
-
+@NoArgsConstructor 
+@AllArgsConstructor
 public class Paciente {
 
     @Id
