@@ -19,7 +19,7 @@ public class PacienteRepositoryTest {
     @Autowired
     private PacienteRepository pacienteRepository;
 
-
+    //Que la consulta no falle si la tabla de pacientes está vacía. Simplemente debe devolver "nada" (vacío).
     @Test
     public void cuandoBuscaUltimoPaciente_yNoHay_devuelveOptionalVacio() {
 
@@ -28,6 +28,7 @@ public class PacienteRepositoryTest {
         assertThat(encontrado).isNotPresent();
     }
 
+    //Que la consulta filtre correctamente. Al buscar por "CA", debe ignorar a "CR0001" y, de entre "CA0001" y "CA0002", debe devolver "CA0002" (el último).
     @Test
     public void cuandoBuscaUltimoPaciente_yHayVarios_devuelveElCorrecto() {
 
@@ -47,6 +48,7 @@ public class PacienteRepositoryTest {
         assertThat(encontrado.get().getIdPaciente()).isEqualTo("CA0002");
     }
     
+    //Que la parte OrderByIdPacienteDesc de la consulta funcione. Inserta "CA0005" y "CA0001" y comprueba que la consulta identifica correctamente a "CA0005" como el "mayor" o "último".
     @Test
     public void cuandoBuscaUltimoPaciente_conNumerosDesordenados_devuelveElMayor() {
         Paciente p1 = new Paciente("CA0005", "Test 5", "t5@c.cl", "dir", "Caso");
