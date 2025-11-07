@@ -24,7 +24,7 @@ public abstract class CrudServices<T, ID> {
         if(getEntidad.isPresent()){
             return ResponseEntity.ok(getEntidad.get());
         }
-        return null;
+        return ResponseEntity.notFound().build();
     }
 
     

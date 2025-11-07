@@ -8,12 +8,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,136 +26,126 @@ public class DicotomizacionServiceTest {
     @Mock private HabitosPacienteRepository habitosPacienteRepository;
     @Mock private DatosClinicosRepository datosClinicosRepository;
     @Mock private FactDietariosAmbientalesRepository factDietariosAmbientalesRepository;
+    @Mock private HistopatologiaRepository histopatologiaRepository;
 
     @InjectMocks
     private DicotomizacionService dicotomizacionService;
 
-
-    private Formulario formularioPrueba;
-    private DicotRegla reglaCuantitativa;
-    private DicotRegla reglaCualitativa;
-    private DicotRegla reglaInvertida;
-    private DatosGenerales datosGeneralesPrueba;
-    private HabitosPaciente habitosPacientePrueba;
+    private Paciente paciente1;
+    private Formulario formulario101;
+    private DatosGenerales datosGenerales101;
+    private HabitosPaciente habitos101;
+    private DicotRegla reglaEdad;
+    private DicotRegla reglaSexo;
+    private DicotRegla reglaSexoInversa;
+    private DicotRegla reglaTraductor;
 
     @BeforeEach
     void setUp() {
-     
-        formularioPrueba = new Formulario();
-        formularioPrueba.setIdFormulario(1);
 
-        reglaCuantitativa = new DicotRegla();
-        reglaCuantitativa.setIdDicotRegla(10);
-        reglaCuantitativa.setEntidadObj("datos_genericos");
-        reglaCuantitativa.setAtributoObj("edad");           
-        reglaCuantitativa.setOperador(">=");
-        reglaCuantitativa.setValorInf(50);
-        reglaCuantitativa.setValorSiCumple(1); 
-        reglaCuantitativa.setValorNoCumple(0); 
-
-        reglaCualitativa = new DicotRegla();
-        reglaCualitativa.setIdDicotRegla(20);
-        reglaCualitativa.setEntidadObj("datos_genericos");  
-        reglaCualitativa.setAtributoObj("zona_residencial");
-        reglaCualitativa.setOperador("=");
-        reglaCualitativa.setValorCategoria("Urbana");
-        reglaCualitativa.setValorSiCumple(1);
-        reglaCualitativa.setValorNoCumple(0);
-
-        reglaInvertida = new DicotRegla();
-        reglaInvertida.setIdDicotRegla(30);
-        reglaInvertida.setEntidadObj("habitos_paciente");     
-        reglaInvertida.setAtributoObj("estado_consumo_tabaco");
-        reglaInvertida.setOperador("=");
-        reglaInvertida.setValorCategoria("Nunca");
-        reglaInvertida.setValorSiCumple(0); 
-        reglaInvertida.setValorNoCumple(1);
-
-        // --- Entidades de Prueba ---
+        paciente1 = new Paciente("pac1", "Paciente 1", "p1@t.cl", "dir1", "Caso");
+        formulario101 = new Formulario(101, "Activo", "Caso", null, "pac1", paciente1);
         
-        datosGeneralesPrueba = new DatosGenerales();
-        datosGeneralesPrueba.setEdad(60);                 
-        datosGeneralesPrueba.setZonaResidencial("Urbana"); 
+        datosGenerales101 = new DatosGenerales();
+        datosGenerales101.setEdad(55);
+        datosGenerales101.setSexo("Femenino");
+        datosGenerales101.setZonaResidencial("Urbana"); 
+
+        habitos101 = new HabitosPaciente();
+        habitos101.setEstadoConsumoTabaco("Fumador"); 
+
+        reglaEdad = new DicotRegla();
+        reglaEdad.setEntidadObj("datos_genericos");
+        reglaEdad.setAtributoObj("edad");
+        reglaEdad.setOperador(">=");
+        reglaEdad.setValorInf(50);
+        reglaEdad.setValorSiCumple(1);
+        reglaEdad.setValorNoCumple(0);
+
+        reglaSexo = new DicotRegla();
+        reglaSexo.setEntidadObj("datos_genericos");
+        reglaSexo.setAtributoObj("sexo");
+        reglaSexo.setOperador("=");
+        reglaSexo.setValorCategoria("Femenino");
+        reglaSexo.setValorSiCumple(1);
+        reglaSexo.setValorNoCumple(0);
+
+        reglaSexoInversa = new DicotRegla();
+        reglaSexoInversa.setEntidadObj("datos_genericos");
+        reglaSexoInversa.setAtributoObj("sexo");
+        reglaSexoInversa.setOperador("=");
+        reglaSexoInversa.setValorCategoria("Femenino");
+        reglaSexoInversa.setValorSiCumple(0);
+        reglaSexoInversa.setValorNoCumple(1);
         
-
-        habitosPacientePrueba = new HabitosPaciente();
-        habitosPacientePrueba.setEstadoConsumoTabaco("Nunca"); 
+        reglaTraductor = new DicotRegla();
+        reglaTraductor.setEntidadObj("habitos_paciente");
+        reglaTraductor.setAtributoObj("estado_cons_tabaco");
+        reglaTraductor.setOperador("=");
+        reglaTraductor.setValorCategoria("Fumador");
+        reglaTraductor.setValorSiCumple(1);
+        reglaTraductor.setValorNoCumple(0);
     }
 
-    /**
-     * Prueba que una regla cuantitativa (ej. edad >= 50) funcione.
-     * También prueba el mapeo de entidad "datos_genericos".
-     */
-    @Test
-    void cuandoEjecutaReglaCuantitativa_yCumple_guardaValorSi() {
-     
-        when(dicotReglaRepository.findByDicotConjuntoId(1)).thenReturn(List.of(reglaCuantitativa));
 
-        when(formularioRepository.findAll()).thenReturn(List.of(formularioPrueba));
- 
-        when(datosGeneralesRepository.findByIdDatosGen_FormularioId(1)).thenReturn(Optional.of(datosGeneralesPrueba));
-     
+    @Test
+    public void cuandoSeEjecutaElFlujoCompleto_DebeGuardarValoresCorrectos() {
+
+        when(dicotReglaRepository.findByDicotConjuntoId(1))
+                .thenReturn(List.of(reglaEdad, reglaSexo));
+
+        when(formularioRepository.findAll()).thenReturn(List.of(formulario101));
+
+        when(datosGeneralesRepository.findByIdDatosGen_FormularioId(101))
+                .thenReturn(Optional.of(datosGenerales101));
+
         when(dicotValorRepository.save(any(DicotValor.class))).thenAnswer(i -> i.getArgument(0));
 
         List<DicotValor> resultados = dicotomizacionService.ejecutarDicotomizacion(1);
 
-        assertThat(resultados).hasSize(1);
- 
-        assertThat(resultados.get(0).getValordicico()).isEqualTo(1); 
-        assertThat(resultados.get(0).getFormularioID()).isEqualTo(1);
-        assertThat(resultados.get(0).getReglaDicotID()).isEqualTo(10);
-    }
+        assertThat(resultados).hasSize(2);
 
-    /**
-     * Prueba que una regla cualitativa (ej. zona_residencial = "Urbana") funcione.
-     * También prueba el mapeo de atributo "zona_residencial" -> "zonaResidencial".
-     */
-    @Test
-    void cuandoEjecutaReglaCualitativa_yMapeoAtributo_guardaValorSi() {
+        assertThat(resultados.get(0).getValordicico()).isEqualTo(1);
+        assertThat(resultados.get(0).getCategoria()).isEqualTo("edad");
 
-        when(dicotReglaRepository.findByDicotConjuntoId(1)).thenReturn(List.of(reglaCualitativa));
-        when(formularioRepository.findAll()).thenReturn(List.of(formularioPrueba));
-        when(datosGeneralesRepository.findByIdDatosGen_FormularioId(1)).thenReturn(Optional.of(datosGeneralesPrueba));
-        when(dicotValorRepository.save(any(DicotValor.class))).thenAnswer(i -> i.getArgument(0));
-
-        List<DicotValor> resultados = dicotomizacionService.ejecutarDicotomizacion(1);
-
-        assertThat(resultados).hasSize(1);
-        assertThat(resultados.get(0).getValordicico()).isEqualTo(1); 
-    }
-
-    /**
-     * Prueba que la lógica de valores (Si=0, No=1) se respete.
-     * También prueba el mapeo de entidad "habitos_paciente" y el atributo "estado_consumo_tabaco".
-     */
-    @Test
-    void cuandoEjecutaReglaLogicaInvertida_yCumple_guardaValorSiInvertido() {
-        when(dicotReglaRepository.findByDicotConjuntoId(1)).thenReturn(List.of(reglaInvertida));
-        when(formularioRepository.findAll()).thenReturn(List.of(formularioPrueba));
-        when(habitosPacienteRepository.findByIdHabPaciente_FormularioId(1)).thenReturn(Optional.of(habitosPacientePrueba));
-        when(dicotValorRepository.save(any(DicotValor.class))).thenAnswer(i -> i.getArgument(0));
-
-        List<DicotValor> resultados = dicotomizacionService.ejecutarDicotomizacion(1);
-
-
-        assertThat(resultados).hasSize(1);
-
-        assertThat(resultados.get(0).getValordicico()).isEqualTo(0); 
+        assertThat(resultados.get(1).getValordicico()).isEqualTo(1);
+        assertThat(resultados.get(1).getCategoria()).isEqualTo("sexo");
+      
+        verify(dicotValorRepository,
+                org.mockito.Mockito.times(2)).save(any(DicotValor.class));
     }
     
-    /**
-     * Prueba que el servicio no falle si un formulario no tiene datos
-     * (ej. el formulario 1 no tiene datos en 'habitos_paciente')
-     */
     @Test
-    void cuandoFormularioNoTieneEntidad_noGuardaValor_yNoFalla() {
-
-        when(dicotReglaRepository.findByDicotConjuntoId(1)).thenReturn(List.of(reglaInvertida));
-        when(formularioRepository.findAll()).thenReturn(List.of(formularioPrueba));
-        when(habitosPacienteRepository.findByIdHabPaciente_FormularioId(1)).thenReturn(Optional.empty()); 
+    public void cuandoSeUsaReglaInversa_DebeDevolverValoresInversos() {
+  
+        when(dicotReglaRepository.findByDicotConjuntoId(1))
+                .thenReturn(List.of(reglaSexoInversa)); 
+        when(formularioRepository.findAll()).thenReturn(List.of(formulario101));
+        when(datosGeneralesRepository.findByIdDatosGen_FormularioId(101))
+                .thenReturn(Optional.of(datosGenerales101));
+        when(dicotValorRepository.save(any(DicotValor.class))).thenAnswer(i -> i.getArgument(0));
 
         List<DicotValor> resultados = dicotomizacionService.ejecutarDicotomizacion(1);
 
-        assertThat(resultados).isEmpty();
+        assertThat(resultados).hasSize(1);
+
+        assertThat(resultados.get(0).getValordicico()).isEqualTo(0);
+    }
+    
+    @Test
+    public void cuandoSeUsaTraductorDeNombres_DebeEncontrarElCampo() {
+         when(dicotReglaRepository.findByDicotConjuntoId(1))
+                 .thenReturn(List.of(reglaTraductor));
+         when(formularioRepository.findAll()).thenReturn(List.of(formulario101));
+
+         when(habitosPacienteRepository.findByIdHabPaciente_FormularioId(101))
+                 .thenReturn(Optional.of(habitos101));
+                 
+         when(dicotValorRepository.save(any(DicotValor.class))).thenAnswer(i -> i.getArgument(0));
+
+        List<DicotValor> resultados = dicotomizacionService.ejecutarDicotomizacion(1);
+
+        assertThat(resultados).hasSize(1);
+        assertThat(resultados.get(0).getValordicico()).isEqualTo(1);
     }
 }

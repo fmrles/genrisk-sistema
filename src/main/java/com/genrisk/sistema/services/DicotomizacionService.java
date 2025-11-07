@@ -94,55 +94,54 @@ public class DicotomizacionService {
     // Uso Reflection para obtener el valor del campo (propiedad) de la entidad
     private Object obtenerValorDeEntidad(Object entidad, String atributoObj) {
         try {
-            
+            // Mapeo manual de nombres de BBDD (snake_case) a nombres de Atributos Java (camelCase)
             String nombreAtributoJava = switch (atributoObj) {
                 
-                //Mapeos de DatosGenerales
-                case "zona" -> "zonaResidencial"; 
-                case "zona_residencial" -> "zonaResidencial"; 
-                case "anios_resi_actual" -> "aniosResiActual"; 
-                //Mapeos de HabitosPaciente
-                case "estado" -> "estadoConsumoTabaco"; 
-                case "frecuencia" -> "frecuenciaAlcohol"; 
-                case "estado_consumo_tabaco" -> "estadoConsumoTabaco";
-                case "edad_inicio_tabaco" -> "edadInicioTabaco"; 
-                case "cant_prom_tabaco" -> "cantPromTabaco"; 
-                case "tiempo_tabaco" -> "tiempoTabaco"; 
-                case "ex_consumidor_tabaco" -> "exConsumidorTabaco"; 
-                case "estado_consumo_alcohol" -> "estadoConsumoAlcohol"; 
-                case "frecuencia_alcohol" -> "frecuenciaAlcohol"; 
-                case "cantidad_alcohol" -> "cantidadAlcohol"; 
-                case "anios_consumo_alcohol" -> "aniosConsumoAlcohol"; 
-                case "ex_consumidor_alcohol" -> "exConsumidorAlcohol"; 
-                case "frecuencia_ejercicio" -> "frecuenciaEjercicio"; 
+                // --- Mapeos de DatosGenerales ---
+                case "zona" -> "zonaResidencial"; // Mapeo especial
+                case "zona_residencial" -> "zonaResidencial";
+                case "anios_resi_actual" -> "aniosResiActual";
 
-                //Mapeos de DatosClinicos
-                case "adeno_gastrico" -> "adenoGastrico"; 
-                case "fecha_adeno_gastrico" -> "fechaAdenoGastrico"; 
-                case "ant_fam_cancer_gast" -> "antFamCancerGast"; 
-                case "otras_enfermedades" -> "otrasEnfermedades"; 
-                case "ant_fam_otro_cancer" -> "antFamOtroCancer"; 
-                case "cirugia_gastrica_previa" -> "cirugiaGastricaPrevia"; 
-                case "hpylori_prueba" -> "hpyloriPrueba"; 
-                case "hpylori_resultado" -> "hpyloriResultado"; 
-                case "hpylori_tiempo_test" -> "hpyloriTiempoTest"; 
+                // --- Mapeos de HabitosPaciente ---
+                case "estado_cons_tabaco", "estado_consumo_tabaco", "estado" -> "estadoConsumoTabaco";
+                case "edad_inicio_tabaco" -> "edadInicioTabaco";
+                case "cant_prom_tabaco" -> "cantPromTabaco";
+                case "tiempo_tabaco" -> "tiempoTabaco";
+                case "ex_consumidor_tabaco" -> "exConsumidorTabaco";
+                case "estado_cons_alcohol", "estado_consumo_alcohol" -> "estadoConsumoAlcohol";
+                case "frecuencia_alcohol", "frecuencia" -> "frecuenciaAlcohol";
+                case "cantidad_alcohol" -> "cantidadAlcohol";
+                case "anios_consumo_alcohol" -> "aniosConsumoAlcohol";
+                case "ex_consumidor_alcohol" -> "exConsumidorAlcohol";
+                case "frecuencia_ejercicio" -> "frecuenciaEjercicio";
 
-                //Mapeos de FactDietariosAmbientales
-                case "trabajo_zona_rural" -> "trabajoZonaRural"; 
-                case "agua_consumo_rural" -> "aguaConsumoRural"; 
-                case "tratamiento_agua" -> "tratamientoAgua"; 
-                case "exposicion_pesticidas" -> "exposicionPesticidas"; 
-                case "combus_lena_diario" -> "combusLenaDiario"; 
-                case "exposicion_quimicos" -> "exposicionQuimicos"; 
-                case "dieta_agregasal" -> "dietaAgregaSal"; 
-                case "dieta_frutas_verduras" -> "dietaFrutasVerduras"; 
-                case "dieta_frituras" -> "dietaFrituras"; 
-                case "dieta_carnes_cecinas" -> "dietaCarnesCecinas"; 
+                // --- Mapeos de DatosClinicos ---
+                case "adeno_gastrico" -> "adenoGastrico";
+                case "fecha_adeno_gastrico" -> "fechaAdenoGastrico";
+                case "ant_fam_cancer_gast" -> "antFamCancerGast";
+                case "otras_enfermedades" -> "otrasEnfermedades";
+                case "ant_fam_otro_cancer" -> "antFamOtroCancer";
+                case "cirugia_gastrica_previa" -> "cirugiaGastricaPrevia";
+                case "hpylori_prueba" -> "hpyloriPrueba";
+                case "hpylori_resultado" -> "hpyloriResultado";
+                case "hpylori_tiempo_test" -> "hpyloriTiempoTest";
+
+                // --- Mapeos de FactDietariosAmbientales ---
+                case "trabajo_zona_rural" -> "trabajoZonaRural";
+                case "agua_consumo_zona" -> "aguaConsumoZona";
+                case "tratamiento_agua" -> "tratamientoAgua";
+                case "fumigaciones" -> "fumigaciones";
+                case "exposicion_pesticidas" -> "exposicionPesticidas";
+                case "combus_lena_diario" -> "combusLenaDiario";
+                case "exposicion_quimicos" -> "exposicionQuimicos";
+                case "dieta_agregasal" -> "dietaAgregaSal";
+                case "dieta_frutas_verduras" -> "dietaFrutasVerduras";
+                case "dieta_frituras" -> "dietaFrituras";
+                case "dieta_carnes_cecinas" -> "dietaCarnesCecinas";
                 
                 // Si el nombre ya está en camelCase o es correcto (ej: "edad", "sexo")
                 default -> atributoObj; 
             };
-            
 
             Field campo = entidad.getClass().getDeclaredField(nombreAtributoJava);
             campo.setAccessible(true);

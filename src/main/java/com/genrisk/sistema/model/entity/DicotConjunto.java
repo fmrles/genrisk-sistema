@@ -1,11 +1,15 @@
 package com.genrisk.sistema.model.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "dicot_conjunto")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class DicotConjunto {
     
     @Id
