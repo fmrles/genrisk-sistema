@@ -46,4 +46,4 @@ public class MuestraService extends CrudServices<Muestra, muestraID> {
         Muestra muestraGuardada = muestraRepository.save(muestra);
         return ResponseEntity.status(201).body(muestraGuardada);
     }
-}
+}//prueba
