@@ -1,11 +1,15 @@
 package com.genrisk.sistema.model.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "dicot_conjunto")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class DicotConjunto {
     
     @Id
@@ -13,9 +17,9 @@ public class DicotConjunto {
     @Column(name = "id_dicotconjunto")
     private Integer idDicotConjunto;
 
-    @Column(name = "nombre_dicot_conjunto")
-    private String nombreDicotConjunto;
+    @Column(name = "nombre")
+    private String nombre;
 
-    @Column(name = "descripcion_dicot_conjunto")
-    private String descripcionDicotConjunto;
+    @Column(name = "descripcion")
+    private String descripcion;
 }
