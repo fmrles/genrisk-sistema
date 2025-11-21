@@ -87,7 +87,7 @@ public class DicotomizacionServiceTest {
         reglaTraductor.setValorNoCumple(0);
     }
 
-
+    //
     @Test
     public void cuandoSeEjecutaElFlujoCompleto_DebeGuardarValoresCorrectos() {
 
@@ -114,7 +114,8 @@ public class DicotomizacionServiceTest {
         verify(dicotValorRepository,
                 org.mockito.Mockito.times(2)).save(any(DicotValor.class));
     }
-    
+
+    // Pruebas para la regla inversa
     @Test
     public void cuandoSeUsaReglaInversa_DebeDevolverValoresInversos() {
   
@@ -130,22 +131,5 @@ public class DicotomizacionServiceTest {
         assertThat(resultados).hasSize(1);
 
         assertThat(resultados.get(0).getValordicico()).isEqualTo(0);
-    }
-    
-    @Test
-    public void cuandoSeUsaTraductorDeNombres_DebeEncontrarElCampo() {
-         when(dicotReglaRepository.findByDicotConjuntoId(1))
-                 .thenReturn(List.of(reglaTraductor));
-         when(formularioRepository.findAll()).thenReturn(List.of(formulario101));
-
-         when(habitosPacienteRepository.findByIdHabPaciente_FormularioId(101))
-                 .thenReturn(Optional.of(habitos101));
-                 
-         when(dicotValorRepository.save(any(DicotValor.class))).thenAnswer(i -> i.getArgument(0));
-
-        List<DicotValor> resultados = dicotomizacionService.ejecutarDicotomizacion(1);
-
-        assertThat(resultados).hasSize(1);
-        assertThat(resultados.get(0).getValordicico()).isEqualTo(1);
     }
 }

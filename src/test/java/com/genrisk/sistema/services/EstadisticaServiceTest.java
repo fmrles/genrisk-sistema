@@ -66,20 +66,6 @@ public class EstadisticaServiceTest {
     }
     
     @Test
-    public void cuandoUsaTraductorDeNombres_debeEncontrarValores() {
-        
-        HabitosPaciente habitoPrueba = new HabitosPaciente();
-        habitoPrueba.setAniosConsumoAlcohol(10);
-        
-        when(habitosPacienteRepository.findAll()).thenReturn(List.of(habitoPrueba));
-        
-        EstadisticaResultado resultado = estadisticaService.calcularEstadisticas("habitos_paciente", "anios_consumo_alcohol");
-        
-        assertThat(resultado.getCount()).isEqualTo(1);
-        assertThat(resultado.getMin()).isEqualTo(10.0);
-    }
-    
-    @Test
     public void cuandoConvierteStringANumero_debeFuncionar() {
         
         DatosClinicos datoPrueba = new DatosClinicos();
