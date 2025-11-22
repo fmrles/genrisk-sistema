@@ -1,5 +1,6 @@
 package com.genrisk.sistema.controller;
 
+import jakarta.validation.Valid;
 import com.genrisk.sistema.model.entity.Paciente;
 import com.genrisk.sistema.services.PacienteService;
 import com.genrisk.sistema.services.PutCommand;
@@ -34,12 +35,12 @@ public class PacienteController {
     }
 
     @PostMapping
-    public ResponseEntity<Paciente> createPaciente(@RequestBody Paciente paciente) {
+    public ResponseEntity<Paciente> createPaciente(@Valid @RequestBody Paciente paciente) {
         return pacienteService.createPost(paciente);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Paciente> updatePaciente(@PathVariable String id, @RequestBody Paciente pacienteDetails) {
+    public ResponseEntity<Paciente> updatePaciente(@PathVariable String id, @Valid @RequestBody Paciente pacienteDetails) {
         PutCommand<Paciente, String> pacienteNew = new PutCommand<>();
         pacienteNew.setId(id);
         pacienteNew.setNewData(pacienteDetails);
