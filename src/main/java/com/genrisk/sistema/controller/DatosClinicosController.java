@@ -7,6 +7,7 @@ import com.genrisk.sistema.services.PutCommand;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/datos-clinicos")
@@ -24,7 +25,7 @@ public class DatosClinicosController {
     }
 
     @PostMapping
-    public ResponseEntity<DatosClinicos> createDatosClinicos(@RequestBody DatosClinicos datosClinicos) {
+    public ResponseEntity<DatosClinicos> createDatosClinicos( @Valid @RequestBody DatosClinicos datosClinicos) {
         return datosClinicosService.createPost(datosClinicos);
     }
     
@@ -43,7 +44,7 @@ public class DatosClinicosController {
     public ResponseEntity<DatosClinicos> updateDatosClinicos(
             @PathVariable Integer itemFormu,
             @PathVariable Integer formularioId,
-            @RequestBody DatosClinicos datosDetails) {
+            @Valid @RequestBody DatosClinicos datosDetails) {
         
         DatosClinicosID id = new DatosClinicosID(itemFormu, formularioId);
         PutCommand<DatosClinicos, DatosClinicosID> command = new PutCommand<>();

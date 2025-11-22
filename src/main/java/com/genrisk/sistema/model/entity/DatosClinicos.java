@@ -1,6 +1,7 @@
 package com.genrisk.sistema.model.entity;
 
 import com.genrisk.sistema.model.entity.weakEntityKey.DatosClinicosID;
+import jakarta.validation.constraints.*;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -18,9 +19,11 @@ public class DatosClinicos{
     private DatosClinicosID idDatosCli;
 
     @Column(name = "adeno_gastrico", nullable = true, updatable = true)
+    @Pattern(regexp = "^(?i)(S[ií]|No)$", message = "Debe responder Sí o No")
     private String adenoGastrico;
 
     @Column(name = "fecha_adeno_gastrico", nullable = true, updatable = true)
+    @PastOrPresent(message = "La fecha de diagnóstico no es valida")
     private LocalDate fechaAdenoGastrico;
 
     @Column(name = "ant_fam_cancer_gast", nullable = true, updatable = true)
@@ -42,8 +45,10 @@ public class DatosClinicos{
     private String hpyloriPrueba;
 
     @Column(name = "hpylori_resultado", nullable = true, updatable = true)
+    @Pattern(regexp = "^(?i)(Positivo|Negativo)$", message = "Resultado H. pylori inválido")
     private String hpyloriResultado ;
 
     @Column(name = "hpylori_tiempo_test", nullable = true, updatable = true)
+    @Pattern(regexp = "^(<1 año|1–5 años|>5 años)$", message = "Tiempo del test inválido según CRF")
     private String hpyloriTiempoTest ;
 }
