@@ -6,6 +6,7 @@ import com.genrisk.sistema.services.HistopatologiaService;
 import com.genrisk.sistema.services.PutCommand;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -24,7 +25,7 @@ public class HistopatologiaController {
     }
 
     @PostMapping
-    public ResponseEntity<Histopatologia> createHistopatologia(@RequestBody Histopatologia histopatologia) {
+    public ResponseEntity<Histopatologia> createHistopatologia( @Valid @RequestBody Histopatologia histopatologia) {
         return histopatologiaService.createPost(histopatologia);
     }
     
@@ -43,7 +44,7 @@ public class HistopatologiaController {
     public ResponseEntity<Histopatologia> updateHistopatologia(
             @PathVariable Integer itemFormu,
             @PathVariable Integer formularioId,
-            @RequestBody Histopatologia histoDetails) {
+            @Valid @RequestBody Histopatologia histoDetails) {
         
         HistopatologiaID id = new HistopatologiaID(itemFormu, formularioId);
         PutCommand<Histopatologia, HistopatologiaID> command = new PutCommand<>();
