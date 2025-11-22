@@ -1,7 +1,10 @@
 package com.genrisk.sistema.services;
 
 import com.genrisk.sistema.model.entity.DicotValor;
+import com.genrisk.sistema.model.entity.Paciente;
 import com.genrisk.sistema.repository.DicotValorRepository;
+import com.genrisk.sistema.repository.PacienteRepository;
+
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -9,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +24,8 @@ public class ExcelExportService {
 
     @Autowired
     private DicotValorRepository dicotValorRepository;
+    @Autowired
+    private PacienteRepository pacienteRepository;
     
     /**
      * Estandariza los nombres de las categorías (columnas) para el reporte final de Excel.
@@ -94,59 +100,83 @@ public class ExcelExportService {
     /**
      * Método privado que toma una lista de DicotValor y genera el archivo Excel.
      */
-    private byte[] crearExcel(List<DicotValor> valores) throws Exception {
+    private byte[] crearExcel(List<DicotValor> valoresEncontrados) throws Exception {
         
-        // 1. Procesar y pivotar los datos
-        Map<String, Map<String, Integer>> pivotData = new LinkedHashMap<>();
-        Set<String> categorias = new TreeSet<>();
+        // 1. Obtener la lista MAESTRA de todos los pacientes en el sistema
+        // Esto asegura que nadie quede fuera del Excel, tenga datos o no.
+        List<Paciente> todosLosPacientes = pacienteRepository.findAll(); 
 
-        for (DicotValor valor : valores) {
-            String pacienteId = valor.getFormulario().getPaciente().getIdPaciente();
-            String categoriaEstandarizada = estandarizarNombreCategoria(valor.getCategoria());
-            Integer valordicico = valor.getValordicico();
+        // 2. Procesar los valores dicotomizados existentes y agruparlos en un Mapa
+        // Mapa: PacienteID -> (Mapa: Variable -> ValorDicotomico)
+        Map<String, Map<String, Integer>> datosPivot = new LinkedHashMap<>();
+        
+        // Usamos un Set ordenado para las columnas (variables) para que siempre salgan en el mismo orden
+        Set<String> columnasCategorias = new TreeSet<>();
 
-            categorias.add(categoriaEstandarizada);
-            Map<String, Integer> pacienteRow = pivotData.computeIfAbsent(pacienteId, k -> new LinkedHashMap<>());
-            pacienteRow.put(categoriaEstandarizada, valordicico);
+        for (DicotValor valor : valoresEncontrados) {
+            if (valor.getFormulario() != null && valor.getFormulario().getPaciente() != null) {
+                String pid = valor.getFormulario().getPaciente().getIdPaciente();
+                String cat = estandarizarNombreCategoria(valor.getCategoria());
+                Integer val = valor.getValordicico();
+
+                columnasCategorias.add(cat);
+                
+                datosPivot.computeIfAbsent(pid, k -> new HashMap<>()).put(cat, val);
+            }
         }
 
-        // 2. Crear el libro de Excel
+        // 3. Crear el libro de Excel
         try (XSSFWorkbook workbook = new XSSFWorkbook(); ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             
-            XSSFSheet sheet = workbook.createSheet("Dicotomizacion");
+            XSSFSheet sheet = workbook.createSheet("Matriz Dicotomizada");
 
-            // 3. Crear la Fila de Cabeceras
+            // --- CREAR ENCABEZADOS (FILA 0) ---
             Row headerRow = sheet.createRow(0);
-            headerRow.createCell(0).setCellValue("paciente_id");
+            headerRow.createCell(0).setCellValue("ID Paciente"); // Primera columna fija
+            headerRow.createCell(1).setCellValue("Tipo");        // Segunda columna útil (Caso/Control)
 
-            int colNum = 1;
-            for (String categoria : categorias) {
-                headerRow.createCell(colNum++).setCellValue(categoria);
+            int colNum = 2;
+            for (String cat : columnasCategorias) {
+                headerRow.createCell(colNum++).setCellValue(cat);
             }
 
-            // 4. Llenar las Filas de Datos
+            // --- LLENAR DATOS (FILA 1 en adelante) ---
+            // Iteramos sobre TODOS los pacientes, no solo los que tienen datos en 'datosPivot'
             int rowNum = 1;
-            for (Map.Entry<String, Map<String, Integer>> entry : pivotData.entrySet()) {
-                String pacienteId = entry.getKey();
-                Map<String, Integer> datosFila = entry.getValue();
+            for (Paciente paciente : todosLosPacientes) {
+                String pacienteId = paciente.getIdPaciente();
+                
+                // Recuperamos los datos dicotomizados de este paciente (si existen)
+                Map<String, Integer> datosDeEstePaciente = datosPivot.getOrDefault(pacienteId, new HashMap<>());
                 
                 Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(pacienteId); 
+                
+                // Columna 0: ID
+                row.createCell(0).setCellValue(pacienteId);
+                
+                // Columna 1: Tipo de Paciente (útil para filtrar en Excel/STATA)
+                row.createCell(1).setCellValue(paciente.getTipoPaciente());
 
-                colNum = 1;
-                for (String categoria : categorias) {
-                    Integer valor = datosFila.getOrDefault(categoria, 0); 
-                    row.createCell(colNum++).setCellValue(valor);
+                // Columnas 2...N: Variables dicotomizadas
+                colNum = 2;
+                for (String cat : columnasCategorias) {
+                    Integer valor = datosDeEstePaciente.get(cat);
+                    
+                    if (valor != null) {
+                        // Si existe el dato (0 o 1), lo escribimos
+                        row.createCell(colNum++).setCellValue(valor);
+                    } else {
+                        // Si NO existe dato, dejamos la celda en blanco (NULL en STATA)
+                        // O podrías poner row.createCell(colNum++).setCellValue("."); 
+                        row.createCell(colNum++).setBlank();
+                    }
                 }
             }
 
-            // 5. Autoajustar el tamaño de las columnas
-            Row adjustmentRow = sheet.createRow(rowNum);
-            for (int i = 0; i <= categorias.size(); i++) {
+            // 4. Autoajustar el ancho de las columnas para que se vea bonito
+            for (int i = 0; i < colNum; i++) {
                 sheet.autoSizeColumn(i);
             }
-            sheet.removeRow(adjustmentRow);
-
 
             workbook.write(baos);
             return baos.toByteArray();
