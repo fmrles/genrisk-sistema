@@ -6,6 +6,7 @@ import com.genrisk.sistema.services.PutCommand;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/genotipificaciones")
@@ -28,16 +29,14 @@ public class GenotipificacionController {
     }
 
     @PostMapping
-    public ResponseEntity<Genotipificacion> createGenotipificacion(@RequestBody Genotipificacion genotipificacion) {
-        // Esta entidad no tiene relaciones muy complejas (espero)
-        // por lo que el JSON es directo.
+    public ResponseEntity<Genotipificacion> createGenotipificacion(@Valid @RequestBody Genotipificacion genotipificacion) { 
         return genotipificacionService.createPost(genotipificacion);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Genotipificacion> updateGenotipificacion(
             @PathVariable Integer id,
-            @RequestBody Genotipificacion genotipificacionDetails) {
+            @Valid @RequestBody Genotipificacion genotipificacionDetails) {
         
         PutCommand<Genotipificacion, Integer> command = new PutCommand<>();
         command.setId(id);
