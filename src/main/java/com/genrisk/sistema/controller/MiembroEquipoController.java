@@ -1,12 +1,12 @@
 package com.genrisk.sistema.controller;
+
 import com.genrisk.sistema.model.entity.*;
 import com.genrisk.sistema.services.*;
-
 import java.util.List;
-
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 
 
@@ -30,7 +30,7 @@ public class MiembroEquipoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MiembroEquipo> putMiembro(@PathVariable Integer id, @RequestBody MiembroEquipo newMiembro){
+    public ResponseEntity<MiembroEquipo> putMiembro(@PathVariable Integer id, @Valid @RequestBody MiembroEquipo newMiembro){
         PutCommand<MiembroEquipo, Integer> miembroNew = new PutCommand<>();
         miembroNew.setId(id);
         miembroNew.setNewData(newMiembro);
@@ -38,7 +38,7 @@ public class MiembroEquipoController {
     }
 
     @PostMapping()
-    public ResponseEntity<MiembroEquipo> createMiembro(@RequestBody MiembroEquipo miembro){
+    public ResponseEntity<MiembroEquipo> createMiembro(@Valid @RequestBody MiembroEquipo miembro){
         return miembroEquipoService.createPost(miembro);
     }
 
