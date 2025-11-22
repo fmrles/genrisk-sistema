@@ -3,7 +3,6 @@ package com.genrisk.sistema.services;
 import com.genrisk.sistema.model.dto.EstadisticaResultado;
 import com.genrisk.sistema.model.entity.DatosClinicos;
 import com.genrisk.sistema.model.entity.DatosGenerales;
-import com.genrisk.sistema.model.entity.HabitosPaciente;
 import com.genrisk.sistema.repository.DatosClinicosRepository;
 import com.genrisk.sistema.repository.DatosGeneralesRepository;
 import com.genrisk.sistema.repository.GenotipificacionRepository;
