@@ -17,13 +17,14 @@ public class DatosGenerales{
     private DatosGeneralesID idDatosGen;
 
     @Column(name = "edad", nullable = true, updatable = true)
-    @Min(value = 18, message = "La edad mínima permitida es 18 años") // Validación
-    @Max(value = 120, message = "La edad no puede superar los 120 años") // Validación
+    @NotNull(message = "La edad es obligatoria")
+    @Min(value = 18, message = "La edad mínima permitida es 18 años") 
+    @Max(value = 120, message = "La edad no puede superar los 120 años")
     private Integer edad;
 
     @Column(name = "sexo", nullable = true, updatable = true)
-    // Validación con expresión regular para asegurar consistencia
-    @Pattern(regexp = "^(?i)(Masculino|Femenino)$", message = "El sexo debe ser 'Masculino' o 'Femenino'")
+    @NotNull(message = "El sexo es obligatorio")
+    @Pattern(regexp = "^(?i)(Hombre|Mujer)$", message = "El sexo debe ser 'Hombre' o 'Mujer'")
     private String sexo;
 
     @Column(name = "peso", nullable = true, updatable = true)
@@ -40,6 +41,7 @@ public class DatosGenerales{
     private Double estatura;
 
     @Column(name = "zona_residencial", nullable = true, updatable = true)
+    @Pattern(regexp = "^(?i)(Urbana|Rural)$", message = "Zona debe ser 'Urbana' o 'Rural'")
     private String zonaResidencial;
 
     @Column(name = "anios_resi_actual", nullable = true, updatable = true)
@@ -47,6 +49,7 @@ public class DatosGenerales{
     private Integer aniosResiActual;
 
     @Column(name = "educacion", nullable = true, updatable = true)
+    @Pattern(regexp = "^(?i)(Básico|Medio|Superior)$", message = "Nivel educacional inválido")
     private String educacion;
 
     @Column(name = "ocupacion", nullable = true, updatable = true)
