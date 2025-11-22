@@ -1,5 +1,6 @@
 package com.genrisk.sistema.controller;
 
+import jakarta.validation.Valid;
 import com.genrisk.sistema.model.entity.DatosGenerales;
 import com.genrisk.sistema.model.entity.weakEntityKey.DatosGeneralesID;
 import com.genrisk.sistema.services.DatosGeneralesService;
@@ -24,7 +25,7 @@ public class DatosGeneralesController {
     }
 
     @PostMapping
-    public ResponseEntity<DatosGenerales> createDatosGenerales(@RequestBody DatosGenerales datosGenerales) {
+    public ResponseEntity<DatosGenerales> createDatosGenerales(@Valid @RequestBody DatosGenerales datosGenerales) {
         // Ejemplo de JSON que envía el ID anidado:
         // {
         //   "idDatosGen": { "itemFormu": 1, "formularioId": 101 },
@@ -47,7 +48,7 @@ public class DatosGeneralesController {
     public ResponseEntity<DatosGenerales> updateDatosGenerales(
             @PathVariable Integer itemFormu,
             @PathVariable Integer formularioId,
-            @RequestBody DatosGenerales datosDetails) {
+            @Valid @RequestBody DatosGenerales datosDetails) {
         
         DatosGeneralesID id = new DatosGeneralesID(itemFormu, formularioId);
         PutCommand<DatosGenerales, DatosGeneralesID> command = new PutCommand<>();
