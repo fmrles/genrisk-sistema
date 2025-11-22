@@ -1,6 +1,6 @@
 package com.genrisk.sistema.model.entity;
 import com.genrisk.sistema.model.entity.weakEntityKey.HabitosPacienteID;
-
+import jakarta.validation.constraints.*;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,6 +17,7 @@ public class HabitosPaciente {
     private HabitosPacienteID idHabPaciente;
 
     @Column(name = "estado_consumo_tabaco", nullable = true, updatable = true)
+    @Pattern(regexp = "^(?i)(Nunca fumó|Exfumador|Fumador actual)$", message = "Estado de tabaquismo inválido")
     private String estadoConsumoTabaco;
 
     @Column(name = "edad_inicio_tabaco", nullable = true, updatable = true)
@@ -41,6 +42,7 @@ public class HabitosPaciente {
     private Integer cantidadAlcohol;
 
     @Column(name = "anios_consumo_alcohol", nullable = true, updatable = true)
+    @PositiveOrZero(message = "Años de consumo no pueden ser negativos")
     private Integer aniosConsumoAlcohol;
 
     @Column(name = "ex_consumidor_alcohol", nullable = true, updatable = true)

@@ -6,6 +6,7 @@ import com.genrisk.sistema.services.HabitosPacienteService;
 import com.genrisk.sistema.services.PutCommand;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class HabitosPacienteController {
     }
 
     @PostMapping
-    public ResponseEntity<HabitosPaciente> createHabitosPaciente(@RequestBody HabitosPaciente habitosPaciente) {
+    public ResponseEntity<HabitosPaciente> createHabitosPaciente( @Valid @RequestBody HabitosPaciente habitosPaciente) {
         return habitosPacienteService.createPost(habitosPaciente);
     }
     
@@ -44,7 +45,7 @@ public class HabitosPacienteController {
     public ResponseEntity<HabitosPaciente> updateHabitosPaciente(
             @PathVariable Integer itemFormu,
             @PathVariable Integer formularioId,
-            @RequestBody HabitosPaciente habitosDetails) {
+            @Valid @RequestBody HabitosPaciente habitosDetails) {
         
         HabitosPacienteID id = new HabitosPacienteID(itemFormu, formularioId);
         PutCommand<HabitosPaciente, HabitosPacienteID> command = new PutCommand<>();
