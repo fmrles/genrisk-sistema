@@ -6,6 +6,7 @@ import com.genrisk.sistema.services.FactDietariosAmbientalesService;
 import com.genrisk.sistema.services.PutCommand;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -24,7 +25,7 @@ public class FactDietariosAmbientalesController {
     }
 
     @PostMapping
-    public ResponseEntity<FactDietariosAmbientales> createFactor(@RequestBody FactDietariosAmbientales factor) {
+    public ResponseEntity<FactDietariosAmbientales> createFactor(@Valid @RequestBody FactDietariosAmbientales factor) {
         return factDietariosService.createPost(factor);
     }
     
@@ -42,7 +43,7 @@ public class FactDietariosAmbientalesController {
     public ResponseEntity<FactDietariosAmbientales> updateFactor(
             @PathVariable Integer itemFormu,
             @PathVariable Integer formularioId,
-            @RequestBody FactDietariosAmbientales factorDetails) {
+            @Valid @RequestBody FactDietariosAmbientales factorDetails) {
         
         FactDietariosAmbientalesID id = new FactDietariosAmbientalesID(itemFormu, formularioId);
         PutCommand<FactDietariosAmbientales, FactDietariosAmbientalesID> command = new PutCommand<>();
