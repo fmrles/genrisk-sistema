@@ -44,16 +44,27 @@ public class DatosGenerales{
     @Pattern(regexp = "^(?i)(Urbana|Rural)$", message = "Zona debe ser 'Urbana' o 'Rural'")
     private String zonaResidencial;
 
-    @Column(name = "anios_resi_actual", nullable = true, updatable = true)
-    @Min(value = 0, message = "Los años de residencia no pueden ser negativos")
-    private Integer aniosResiActual;
-
     @Column(name = "educacion", nullable = true, updatable = true)
     @Pattern(regexp = "^(?i)(Básico|Medio|Superior)$", message = "Nivel educacional inválido")
     private String educacion;
 
     @Column(name = "ocupacion", nullable = true, updatable = true)
     private String ocupacion;
+
+    @Column (name = "nacionalidad", nullable = true, updatable = true)
+    private String nacionalidad;
+
+    @Column(name = "direccion", nullable = true, updatable = true)
+    private String direccion;
+
+    @Column(name = "comuna", nullable = true, updatable = true)
+    private String comuna;
+
+    @Column(name = "ciudad", nullable = true, updatable = true)
+    private String ciudad;
+
+    @Column(name = "prevision_salud", nullable = true, updatable = true)
+    private String previsionSalud;
 
     //Método para el cálculo automático del IMC
     // @PrePersist: Se ejecuta antes de crear un nuevo registro (SQL INSERT)

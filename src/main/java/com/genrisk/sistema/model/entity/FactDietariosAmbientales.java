@@ -17,10 +17,6 @@ public class FactDietariosAmbientales{
     @EmbeddedId
     private FactDietariosAmbientalesID idFact;
 
-    @Column(name = "trabajo_zona_rural", nullable = true, updatable = true)
-    @Pattern(regexp = "^(?i)(S[ií]|No)$", message = "Trabajo rural debe ser Sí o No")
-    private String trabajoZonaRural;
-
     @Column(name = "agua_consumo_zona", nullable = true, updatable = true)
     @Pattern(regexp = "^(?i)(Red pública|Pozo|Camión aljibe|Otra.*)$", 
              message = "Fuente de agua inválida (Opciones: Red pública, Pozo, Camión aljibe, Otra)")
@@ -67,7 +63,13 @@ public class FactDietariosAmbientales{
              message = "Consumo carnes/cecinas inválido (<1/sem, 1–2/sem, ≥3/sem)")
     private String dietaCarnesCecinas;
 
-    @Column(name = "agua_consumo_rural", nullable = true, updatable = true)
-    private String aguaConsumoRural;
+    @Column(name = "ali_condimentado", nullable = true, updatable = true)
+    @Pattern(regexp = "^(Casi Nunca/Rara vez|1 a 2 veces por semana|3 o más veces por semana)", 
+                        message = "Alimentos condimentados inválido")
+    private String aliCondimentado;
 
+    @Column(name = "infusiones_bebidas", nullable = true, updatable = true)
+    @Pattern(regexp = "^(Nunca/Rara vez|1-2/sem|≥3/sem)", 
+                        message = "Infusiones y bebidas inválido")
+    private String infusionesBebidas;
 }

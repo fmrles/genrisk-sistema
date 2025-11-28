@@ -1,5 +1,7 @@
 package com.genrisk.sistema.model.entity;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -35,4 +37,9 @@ public class Paciente {
     @NotBlank(message = "El tipo de paciente es obligatorio")
     @Pattern(regexp = "^(?i)(Caso|Control)$", message = "El tipo de paciente debe ser 'Caso' o 'Control'")
     private String tipoPaciente;
+
+    @Column(name = "fecha_inclusion") //Se debe revisar a qué se refiere exactamente con fecha inclusion
+    @NotNull(message ="La fecha de inclusión solo debe ser actual o futura")
+    @FutureOrPresent(message = "La fecha no debe ser anterior a la del ingreso del nuevo paciente")
+    private LocalDate fechaInclusion;
 }
