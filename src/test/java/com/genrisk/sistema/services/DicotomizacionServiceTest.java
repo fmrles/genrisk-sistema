@@ -8,6 +8,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +19,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class DicotomizacionServiceTest {
+public class DicotomizacionServiceTest { //Revisar los LocalDate en caso de fallas
 
     @Mock private DicotReglaRepository dicotReglaRepository;
     @Mock private DicotValorRepository dicotValorRepository;
@@ -43,7 +45,7 @@ public class DicotomizacionServiceTest {
     @BeforeEach
     void setUp() {
 
-        paciente1 = new Paciente("pac1", "Paciente 1", "p1@t.cl", "dir1", "Caso");
+        paciente1 = new Paciente("pac1", "Paciente 1", "p1@t.cl", "dir1", "Caso", LocalDate.of(2025, 10, 11));
         formulario101 = new Formulario(101, "Activo", "Caso", null, "pac1", paciente1);
         
         datosGenerales101 = new DatosGenerales();
