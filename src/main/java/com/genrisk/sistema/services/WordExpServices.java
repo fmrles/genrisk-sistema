@@ -217,9 +217,8 @@ public class WordExpServices {
                 configurarCeldaDatos(row.getCell(4), safeDouble(dg.getImc()));
                 configurarCeldaDatos(row.getCell(5), safeDouble(dg.getEstatura()));
                 configurarCeldaDatos(row.getCell(6), safe(dg.getZonaResidencial()));
-                configurarCeldaDatos(row.getCell(7), safe(dg.getAniosResiActual()));
-                configurarCeldaDatos(row.getCell(8), safe(dg.getEducacion()));
-                configurarCeldaDatos(row.getCell(9), safe(dg.getOcupacion()));
+                configurarCeldaDatos(row.getCell(7), safe(dg.getEducacion()));
+                configurarCeldaDatos(row.getCell(8), safe(dg.getOcupacion()));
             }
 
             agregarSaltoLinea(document);
@@ -291,9 +290,9 @@ public class WordExpServices {
             List<HabitosPaciente> list = habitosPacienteRepository.findAll();
 
             String[] headers = new String[] {
-                "Form ID", "Estado Tabaco", "Edad Inicio", "Cant. Prom.", 
+                "Form ID", "Estado Tabaco", "Cant. Prom.", 
                 "Tiempo Consumo (meses)", "Consumo Alcohol", "Frecuencia Alcohol", 
-                "Años Consumo", "Ejercicio"
+                "Años Consumo"
             };
 
             XWPFTable table = document.createTable(list.size() + 1, headers.length);
@@ -312,13 +311,11 @@ public class WordExpServices {
                     XWPFTableRow row = table.getRow(rowIndex++);
                     configurarCeldaDatos(row.getCell(0), String.valueOf(h.getIdHabPaciente().getFormularioId()));
                     configurarCeldaDatos(row.getCell(1), safe(h.getEstadoConsumoTabaco()));
-                    configurarCeldaDatos(row.getCell(2), safe(h.getEdadInicioTabaco()));
-                    configurarCeldaDatos(row.getCell(3), safe(h.getCantPromTabaco()));
-                    configurarCeldaDatos(row.getCell(4), safe(h.getTiempoTabaco()));
-                    configurarCeldaDatos(row.getCell(5), safe(h.getEstadoConsumoAlcohol()));
-                    configurarCeldaDatos(row.getCell(6), safe(h.getFrecuenciaAlcohol()));
-                    configurarCeldaDatos(row.getCell(7), safe(h.getAniosConsumoAlcohol()));
-                    configurarCeldaDatos(row.getCell(8), safe(h.getEjercicio()));
+                    configurarCeldaDatos(row.getCell(2), safe(h.getCantPromTabaco()));
+                    configurarCeldaDatos(row.getCell(3), safe(h.getTiempoTabaco()));
+                    configurarCeldaDatos(row.getCell(4), safe(h.getEstadoConsumoAlcohol()));
+                    configurarCeldaDatos(row.getCell(5), safe(h.getFrecuenciaAlcohol()));
+                    configurarCeldaDatos(row.getCell(6), safe(h.getAniosConsumoAlcohol()));
                 }
             } else {
                 configurarCeldaDatos(table.getRow(1).getCell(0), "Sin registros");
@@ -343,7 +340,7 @@ public class WordExpServices {
 
             // Reducir headers para caber en una página
             String[] headers = new String[] {
-                "Form ID", "Trabajo Rural", "Agua Consumo", "Tratamiento Agua", 
+                "Form ID", "Agua Consumo", "Tratamiento Agua", 
                 "Fumigaciones", "Exposición Químicos", "Dieta Sal", "Dieta Frituras"
             };
 
@@ -360,13 +357,12 @@ public class WordExpServices {
                 for (FactDietariosAmbientales f : list) {
                     XWPFTableRow row = table.getRow(r++);
                     configurarCeldaDatos(row.getCell(0), safe(f.getIdFact().getFormularioId()));
-                    configurarCeldaDatos(row.getCell(1), safe(f.getTrabajoZonaRural()));
-                    configurarCeldaDatos(row.getCell(2), safe(f.getAguaConsumoZona()));
-                    configurarCeldaDatos(row.getCell(3), safe(f.getTratamientoAgua()));
-                    configurarCeldaDatos(row.getCell(4), safe(f.getFumigaciones()));
-                    configurarCeldaDatos(row.getCell(5), safe(f.getExposicionQuimicos()));
-                    configurarCeldaDatos(row.getCell(6), safe(f.getDietaAgregaSal()));
-                    configurarCeldaDatos(row.getCell(7), safe(f.getDietaFrituras()));
+                    configurarCeldaDatos(row.getCell(1), safe(f.getAguaConsumoZona()));
+                    configurarCeldaDatos(row.getCell(2), safe(f.getTratamientoAgua()));
+                    configurarCeldaDatos(row.getCell(3), safe(f.getFumigaciones()));
+                    configurarCeldaDatos(row.getCell(4), safe(f.getExposicionQuimicos()));
+                    configurarCeldaDatos(row.getCell(5), safe(f.getDietaAgregaSal()));
+                    configurarCeldaDatos(row.getCell(6), safe(f.getDietaFrituras()));
                 }
             } else {
                 configurarCeldaDatos(table.getRow(1).getCell(0), "Sin registros");
@@ -513,8 +509,6 @@ public class WordExpServices {
             dg.getEdad(), dg.getSexo(), dg.getImc()));
         agregarTexto(document, String.format("Peso: %.1f kg | Estatura: %.1f cm", 
             dg.getPeso(), dg.getEstatura()));
-        agregarTexto(document, String.format("Zona: %s | Años residencia: %d", 
-            dg.getZonaResidencial(), dg.getAniosResiActual()));
         agregarTexto(document, String.format("Educación: %s | Ocupación: %s", 
             dg.getEducacion(), dg.getOcupacion()));
         agregarSaltoLinea(document);
@@ -556,11 +550,11 @@ public class WordExpServices {
 
         agregarSubtitulo(document,"Tabaco" ); 
 
-        agregarTexto(document, String.format("Estado de Consumo: %s | Edad de Inicio: %s", 
-            hp.getEstadoConsumoTabaco(), hp.getEdadInicioTabaco()));
+        agregarTexto(document, String.format("Estado de Consumo: %s", 
+            hp.getEstadoConsumoTabaco()));
         agregarTexto(document, String.format("Cantidad Promedio (unidades): %s | Tiempo en Consumo (meses): %s", 
             hp.getCantPromTabaco(), hp.getTiempoTabaco())); 
-        agregarTexto(document, String.format("Tiempo sin consumir (meses): %s", 
+        agregarTexto(document, String.format("Tiempo sin consumir (años): %s", 
             hp.getExConsumidorTabaco())); 
 
         agregarSaltoLinea(document);
@@ -574,22 +568,14 @@ public class WordExpServices {
             hp.getCantidadAlcohol(), hp.getAniosConsumoAlcohol(), hp.getExConsumidorAlcohol()));
 
         agregarSaltoLinea(document);
-        agregarSubtitulo(document,"Ejercicio" ); 
-        agregarSaltoLinea(document);
-
-
-        agregarTexto(document, String.format("Ejercicio: %s | Frecuencia: %s", 
-            hp.getEjercicio(), hp.getFrecuenciaEjercicio()));    
-
-        agregarSaltoLinea(document);
     }
 
     private void agregarFactoresDietariosAmbientales(XWPFDocument document, FactDietariosAmbientales fda){
         agregarTextoNegrita(document, "Factores Dietario-Ambiental del Paciente:");
         agregarSaltoLinea(document);
 
-        agregarTexto(document, String.format("Trabajo Zona Rural: %s | Consumo Agua: %s | Tratamiento Agua: %s", 
-            fda.getTrabajoZonaRural(), fda.getAguaConsumoZona(), fda.getTratamientoAgua()));
+        agregarTexto(document, String.format("Consumo Agua: %s | Tratamiento Agua: %s", 
+            fda.getAguaConsumoZona(), fda.getTratamientoAgua()));
 
         agregarTexto(document, String.format("Fumigaciones: %s | ExposicionPesticidas: %s | CombustiónLeña: %s", 
             fda.getFumigaciones(), fda.getExposicionPesticidas(), fda.getCombusLenaDiario()));
@@ -597,8 +583,8 @@ public class WordExpServices {
         agregarTexto(document, String.format("ExposiciónQuímicos: %s | AgregaSal: %s | ConsumoFrutaVerdura: %s", 
             fda.getExposicionQuimicos(), fda.getDietaAgregaSal(), fda.getDietaFrutasVerduras()));
 
-        agregarTexto(document, String.format("ConsumoFrituras: %s | ConsumoCarnesCecinas: %s | ConsumoRuralAgua: %s", 
-            fda.getDietaFrituras(), fda.getDietaCarnesCecinas(), fda.getAguaConsumoRural()));
+        agregarTexto(document, String.format("ConsumoFrituras: %s | ConsumoCarnesCecinas: %s", 
+            fda.getDietaFrituras(), fda.getDietaCarnesCecinas()));
     }
 
     private void agregarPiePagina(XWPFDocument document) {

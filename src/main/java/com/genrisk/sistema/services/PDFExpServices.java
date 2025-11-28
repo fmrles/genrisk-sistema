@@ -253,7 +253,7 @@ public class PDFExpServices{
 
     private PdfPTable createPdfTableForDatosGenerales() {
         List<DatosGenerales> datosGenerales = datosGeneralesRepository.findAll();
-        PdfPTable table = new PdfPTable(10);
+        PdfPTable table = new PdfPTable(9);
         table.setWidthPercentage(100);
         // Ajuste de ancho de columnas para mejor visualización
         try { table.setWidths(new float[] {1f, 1f, 1f, 1f, 1f, 1f, 1.5f, 1f, 1.5f, 2f}); } catch (DocumentException e) { /* ignore */ }
@@ -270,7 +270,6 @@ public class PDFExpServices{
             agregarCeldaTabla(table, safeDouble(dg.getImc()));
             agregarCeldaTabla(table, safeDouble(dg.getEstatura()));
             agregarCeldaTabla(table, safe(dg.getZonaResidencial()));
-            agregarCeldaTabla(table, safe(dg.getAniosResiActual()));
             agregarCeldaTabla(table, safe(dg.getEducacion()));
             agregarCeldaTabla(table, safe(dg.getOcupacion()));
         }
@@ -315,23 +314,21 @@ public class PDFExpServices{
 
     private PdfPTable createPdfTableForHabitosPaciente() {
         List<HabitosPaciente> list = habitosPacienteRepository.findAll();
-        // Reducido a 8 columnas clave para evitar desborde
-        PdfPTable table = new PdfPTable(8); 
+        
+        PdfPTable table = new PdfPTable(6); 
         table.setWidthPercentage(100);
         
         agregarEncabezadoTabla(table,
-             "Form ID", "Estado Tabaco", "Edad Inicio Tab.", "Tiempo Tab. (meses)", 
-            "Estado Alcohol", "Frec. Alcohol", "Años Consumo Alcohol", "Ejercicio");
+             "Form ID", "Estado Tabaco", "Tiempo Tab. (meses)", 
+            "Estado Alcohol", "Frec. Alcohol", "Años Consumo Alcohol");
 
         for (HabitosPaciente h : list) {
             agregarCeldaTabla(table, safe(h.getIdHabPaciente().getFormularioId()));
             agregarCeldaTabla(table, safe(h.getEstadoConsumoTabaco()));
-            agregarCeldaTabla(table, safe(h.getEdadInicioTabaco()));
             agregarCeldaTabla(table, safe(h.getTiempoTabaco()));
             agregarCeldaTabla(table, safe(h.getEstadoConsumoAlcohol()));
             agregarCeldaTabla(table, safe(h.getFrecuenciaAlcohol()));
             agregarCeldaTabla(table, safe(h.getAniosConsumoAlcohol()));
-            agregarCeldaTabla(table, safe(h.getEjercicio()));
         }
         return table;
     }
@@ -339,16 +336,15 @@ public class PDFExpServices{
     private PdfPTable createPdfTableForFactDietarioAmbiental() {
         List<FactDietariosAmbientales> list = factDietariosAmbientalesRepository.findAll();
         // Reducido a 8 columnas clave para evitar desborde
-        PdfPTable table = new PdfPTable(8); 
+        PdfPTable table = new PdfPTable(7); 
         table.setWidthPercentage(100);
         
         agregarEncabezadoTabla(table,
-            "Form ID", "Trabajo Rural", "Agua Consumo", "Fumigaciones", "Exp. Pesticidas",
+            "Form ID", "Agua Consumo", "Fumigaciones", "Exp. Pesticidas",
             "Exp. Químicos", "Dieta Agrega Sal", "Dieta Frituras");
 
         for (FactDietariosAmbientales f : list) {
             agregarCeldaTabla(table, safe(f.getIdFact().getFormularioId()));
-            agregarCeldaTabla(table, safe(f.getTrabajoZonaRural()));
             agregarCeldaTabla(table, safe(f.getAguaConsumoZona()));
             agregarCeldaTabla(table, safe(f.getFumigaciones()));
             agregarCeldaTabla(table, safe(f.getExposicionPesticidas()));
@@ -444,9 +440,7 @@ public class PDFExpServices{
         document.add(new Paragraph(String.format("Peso: %s kg | Estatura: %s cm",
             dg.getPeso() != null ? String.format("%.1f", dg.getPeso()) : "N/A",
             dg.getEstatura() != null ? String.format("%.1f", dg.getEstatura()) : "N/A"), NORMAL_FONT));
-        document.add(new Paragraph(String.format("Zona: %s | Años residencia: %s",
-            safe(dg.getZonaResidencial()),
-            dg.getAniosResiActual() != null ? String.valueOf(dg.getAniosResiActual()) : "N/A"), NORMAL_FONT));
+        document.add(new Paragraph(String.format("Zona: %s", safe(dg.getZonaResidencial()), NORMAL_FONT)));
         document.add(new Paragraph(String.format("Educación: %s | Ocupación: %s",
             safe(dg.getEducacion()), safe(dg.getOcupacion())), NORMAL_FONT));
         document.add(Chunk.NEWLINE);
@@ -483,8 +477,8 @@ public class PDFExpServices{
         Paragraph p = new Paragraph("Factores Dietario-Ambiental del Paciente:", BOLD_FONT);
         document.add(p);
 
-        document.add(new Paragraph(String.format("Trabajo Zona Rural: %s | Consumo Agua: %s | Tratamiento Agua: %s",
-            safe(fda.getTrabajoZonaRural()), safe(fda.getTratamientoAgua() != null ? fda.getTratamientoAgua() : fda.getAguaConsumoZona()),
+        document.add(new Paragraph(String.format("Consumo Agua: %s | Tratamiento Agua: %s",
+            safe(fda.getTratamientoAgua() != null ? fda.getTratamientoAgua() : fda.getAguaConsumoZona()),
             safe(fda.getTratamientoAgua())), NORMAL_FONT));
 
         document.add(new Paragraph(String.format("Fumigaciones: %s | ExposicionPesticidas: %s | CombustiónLeña: %s",
