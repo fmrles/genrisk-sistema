@@ -117,9 +117,9 @@ public class PDFExpServices{
 
             List<Paciente> pacientes = pacienteRepository.findAll();
 
-            PdfPTable table = new PdfPTable(5);
+            PdfPTable table = new PdfPTable(6);
             table.setWidthPercentage(100);
-            agregarEncabezadoTabla(table, "ID", "Nombre", "Correo", "Dirección", "Tipo");
+            agregarEncabezadoTabla(table, "ID", "Nombre", "Correo", "Dirección", "Tipo", "Fecha de Inclusión");
 
             for (Paciente paciente : pacientes) {
                 agregarCeldaTabla(table, safe(paciente.getIdPaciente()));
@@ -127,6 +127,7 @@ public class PDFExpServices{
                 agregarCeldaTabla(table, safe(paciente.getCorreoPaciente()));
                 agregarCeldaTabla(table, safe(paciente.getDireccionPaciente()));
                 agregarCeldaTabla(table, safe(paciente.getTipoPaciente()));
+                agregarCeldaTabla(table, safe(paciente.getFechaInclusion()));
             }
 
             document.add(table);
@@ -151,13 +152,14 @@ public class PDFExpServices{
 
             List<Paciente> pacientes = pacienteRepository.findAll();
 
-            PdfPTable table = new PdfPTable(2);
+            PdfPTable table = new PdfPTable(3);
             table.setWidthPercentage(100);
-            agregarEncabezadoTabla(table, "ID", "Tipo");
+            agregarEncabezadoTabla(table, "ID", "Tipo", "Fecha de Inclusión");
 
             for (Paciente paciente : pacientes) {
                 agregarCeldaTabla(table, safe(paciente.getIdPaciente()));
                 agregarCeldaTabla(table, safe(paciente.getTipoPaciente()));
+                agregarCeldaTabla(table, safe(paciente.getFechaInclusion()));
             }
 
             document.add(table);
@@ -512,7 +514,8 @@ public class PDFExpServices{
         document.add(new Paragraph("Nombre: " + safe(paciente.getNombrePaciente()), NORMAL_FONT));
         document.add(new Paragraph("Correo: " + safe(paciente.getCorreoPaciente()), NORMAL_FONT));
         document.add(new Paragraph("Dirección: " + safe(paciente.getDireccionPaciente()), NORMAL_FONT));
-        document.add(new Paragraph("Tipo: " + safe(paciente.getTipoPaciente()), NORMAL_FONT));
+        document.add(new Paragraph("Tipo de Paciente: " + safe(paciente.getTipoPaciente()), NORMAL_FONT));
+        document.add(new Paragraph("Fecha de Inclusión: " +safe(paciente.getFechaInclusion()), NORMAL_FONT));
     }
 
     private void agregarSeccionPacienteReclutador(Document document, Paciente paciente) throws DocumentException {
@@ -521,7 +524,8 @@ public class PDFExpServices{
         document.add(Chunk.NEWLINE);
 
         document.add(new Paragraph("ID: " + safe(paciente.getIdPaciente()), NORMAL_FONT));
-        document.add(new Paragraph("Tipo: " + safe(paciente.getTipoPaciente()), NORMAL_FONT));
+        document.add(new Paragraph("Tipo de Paciente: " + safe(paciente.getTipoPaciente()), NORMAL_FONT));
+        document.add(new Paragraph("Fecha de Inclusión: " +safe(paciente.getFechaInclusion()), NORMAL_FONT));
     }
 
     private void agregarPiePagina(Document document) throws DocumentException {
