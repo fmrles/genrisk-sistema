@@ -44,6 +44,9 @@ public class DatosGenerales{
     @Pattern(regexp = "^(?i)(Urbana|Rural)$", message = "Zona debe ser 'Urbana' o 'Rural'")
     private String zonaResidencial;
 
+    @Column(name="anios_resi_actual", nullable = true, updatable = true)
+    private String aniosResiActual;
+
     @Column(name = "educacion", nullable = true, updatable = true)
     @Pattern(regexp = "^(?i)(Básico|Medio|Superior)$", message = "Nivel educacional inválido")
     private String educacion;
