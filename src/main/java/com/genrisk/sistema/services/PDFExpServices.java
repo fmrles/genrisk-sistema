@@ -251,65 +251,78 @@ public class PDFExpServices{
         return baos.toByteArray();
     }
 
-    // ============= MÉTODOS AUXILIARES =============
+    // ============= MÉTODOS CREADORES =============
 
     private PdfPTable createPdfTableForDatosGenerales() {
         List<DatosGenerales> datosGenerales = datosGeneralesRepository.findAll();
-        PdfPTable table = new PdfPTable(9);
+        PdfPTable table = new PdfPTable(16);
         table.setWidthPercentage(100);
         // Ajuste de ancho de columnas para mejor visualización
-        try { table.setWidths(new float[] {1f, 1f, 1f, 1f, 1f, 1f, 1.5f, 1f, 1.5f, 2f}); } catch (DocumentException e) { /* ignore */ }
+        try { table.setWidths(new float[] {0.7f, 0.7f, 0.6f, 0.6f, 0.6f, 0.5f, 0.5f, 1f, 1f, 1f, 1f, 1f, 0.7f, 1f, 1f, 1f}); } catch (DocumentException e) { /* ignore */ }
+
+
 
         agregarEncabezadoTabla(table,
-             "Form ID", "Edad", "Sexo", "Peso (kg)", "IMC", "Estatura (cm)",
-            "Zona Residencial", "Años Resi.", "Educación", "Ocupación");
-
+             "FormID", "PacID", "Edad", "Sexo", "Peso", "IMC", "Estatura", "Nacionalidad", "Dirección", "Comuna", "Ciudad",
+            "Zona Resi.", "Años Resi.", "Educación", "Ocupación", "Previsión Salud");
+        
         for (DatosGenerales dg : datosGenerales) {
+
+            List<Paciente> pac = pacienteRepository.findAll();
+            List<Formulario> form = formularioRepository.findAll();
+
             agregarCeldaTabla(table, safe(dg.getIdDatosGen().getFormularioId()));
+            
+            String pacienteId = obtenerPacienteIdPorFormulario(dg.getIdDatosGen().getFormularioId());
+            agregarCeldaTabla(table, pacienteId);
+
+            //Datos Sociodemográficos (formulario)
             agregarCeldaTabla(table, safe(dg.getEdad()));
             agregarCeldaTabla(table, safe(dg.getSexo()));
-            agregarCeldaTabla(table, safeDouble(dg.getPeso()));
-            agregarCeldaTabla(table, safeDouble(dg.getImc()));
-            agregarCeldaTabla(table, safeDouble(dg.getEstatura()));
+
+            agregarCeldaTabla(table, safeDouble(dg.getPeso())); //Var. Antropométricas (formulario)
+            agregarCeldaTabla(table, safeDouble(dg.getImc()));  //Var. Antropométricas (formulario)
+            agregarCeldaTabla(table, safeDouble(dg.getEstatura())); //Var. Antropométricas (formulario)
+
+
+            agregarCeldaTabla(table, safe(dg.getNacionalidad()));
+            agregarCeldaTabla(table, safe(dg.getDireccion()));
+            agregarCeldaTabla(table, safe(dg.getComuna()));
+            agregarCeldaTabla(table, safe(dg.getCiudad()));
+
             agregarCeldaTabla(table, safe(dg.getZonaResidencial()));
+            agregarCeldaTabla(table, safe(dg.getAniosResiActual()));
+
             agregarCeldaTabla(table, safe(dg.getEducacion()));
             agregarCeldaTabla(table, safe(dg.getOcupacion()));
+            agregarCeldaTabla(table, safe(dg.getPrevisionSalud()));
         }
         return table;
     }
 
     private PdfPTable createPdfTableForDatosClinicos() {
         List<DatosClinicos> list = datosClinicosRepository.findAll();
-        // Reducido a 10 columnas para caber en A4 horizontal, Cirugia y Otros consolidado
+        
         PdfPTable table = new PdfPTable(9); 
         table.setWidthPercentage(100);
+        try { table.setWidths(new float[] {0.5f, 0.5f, 0.6f, 0.6f, 1f, 1f, 1f, 1f, 1f}); } catch (DocumentException e) { /* ignore */ }
         
         agregarEncabezadoTabla(table,
-            "Form ID", 
-            "AdenoGástrico", 
-            "Fecha Adeno", 
-            "Ant. Fam. Cán. Gást.", 
-            "Medicamentos", 
-            "Otras Enf.", 
-            "H. Pylori (P/R/T)", 
-            "Cirugía Previa", 
-            "Ant. Fam. Otro Cáncer");
+            "FormID", "PacID", "AdenoGást", "FechaAdeno", "AntFamCánGást", "AntFamOtroCán", "OtrasEnf", "Medicamentos", "Cirugía Previa");
 
         for (DatosClinicos dc : list) {
             agregarCeldaTabla(table, safe(dc.getIdDatosCli().getFormularioId()));
+
+            String pacienteId = obtenerPacienteIdPorFormulario(dc.getIdDatosCli().getFormularioId());
+            agregarCeldaTabla(table, pacienteId);
+
             agregarCeldaTabla(table, safe(dc.getAdenoGastrico()));
             agregarCeldaTabla(table, safe(dc.getFechaAdenoGastrico()));
             agregarCeldaTabla(table, safe(dc.getAntFamCancerGast()));
-            agregarCeldaTabla(table, safe(dc.getMedicamentos()));
-            agregarCeldaTabla(table, safe(dc.getOtrasEnfermedades()));
-            
-            // Consolidación de H. Pylori (las tres variables en una celda)
-            agregarCeldaTabla(table, safe(dc.getHpyloriPrueba()) + "/" + safe(dc.getHpyloriResultado()) + "/" + safe(dc.getHpyloriTiempoTest()));
-            
-            agregarCeldaTabla(table, safe(dc.getCirugiaGastricaPrevia()));
-            // Esta celda estaba duplicando el AntFamOtroCancer en el código anterior, ahora está correcta:
             agregarCeldaTabla(table, safe(dc.getAntFamOtroCancer()));
-
+            agregarCeldaTabla(table, safe(dc.getOtrasEnfermedades()));
+            agregarCeldaTabla(table, safe(dc.getMedicamentos()));
+            agregarCeldaTabla(table, safe(dc.getCirugiaGastricaPrevia()));
         }
         return table;
     }
@@ -317,55 +330,72 @@ public class PDFExpServices{
     private PdfPTable createPdfTableForHabitosPaciente() {
         List<HabitosPaciente> list = habitosPacienteRepository.findAll();
         
-        PdfPTable table = new PdfPTable(6); 
+        PdfPTable table = new PdfPTable(10); 
         table.setWidthPercentage(100);
+        try { table.setWidths(new float[] {0.5f, 0.5f, 0.8f, 1f, 0.8f, 0.9f, 0.8f, 0.7f, 0.5f, 0.7f}); } catch (DocumentException e) { /* ignore */ }
         
         agregarEncabezadoTabla(table,
-             "Form ID", "Estado Tabaco", "Tiempo Tab. (meses)", 
-            "Estado Alcohol", "Frec. Alcohol", "Años Consumo Alcohol");
+             "FormID", "PacID", "ConsumoTabaco", "CantPromDiario", "ExFumador", "ConsumoAlcohol", "Frecuencia", "CantProm", "AñosCons", "ExAlcohol");
 
         for (HabitosPaciente h : list) {
             agregarCeldaTabla(table, safe(h.getIdHabPaciente().getFormularioId()));
+            String pacienteId = obtenerPacienteIdPorFormulario(h.getIdHabPaciente().getFormularioId());
+            agregarCeldaTabla(table, pacienteId);
             agregarCeldaTabla(table, safe(h.getEstadoConsumoTabaco()));
-            agregarCeldaTabla(table, safe(h.getTiempoTabaco()));
+            agregarCeldaTabla(table, safe(h.getCantPromTabaco()));
+            agregarCeldaTabla(table, safe(h.getExConsumidorTabaco()));
             agregarCeldaTabla(table, safe(h.getEstadoConsumoAlcohol()));
             agregarCeldaTabla(table, safe(h.getFrecuenciaAlcohol()));
+            agregarCeldaTabla(table, safe(h.getCantidadAlcohol()));
             agregarCeldaTabla(table, safe(h.getAniosConsumoAlcohol()));
+            agregarCeldaTabla(table, safe(h.getExConsumidorAlcohol()));
         }
         return table;
     }
 
     private PdfPTable createPdfTableForFactDietarioAmbiental() {
         List<FactDietariosAmbientales> list = factDietariosAmbientalesRepository.findAll();
-        // Reducido a 8 columnas clave para evitar desborde
-        PdfPTable table = new PdfPTable(7); 
+        
+        PdfPTable table = new PdfPTable(13); 
         table.setWidthPercentage(100);
+        try { table.setWidths(new float[] {0.5f, 0.5f, 0.6f, 0.6f, 0.8f, 0.6f, 0.8f, 0.8f, 0.8f, 0.6f, 0.7f, 0.8f, 0.8f}); } catch (DocumentException e) { /* ignore */ }
         
         agregarEncabezadoTabla(table,
-            "Form ID", "Agua Consumo", "Fumigaciones", "Exp. Pesticidas",
-            "Exp. Químicos", "Dieta Agrega Sal", "Dieta Frituras");
+            "Form ID", "PacID", "CarnesCecinas", "AlimSalados", "FrutaVerdura", "Frituras", "AlimCondimentado", "BebidasInfusiones", 
+        "Pesticidas", "Quimicos", "HumoLeña", "FuenteAgua", "TratamAgua");
 
         for (FactDietariosAmbientales f : list) {
             agregarCeldaTabla(table, safe(f.getIdFact().getFormularioId()));
-            agregarCeldaTabla(table, safe(f.getAguaConsumoZona()));
-            agregarCeldaTabla(table, safe(f.getFumigaciones()));
+
+            String pacienteId = obtenerPacienteIdPorFormulario(f.getIdFact().getFormularioId());
+            agregarCeldaTabla(table, pacienteId);
+
+            agregarCeldaTabla(table, safe(f.getDietaCarnesCecinas()));
+            agregarCeldaTabla(table, safe(f.getDietaAgregaSal()));
+            agregarCeldaTabla(table, safe(f.getDietaFrutasVerduras()));
+            agregarCeldaTabla(table, safe(f.getDietaFrituras()));
+            agregarCeldaTabla(table, safe(f.getAliCondimentado()));
+            agregarCeldaTabla(table, safe(f.getInfusionesBebidas()));
             agregarCeldaTabla(table, safe(f.getExposicionPesticidas()));
             agregarCeldaTabla(table, safe(f.getExposicionQuimicos()));
-            agregarCeldaTabla(table, safe(f.getDietaAgregaSal()));
-            agregarCeldaTabla(table, safe(f.getDietaFrituras()));
+            agregarCeldaTabla(table, safe(f.getCombusLenaDiario()));
+            agregarCeldaTabla(table, safe(f.getAguaConsumoZona()));
+            agregarCeldaTabla(table, safe(f.getTratamientoAgua()));
         }
         return table;
     }
 
     private PdfPTable createPdfTableForHistopatologia() {
         List<Histopatologia> list = histopatologiaRepository.findAll();
-        PdfPTable table = new PdfPTable(4); // 4 columnas
+        PdfPTable table = new PdfPTable(5); // 4 columnas
         table.setWidthPercentage(100);
 
-        agregarEncabezadoTabla(table, "Formulario ID", "Tipo", "Estado Clínico", "Localización Tumoral");
+        agregarEncabezadoTabla(table, "Formulario ID", "Paciente ID", "Tipo", "Estado Clínico", "Localización Tumoral");
 
         for (Histopatologia h : list) {
             agregarCeldaTabla(table, safe(h.getHistoID().getFormularioId()));
+            String pacienteId = obtenerPacienteIdPorFormulario(h.getHistoID().getFormularioId());
+            agregarCeldaTabla(table, pacienteId);
             agregarCeldaTabla(table, safe(h.getTipo()));
             agregarCeldaTabla(table, safe(h.getEstadoClinico()));
             agregarCeldaTabla(table, safe(h.getLocaliTumoral()));
@@ -373,7 +403,7 @@ public class PDFExpServices{
         return table;
     }
 
-    // ============= MÉTODOS EXTRA =============
+    // ============= MÉTODOS DE LLAMADA =============
 
     private void agregarSeccionFormulario(Document document, Formulario formulario) throws DocumentException {
         Paragraph subtitle = new Paragraph("Formulario ID: " + formulario.getIdFormulario(), SUBTITLE_FONT);
@@ -432,19 +462,44 @@ public class PDFExpServices{
 
     }
 
+    // =========== MÉTODOS FORMULARIO POR PACIENTE =============
     private void agregarDatosGenerales(Document document, DatosGenerales dg) throws DocumentException {
         Paragraph p = new Paragraph("Datos Generales:", BOLD_FONT);
         document.add(p);
 
         document.add(new Paragraph(String.format("Edad: %d años | Sexo: %s | IMC: %s",
-            dg.getEdad() != null ? dg.getEdad() : 0, safe(dg.getSexo()),
+            dg.getEdad() != null ? dg.getEdad() : 0, 
+            safe(dg.getSexo()),
             dg.getImc() != null ? String.format("%.1f", dg.getImc()) : "N/A"), NORMAL_FONT));
+
+
         document.add(new Paragraph(String.format("Peso: %s kg | Estatura: %s cm",
             dg.getPeso() != null ? String.format("%.1f", dg.getPeso()) : "N/A",
             dg.getEstatura() != null ? String.format("%.1f", dg.getEstatura()) : "N/A"), NORMAL_FONT));
-        document.add(new Paragraph(String.format("Zona: %s", safe(dg.getZonaResidencial()), NORMAL_FONT)));
+
+        document.add(new Paragraph(String.format("Nacionalidad: %s", safe(dg.getNacionalidad())), NORMAL_FONT));
+
+        document.add(new Paragraph(String.format("Dirección: %s | Comuna: %s | Ciudad: %s",
+            safe(dg.getDireccion() != null ? String.valueOf(dg.getNacionalidad()) : "N/A"), 
+            safe(dg.getComuna() != null ? String.valueOf(dg.getComuna()) : "N/A"), 
+            safe(dg.getCiudad() != null ? String.valueOf(dg.getCiudad()) : "N/A")), 
+            NORMAL_FONT));
+
+        document.add(new Paragraph(String.format("Zona Residencial: %s | Años Residencia: %s",
+            safe(dg.getZonaResidencial() != null ? String.valueOf(dg.getZonaResidencial()) : "N/A"), 
+            safe(dg.getAniosResiActual() != null ? String.valueOf(dg.getAniosResiActual()) : "N/A")), 
+            NORMAL_FONT));
+
+
         document.add(new Paragraph(String.format("Educación: %s | Ocupación: %s",
-            safe(dg.getEducacion()), safe(dg.getOcupacion())), NORMAL_FONT));
+            safe(dg.getEducacion() != null ? String.valueOf(dg.getEducacion()) : "N/A"), 
+            safe(dg.getOcupacion() != null ? String.valueOf(dg.getOcupacion()) : "N/A")), 
+            NORMAL_FONT));
+
+        document.add(new Paragraph(String.format("Previsión de Salud: %s", 
+            safe(dg.getPrevisionSalud() != null ? String.valueOf(dg.getPrevisionSalud()) : "N/A")), 
+            NORMAL_FONT));
+        
         document.add(Chunk.NEWLINE);
     }
 
@@ -454,13 +509,40 @@ public class PDFExpServices{
 
         document.add(new Paragraph(String.format("Adenocarcinoma Gástrico: %s | Fecha Adeno Gástrico: %s",
             safe(dc.getAdenoGastrico()), dc.getFechaAdenoGastrico() != null ? dc.getFechaAdenoGastrico().toString() : "N/A"), NORMAL_FONT));
-        document.add(new Paragraph(String.format("Cirugía Gástrica Previa: %s", safe(dc.getCirugiaGastricaPrevia())), NORMAL_FONT));
+        
         document.add(new Paragraph(String.format("Antecedentes Fam. Cáncer Gástrico: %s", safe(dc.getAntFamCancerGast())), NORMAL_FONT));
-        document.add(new Paragraph(String.format("H. Pylori - Prueba: %s | Resultado: %s | Tiempo(meses): %s",
-            safe(dc.getHpyloriPrueba()), safe(dc.getHpyloriResultado()), safe(dc.getHpyloriTiempoTest())), NORMAL_FONT));
-        document.add(new Paragraph(String.format("Medicamentos: %s", safe(dc.getMedicamentos())), NORMAL_FONT));
         document.add(new Paragraph(String.format("Antecedentes Fam. Cáncer: %s", safe(dc.getAntFamOtroCancer())), NORMAL_FONT));
         document.add(new Paragraph(String.format("Otras Enfermedades: %s", safe(dc.getOtrasEnfermedades())), NORMAL_FONT));
+        document.add(new Paragraph(String.format("Medicamentos: %s", safe(dc.getMedicamentos())), NORMAL_FONT));
+        document.add(new Paragraph(String.format("Cirugía Gástrica Previa: %s", safe(dc.getCirugiaGastricaPrevia())), NORMAL_FONT));
+
+        document.add(new Paragraph(String.format("Resultado HPylori Actual: %s | Tipo de Prueba: %s | Tiempo de Test: %s",
+            safe(dc.getHpyloriResultado() != null ? dc.getHpyloriResultado().toString() : "N/A"), 
+            dc.getHpyloriPrueba() != null ? dc.getHpyloriPrueba().toString() : "N/A", 
+            dc.getHpyloriTiempoTest() != null ? String.valueOf(dc.getHpyloriTiempoTest()): "N/A"), 
+            NORMAL_FONT));
+
+        document.add(new Paragraph(String.format("Resultado HPylori Pasado: %s | Esquema: %s | Año aproximado: %s",
+            safe(dc.getPositivoPasadoHPylori() != null ?  String.valueOf(dc.getPositivoPasadoHPylori()): "N/A"), 
+            dc.getTipoExamenPasadoHPy() != null ? dc.getTipoExamenPasadoHPy().toString() : "N/A", 
+            dc.getAnioPositivoPasado() != null ? String.valueOf(dc.getAnioPositivoPasado()): "N/A"), 
+            NORMAL_FONT));
+
+        document.add(new Paragraph(String.format("Tratamiento Erradicación: %s | Esquema Erradicación: %s | Año aproximado: %s",
+            safe(dc.getTrataErradicacion() != null ?  String.valueOf(dc.getTrataErradicacion()): "N/A"), 
+            dc.getEsquemaTratamientoErra() != null ? dc.getEsquemaTratamientoErra().toString() : "N/A", 
+            dc.getAnioTrataEradica() != null ? String.valueOf(dc.getAnioTrataEradica()): "N/A"), 
+            NORMAL_FONT));
+        
+        document.add(new Paragraph(String.format("Uso de antibióticos o inhibidores IBP: %s", safe(dc.getAntibioticosIBP() 
+            != null ?  String.valueOf(dc.getAntibioticosIBP()): "N/A")), NORMAL_FONT));
+
+        document.add(new Paragraph(String.format("Repetición Examen HPylori: %s | Fecha: %s | Resultado: %s",
+            safe(dc.getRepeticionExamen() != null ?  String.valueOf(dc.getRepeticionExamen()): "N/A"), 
+            dc.getFechaRepetiExamen() != null ? String.valueOf(dc.getFechaRepetiExamen()): "N/A", 
+            dc.getResultadosExamen() != null ? String.valueOf(dc.getResultadosExamen()): "N/A"), 
+            NORMAL_FONT));       
+
         document.add(Chunk.NEWLINE);
     }
 
@@ -468,10 +550,23 @@ public class PDFExpServices{
         Paragraph p = new Paragraph("Hábitos del Paciente:", BOLD_FONT);
         document.add(p);
 
-        document.add(new Paragraph(String.format("Consumo Tabaco: %s | Frecuencia/Promedio: %s",
-            safe(hp.getEstadoConsumoTabaco()), hp.getCantPromTabaco() != null ? String.valueOf(hp.getCantPromTabaco()) : "N/A"), NORMAL_FONT));
-        document.add(new Paragraph(String.format("Consumo Alcohol: %s | Frecuencia: %s",
-            safe(hp.getEstadoConsumoAlcohol()), safe(hp.getFrecuenciaAlcohol())), NORMAL_FONT));
+        document.add(new Paragraph(String.format("Consumo Tabaco: %s | Cantidad Promedio: %s | Ex Fumador: %s",
+            safe(hp.getEstadoConsumoTabaco() != null ? String.valueOf(hp.getEstadoConsumoTabaco()) : "N/A"), 
+            hp.getCantPromTabaco() != null ? String.valueOf(hp.getCantPromTabaco()) : "N/A",  
+            hp.getExConsumidorTabaco() != null ? String.valueOf(hp.getExConsumidorTabaco()) : "N/A"), 
+            NORMAL_FONT));
+
+        document.add(new Paragraph(String.format("Consumo Alcohol: %s | Frecuencia: %s | Cantidad Promedio: %s",
+            safe(hp.getEstadoConsumoAlcohol() != null ? String.valueOf(hp.getEstadoConsumoAlcohol()) : "N/A"), 
+            safe(hp.getFrecuenciaAlcohol() != null ? String.valueOf(hp.getFrecuenciaAlcohol()) : "N/A"), 
+            safe(hp.getCantidadAlcohol() != null ? String.valueOf(hp.getCantidadAlcohol()) : "N/A")), 
+            NORMAL_FONT));
+
+        document.add(new Paragraph(String.format("Años de Consumo: %s | Ex Alcohol: %s",
+            safe(hp.getAniosConsumoAlcohol() != null ? String.valueOf(hp.getAniosConsumoAlcohol()) : "N/A"), 
+            safe(hp.getExConsumidorAlcohol() != null ? String.valueOf(hp.getExConsumidorAlcohol()) : "N/A")), 
+            NORMAL_FONT));
+
         document.add(Chunk.NEWLINE);
     }
 
@@ -479,19 +574,31 @@ public class PDFExpServices{
         Paragraph p = new Paragraph("Factores Dietario-Ambiental del Paciente:", BOLD_FONT);
         document.add(p);
 
-        document.add(new Paragraph(String.format("Consumo Agua: %s | Tratamiento Agua: %s",
-            safe(fda.getTratamientoAgua() != null ? fda.getTratamientoAgua() : fda.getAguaConsumoZona()),
-            safe(fda.getTratamientoAgua())), NORMAL_FONT));
+        document.add(new Paragraph(String.format("Consumo Carnes Procesadas: %s | Consumo Alimentos Salados: %s",
+            safe(fda.getDietaCarnesCecinas() != null ? String.valueOf(fda.getDietaCarnesCecinas()) : "N/A"), 
+            safe(fda.getDietaAgregaSal() != null ? String.valueOf(fda.getDietaAgregaSal()) : "N/A")), 
+            NORMAL_FONT));
 
-        document.add(new Paragraph(String.format("Fumigaciones: %s | ExposicionPesticidas: %s | CombustiónLeña: %s",
-            safe(fda.getFumigaciones()), safe(fda.getExposicionPesticidas()), safe(fda.getCombusLenaDiario())), NORMAL_FONT));
+        document.add(new Paragraph(String.format("Consumo Frituras: %s | Consumo Alimentos Condimentados: %s",
+            safe(fda.getDietaFrituras() != null ? String.valueOf(fda.getDietaFrituras()) : "N/A"), 
+            safe(fda.getAliCondimentado() != null ? String.valueOf(fda.getAliCondimentado()) : "N/A")), 
+            NORMAL_FONT));
 
-        document.add(new Paragraph(String.format("ExposiciónQuímicos: %s | AgregaSal: %s | ConsumoFrutaVerdura: %s",
-            safe(fda.getExposicionQuimicos()), safe(fda.getDietaAgregaSal() != null ? fda.getDietaAgregaSal() : fda.getDietaAgregaSal()),
-            safe(fda.getDietaFrutasVerduras())), NORMAL_FONT));
+        document.add(new Paragraph(String.format("Consumo Frutas-Verduras: %s | Consumo Infusiones-Bebidas: %s",
+            safe(fda.getDietaFrutasVerduras() != null ? String.valueOf(fda.getDietaFrutasVerduras()) : "N/A"), 
+            safe(fda.getInfusionesBebidas() != null ? String.valueOf(fda.getInfusionesBebidas()) : "N/A")),
+            NORMAL_FONT));
 
-        document.add(new Paragraph(String.format("ConsumoFrituras: %s | ConsumoCarnesCecinas: %s",
-            safe(fda.getDietaFrituras()), safe(fda.getDietaCarnesCecinas())), NORMAL_FONT));
+        document.add(new Paragraph(String.format("Fumigaciones: %s | ExposicionPesticidas: %s | Humo Leña: %s",
+            safe(fda.getFumigaciones() != null ? String.valueOf(fda.getFumigaciones()) : "N/A"), 
+            safe(fda.getExposicionPesticidas() != null ? String.valueOf(fda.getExposicionPesticidas()) : "N/A"), 
+            safe(fda.getCombusLenaDiario() != null ? String.valueOf(fda.getExposicionQuimicos()) : "N/A")), 
+            NORMAL_FONT));
+
+        document.add(new Paragraph(String.format("Fuente de Agua: %s | Tratamiento de Agua: %s",
+            safe(fda.getAguaConsumoZona() != null ? String.valueOf(fda.getAguaConsumoZona()) : "N/A"), 
+            safe(fda.getTratamientoAgua() != null ? String.valueOf(fda.getTratamientoAgua()) : "N/A")), 
+            NORMAL_FONT));    
 
         document.add(Chunk.NEWLINE);
     }
@@ -501,7 +608,10 @@ public class PDFExpServices{
         document.add(p);
 
         document.add(new Paragraph(String.format("Tipo: %s | Estado Clínico: %s | Localización Tumoral: %s",
-            safe(hp.getTipo()), safe(hp.getEstadoClinico()), safe(hp.getLocaliTumoral())), NORMAL_FONT));
+            safe(hp.getTipo() != null ? String.valueOf(hp.getTipo()) : "N/A"), 
+            safe(hp.getEstadoClinico() != null ? String.valueOf(hp.getEstadoClinico()) : "N/A"), 
+            safe(hp.getLocaliTumoral() != null ? String.valueOf(hp.getLocaliTumoral()) : "N/A")), 
+            NORMAL_FONT));
         document.add(Chunk.NEWLINE);
     }
 
@@ -510,12 +620,12 @@ public class PDFExpServices{
         document.add(subtitle);
         document.add(Chunk.NEWLINE);
 
-        document.add(new Paragraph("ID: " + safe(paciente.getIdPaciente()), NORMAL_FONT));
-        document.add(new Paragraph("Nombre: " + safe(paciente.getNombrePaciente()), NORMAL_FONT));
-        document.add(new Paragraph("Correo: " + safe(paciente.getCorreoPaciente()), NORMAL_FONT));
-        document.add(new Paragraph("Dirección: " + safe(paciente.getDireccionPaciente()), NORMAL_FONT));
-        document.add(new Paragraph("Tipo de Paciente: " + safe(paciente.getTipoPaciente()), NORMAL_FONT));
-        document.add(new Paragraph("Fecha de Inclusión: " +safe(paciente.getFechaInclusion()), NORMAL_FONT));
+        document.add(new Paragraph("ID: " + safe(paciente.getIdPaciente() != null ? String.valueOf(paciente.getIdPaciente()) : "N/A"), NORMAL_FONT));
+        document.add(new Paragraph("Nombre: " + safe(paciente.getNombrePaciente() != null ? String.valueOf(paciente.getNombrePaciente()) : "N/A"), NORMAL_FONT));
+        document.add(new Paragraph("Correo: " + safe(paciente.getCorreoPaciente() != null ? String.valueOf(paciente.getCorreoPaciente()) : "N/A"), NORMAL_FONT));
+        document.add(new Paragraph("Dirección: " + safe(paciente.getDireccionPaciente() != null ? String.valueOf(paciente.getDireccionPaciente()) : "N/A"), NORMAL_FONT));
+        document.add(new Paragraph("Tipo de Paciente: " + safe(paciente.getTipoPaciente() != null ? String.valueOf(paciente.getTipoPaciente()) : "N/A"), NORMAL_FONT));
+        document.add(new Paragraph("Fecha de Inclusión: " +safe(paciente.getFechaInclusion() != null ? String.valueOf(paciente.getFechaInclusion()) : "N/A"), NORMAL_FONT));
     }
 
     private void agregarSeccionPacienteReclutador(Document document, Paciente paciente) throws DocumentException {
@@ -523,11 +633,13 @@ public class PDFExpServices{
         document.add(subtitle);
         document.add(Chunk.NEWLINE);
 
-        document.add(new Paragraph("ID: " + safe(paciente.getIdPaciente()), NORMAL_FONT));
-        document.add(new Paragraph("Tipo de Paciente: " + safe(paciente.getTipoPaciente()), NORMAL_FONT));
-        document.add(new Paragraph("Fecha de Inclusión: " +safe(paciente.getFechaInclusion()), NORMAL_FONT));
+        document.add(new Paragraph("ID: " + safe(paciente.getIdPaciente() != null ? String.valueOf(paciente.getIdPaciente()) : "N/A"), NORMAL_FONT));
+        document.add(new Paragraph("Tipo de Paciente: " + safe(paciente.getTipoPaciente() != null ? String.valueOf(paciente.getTipoPaciente()) : "N/A"), NORMAL_FONT));
+        document.add(new Paragraph("Fecha de Inclusión: " +safe(paciente.getFechaInclusion() != null ? String.valueOf(paciente.getFechaInclusion()) : "N/A"), NORMAL_FONT));
     }
 
+
+    // ============= MÉTODOS EXTRA O AUXILIARES ============
     private void agregarPiePagina(Document document) throws DocumentException {
         document.add(Chunk.NEWLINE);
         Paragraph footer = new Paragraph(
@@ -564,5 +676,17 @@ public class PDFExpServices{
     
     private String safeDouble(Double d) {
         return d == null ? "N/A" : String.format("%.1f", d);
+    }
+
+    private String obtenerPacienteIdPorFormulario(Integer formularioId) {
+        try {
+            Formulario formulario = formularioRepository.findById(formularioId).orElse(null);
+            if (formulario != null && formulario.getPaciente() != null) {
+                return safe(formulario.getPaciente().getIdPaciente());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "N/A";
     }
 }
