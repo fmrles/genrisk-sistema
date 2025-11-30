@@ -203,6 +203,22 @@ public class PDFExpServices{
         return baos.toByteArray();
     }
 
+    public byte[] exportarDatosClinicosHPyloriAPDF() throws Exception {
+        Document document = new Document(PageSize.A4.rotate());
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            PdfWriter.getInstance(document, baos);
+            document.open();
+            agregarTitulo(document, "Datos Clínicos HPylori de Pacientes");
+            PdfPTable table = createPdfTableForDatosClinicosHPylori();
+            document.add(table);
+            agregarPiePagina(document);
+        } finally {
+            document.close();
+        }
+        return baos.toByteArray();
+    }
+
     public byte[] exportarHabitosAPDF() throws Exception {
         Document document = new Document(PageSize.A4.rotate());
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -225,7 +241,7 @@ public class PDFExpServices{
         try {
             PdfWriter.getInstance(document, baos);
             document.open();
-            agregarTitulo(document, "Factores Dietario / Ambientales");
+            agregarTitulo(document, "Factores Dietario / Ambientales de Pacientes");
             PdfPTable table = createPdfTableForFactDietarioAmbiental();
             document.add(table);
             agregarPiePagina(document);
@@ -241,7 +257,7 @@ public class PDFExpServices{
         try {
             PdfWriter.getInstance(document, baos);
             document.open();
-            agregarTitulo(document, "Histopatología");
+            agregarTitulo(document, "Histopatologías de Pacientes");
             PdfPTable table = createPdfTableForHistopatologia();
             document.add(table);
             agregarPiePagina(document);
@@ -323,6 +339,48 @@ public class PDFExpServices{
             agregarCeldaTabla(table, safe(dc.getOtrasEnfermedades()));
             agregarCeldaTabla(table, safe(dc.getMedicamentos()));
             agregarCeldaTabla(table, safe(dc.getCirugiaGastricaPrevia()));
+        }
+        return table;
+    }
+
+    private PdfPTable createPdfTableForDatosClinicosHPylori(){
+        List<DatosClinicos> list2 = datosClinicosRepository.findAll();
+
+        PdfPTable table = new PdfPTable(15);
+        table.setWidthPercentage(100);
+
+        try{
+            table.setWidths(new float [] {0.5f, 0.5f, 0.6f, 0.6f, 0.8f, 0.6f, 0.8f, 0.8f, 0.8f, 0.6f, 0.7f, 0.8f, 0.8f, 0,8, 0,7});
+        } catch (DocumentException excep){
+            /* ignore */
+        }
+
+        agregarEncabezadoTabla(table, "FormID", "PacID", "ResulExam", "TipoExam", "TiempoExam", "ResulPas", "AñoResul", "TipoExamPas", 
+            "TrataErra", "AñoTrata", "Esquema", "Antib/IBP", "RepeExamPos", "FechaExamPos", "ResulExamPos");
+
+        for (DatosClinicos dc : list2) {
+            agregarCeldaTabla(table, safe(dc.getIdDatosCli().getFormularioId()));
+
+            String pacienteId = obtenerPacienteIdPorFormulario(dc.getIdDatosCli().getFormularioId());
+            agregarCeldaTabla(table, pacienteId);
+
+            agregarCeldaTabla(table, safe(dc.getHpyloriResultado()));
+            agregarCeldaTabla(table, safe(dc.getHpyloriPrueba()));
+            agregarCeldaTabla(table, safe(dc.getHpyloriTiempoTest()));
+
+            agregarCeldaTabla(table, safe(dc.getPositivoPasadoHPylori()));
+            agregarCeldaTabla(table, safe(dc.getAnioPositivoPasado()));
+            agregarCeldaTabla(table, safe(dc.getTipoExamenPasadoHPy()));
+
+            agregarCeldaTabla(table, safe(dc.getTrataErradicacion()));
+            agregarCeldaTabla(table, safe(dc.getAnioTrataEradica()));
+            agregarCeldaTabla(table, safe(dc.getEsquemaTratamientoErra()));
+
+            agregarCeldaTabla(table, safe(dc.getAntibioticosIBP()));
+
+            agregarCeldaTabla(table, safe(dc.getRepeticionExamen()));
+            agregarCeldaTabla(table, safe(dc.getResultadosExamen()));
+            agregarCeldaTabla(table, safe(dc.getFechaRepetiExamen()));
         }
         return table;
     }

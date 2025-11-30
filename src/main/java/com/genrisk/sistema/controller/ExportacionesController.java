@@ -155,6 +155,25 @@ public class ExportacionesController {
         }
     }
 
+    @GetMapping("/datos-clinicos-hpylori/pdf")
+    public ResponseEntity<byte[]> exportarDatosClinicosHPyloriPDF() {
+        try {
+            byte[] pdfBytes = pdfExportService.exportarDatosClinicosHPyloriAPDF();
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", 
+                "datos_clinicos_hpylori" + getTimestamp() + ".pdf");
+            headers.setContentLength(pdfBytes.length);
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @GetMapping("/habitos-pacientes/pdf")
     public ResponseEntity<byte[]> exportarHabitosAPDF() {
         try {
@@ -397,7 +416,7 @@ public class ExportacionesController {
         }
     }
 
-    // --- 3. AÑADIR NUEVO ENDPOINT DE EXCEL ---
+    // ============ EXPORTACIÓN A EXCEL ================
 
     /**
      * Exporta los datos dicotomizados (formato pivot) a Excel (XLSX).
