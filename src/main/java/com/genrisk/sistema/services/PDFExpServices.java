@@ -550,7 +550,7 @@ public class PDFExpServices{
         Paragraph p = new Paragraph("Hábitos del Paciente:", BOLD_FONT);
         document.add(p);
 
-        document.add(new Paragraph(String.format("Consumo Tabaco: %s | Cantidad Promedio: %s | Ex Fumador: %s",
+        document.add(new Paragraph(String.format("Consumo Tabaco: %s | Cantidad Promedio (Unidades): %s | Ex Fumador: %s",
             safe(hp.getEstadoConsumoTabaco() != null ? String.valueOf(hp.getEstadoConsumoTabaco()) : "N/A"), 
             hp.getCantPromTabaco() != null ? String.valueOf(hp.getCantPromTabaco()) : "N/A",  
             hp.getExConsumidorTabaco() != null ? String.valueOf(hp.getExConsumidorTabaco()) : "N/A"), 
