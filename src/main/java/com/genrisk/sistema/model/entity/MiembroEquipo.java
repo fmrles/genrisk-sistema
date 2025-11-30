@@ -30,7 +30,7 @@ public class MiembroEquipo {
 
     @Column(name = "rol_miembro")
     @NotBlank(message = "El rol es obligatorio")
-    @Pattern(regexp = "^(Investigador|Administrador|Reclutador|Informatico)$", 
-             message = "Rol inválido. Roles permitidos: Investigador, Administrador, Reclutador, Informatico")
+    @Pattern(regexp = "^(Investigador|Administrador|Reclutador|Informatico|Medico)$", 
+             message = "Rol inválido. Roles permitidos: Investigador, Administrador, Reclutador, Informatico, Medico")
     private String rolMiembro;
 }
