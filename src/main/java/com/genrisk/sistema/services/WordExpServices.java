@@ -418,10 +418,7 @@ public class WordExpServices {
         }
     }
 
-
-
-
-    // ============= MÉTODOS AUXILIARES =============
+    // ================== LLAMADAS PARA IMPORTAR DATOS ================0
 
     private void agregarSeccionFormulario(XWPFDocument document, Formulario formulario) {
         agregarSubtitulo(document, "Formulario ID: " + formulario.getIdFormulario() + " (" + safe(formulario.getTipoFormulario()) + ")");
@@ -442,7 +439,7 @@ public class WordExpServices {
         histopatologiaRepository.findByHistoID_FormularioId(formulario.getIdFormulario())
              .ifPresent(h -> agregarHistopatologia(document, h));
     }
-
+    // ===================== MÉTODOS PARA CONFIGURAR ESTÉTICA =====================
     private void agregarTitulo(XWPFDocument document, String titulo) {
         XWPFParagraph paragraph = document.createParagraph();
         paragraph.setAlignment(ParagraphAlignment.CENTER);
@@ -451,7 +448,7 @@ public class WordExpServices {
         run.setText(titulo);
         run.setBold(true);
         run.setFontSize(18);
-        run.setColor("2E4053");
+        run.setColor("033664");
     }
 
     private void agregarSubtitulo(XWPFDocument document, String subtitulo) {
@@ -460,8 +457,8 @@ public class WordExpServices {
         XWPFRun run = paragraph.createRun();
         run.setText(subtitulo);
         run.setBold(true);
-        run.setFontSize(14);
-        run.setColor("3498DB");
+        run.setFontSize(15);
+        run.setColor("077C9C");
     }
 
     private void agregarTexto(XWPFDocument document, String texto) {
@@ -471,122 +468,188 @@ public class WordExpServices {
         run.setFontSize(11);
     }
 
-    private void agregarTextoNegrita(XWPFDocument document, String texto) {
+    private void agregarTextoNegrita2(XWPFDocument document, String texto) {
         XWPFParagraph paragraph = document.createParagraph();
         XWPFRun run = paragraph.createRun();
         run.setText(texto);
         run.setBold(true);
-        run.setFontSize(11);
+        run.setFontSize(14);
+        run.setColor("701E05");
+    }
+
+    private void agregarTextoNegrita3(XWPFDocument document, String texto) {
+        XWPFParagraph paragraph = document.createParagraph();
+        XWPFRun run = paragraph.createRun();
+        run.setText(texto);
+        run.setBold(true);
+        run.setFontSize(12);
+        run.setColor("6370F8");
     }
 
     private void agregarSaltoLinea(XWPFDocument document) {
         document.createParagraph();
     }
 
+    // ============== MÉTODOS PARA EXPORTAR PACIENTES ============
     private void agregarSeccionPaciente(XWPFDocument document, Paciente paciente) {
         agregarSubtitulo(document, "Información del Paciente");
-        agregarSaltoLinea(document);
-
-        agregarTexto(document, "ID: " + paciente.getIdPaciente());
-        agregarTexto(document, "Nombre: " + paciente.getNombrePaciente());
-        agregarTexto(document, "Correo: " + paciente.getCorreoPaciente());
-        agregarTexto(document, "Dirección: " + paciente.getDireccionPaciente());
-        agregarTexto(document, "Tipo: " + paciente.getTipoPaciente());
+        
+        agregarTextoConEtiqueta(document, "ID: ", paciente.getIdPaciente());
+        agregarTextoConEtiqueta(document, "Nombre: ", paciente.getNombrePaciente());
+        agregarTextoConEtiqueta(document, "Correo: ", paciente.getCorreoPaciente());
+        agregarTextoConEtiqueta(document, "Dirección: ", paciente.getDireccionPaciente());
+        agregarTextoConEtiqueta(document, "Tipo: ", paciente.getTipoPaciente());
+        agregarTextoConEtiqueta(document, "Fecha de Inclusión: ", String.valueOf(paciente.getFechaInclusion()));
     }
 
     private void agregarSeccionPacienteReclutador(XWPFDocument document, Paciente paciente) { //Nuevo Método
         agregarSubtitulo(document, "Información del Paciente");
-        agregarSaltoLinea(document);
-
-        agregarTexto(document, "ID: " + paciente.getIdPaciente());
-        agregarTexto(document, "Tipo: " + paciente.getTipoPaciente());
+        
+        agregarTextoConEtiqueta(document, "ID: ", paciente.getIdPaciente());
+        agregarTextoConEtiqueta(document, "Tipo: ", paciente.getTipoPaciente());
+        agregarTextoConEtiqueta(document, "Fecha de Inclusión: ", String.valueOf(paciente.getFechaInclusion()));
     }
 
+    // =========== MÉTODOS DE FORMULARIO PARA WORD POR CADA PACIENTE =================
     private void agregarDatosGenerales(XWPFDocument document, DatosGenerales dg) {
-        agregarTextoNegrita(document, "Datos Generales:");
+        agregarTextoNegrita2(document, "Datos Generales:");
         
-        agregarTexto(document, String.format("Edad: %d años | Sexo: %s | IMC: %.1f", 
-            dg.getEdad(), dg.getSexo(), dg.getImc()));
-        agregarTexto(document, String.format("Peso: %.1f kg | Estatura: %.1f cm", 
-            dg.getPeso(), dg.getEstatura()));
-        agregarTexto(document, String.format("Educación: %s | Ocupación: %s", 
-            dg.getEducacion(), dg.getOcupacion()));
+        agregarTextosMultiples(document,
+        "Edad: ", String.format("%d años", dg.getEdad() != null ? dg.getEdad() : 0),
+        "Sexo: ", safe(dg.getSexo()),
+        "IMC: ", dg.getImc() != null ? String.format("%.1f", dg.getImc()) : "N/A");
+
+        agregarTextosMultiples(document,
+            "Peso: ", dg.getPeso() != null ? String.format("%.1f kg", dg.getPeso()) : "N/A",
+            "Estatura: ", dg.getEstatura() != null ? String.format("%.1f cm", dg.getEstatura()) : "N/A");
+
+        agregarTextoConEtiqueta(document, "Nacionalidad: ", safe(dg.getNacionalidad()));
+
+        agregarTextosMultiples(document,"Dirección: ", safe(dg.getDireccion()), 
+                "Comuna: ", safe(dg.getComuna()),"Ciudad: ", safe(dg.getCiudad()));
+        
+        agregarTextosMultiples(document,
+            "Zona Residencial: ", safe(dg.getZonaResidencial()),
+            "Años Residencia: ", safe(dg.getAniosResiActual())
+        );
+
+        agregarTextosMultiples(document,
+            "Educación: ", safe(dg.getEducacion()),
+            "Ocupación: ", safe(dg.getOcupacion())
+        );
+
+        agregarTextoConEtiqueta(document, "Previsión de Salud: ", safe(dg.getPrevisionSalud()));
+        
         agregarSaltoLinea(document);
     }
 
     private void agregarDatosClinicos(XWPFDocument document, DatosClinicos dc) {
-        agregarTextoNegrita(document, "Datos Clínicos:");
+        agregarTextoNegrita2(document, "Datos Clínicos:");
         
-        agregarTexto(document, String.format("Adenocarcinoma Gástrico: %s | Fecha Adeno Gástrico: %s", 
-            dc.getAdenoGastrico() != null ? dc.getAdenoGastrico() : "N/A", dc.getFechaAdenoGastrico() != null ? dc.getFechaAdenoGastrico() : "N/A"));
-         agregarTexto(document, String.format("Cirugía Gástrica Previa: %s", 
-            dc.getCirugiaGastricaPrevia()));
-        agregarTexto(document, String.format("Antecedentes Fam. Cáncer Gástrico: %s", 
-            dc.getAntFamCancerGast()));
-        agregarTexto(document, String.format("H. Pylori - Prueba: %s | Resultado: %s | Tiempo(meses): %s", 
-            dc.getHpyloriPrueba(), dc.getHpyloriResultado(), dc.getHpyloriTiempoTest()));
-        agregarTexto(document, String.format("Medicamentos: %s", 
-            dc.getMedicamentos()));
-        agregarTexto(document, String.format("Antecedentes Fam. Cáncer: %s", 
-            dc.getAntFamOtroCancer()));
-        agregarTexto(document, String.format("Otras Enfermedades: %s", 
-            dc.getOtrasEnfermedades()));
+        agregarTextosMultiples(document,
+            "Adenocarcinoma Gástrico: ", safe(dc.getAdenoGastrico()),
+            "Fecha Adeno Gástrico: ", dc.getFechaAdenoGastrico() != null ? dc.getFechaAdenoGastrico().toString() : "N/A"
+        );
+        agregarTextoConEtiqueta(document, "Antecedentes Fam. Cáncer Gástrico: ", dc.getAntFamCancerGast());
+        agregarTextoConEtiqueta(document, "Antecedentes Fam. Cáncer: ", dc.getAntFamOtroCancer());
+        agregarTextoConEtiqueta(document, "Otras Enfermedades: ", dc.getOtrasEnfermedades());
+        agregarTextosMultiples(document, "Medicamentos: ", safe(dc.getMedicamentos()), 
+        "Ciruguia Gástrica Previa: ", safe(dc.getCirugiaGastricaPrevia()));
+
+        agregarSaltoLinea(document);
+
+        agregarTextosMultiples(document,
+            "Resultado HPylori Actual: ", safe(dc.getHpyloriResultado()),
+            "Tipo de Prueba: ", dc.getHpyloriPrueba() != null ? dc.getHpyloriPrueba().toString() : "N/A",
+            "Tiempo de Test: ", dc.getHpyloriTiempoTest() != null ? String.valueOf(dc.getHpyloriTiempoTest()) : "N/A"
+        );
+
+        agregarTextosMultiples(document,
+    "Resultado HPylori Pasado: ", safe(dc.getPositivoPasadoHPylori()),
+            "Tipo de Prueba: ", dc.getTipoExamenPasadoHPy() != null ? dc.getTipoExamenPasadoHPy().toString() : "N/A",
+            "Tiempo de Test (años): ", dc.getAnioPositivoPasado() != null ? String.valueOf(dc.getAnioPositivoPasado()) : "N/A");
+
+        agregarTextosMultiples(document,
+    "Tratamiento Erradicación: ", safe(dc.getTrataErradicacion()),
+            "Esquema Erradicación: ", dc.getEsquemaTratamientoErra() != null ? dc.getEsquemaTratamientoErra().toString() : "N/A",
+            "Año Aproximado: ", dc.getAnioTrataEradica() != null ? String.valueOf(dc.getAnioTrataEradica()) : "N/A");
+        
+        agregarTextosMultiples(document,"Uso de antibióticos o inhibidores IBP: ", safe(dc.getAntibioticosIBP() 
+            != null ?  String.valueOf(dc.getAntibioticosIBP()): "N/A"));
+
+        agregarTextosMultiples(document, "Repetición Examen HPylori: ",
+            safe(dc.getRepeticionExamen() != null ?  String.valueOf(dc.getRepeticionExamen()): "N/A"), 
+            "Fecha: ", dc.getFechaRepetiExamen() != null ? String.valueOf(dc.getFechaRepetiExamen()): "N/A", 
+            "Resultado: ", dc.getResultadosExamen() != null ? String.valueOf(dc.getResultadosExamen()): "N/A"); 
+
         agregarSaltoLinea(document);
     }
 
     private void agregarHistopatologia(XWPFDocument document, Histopatologia hp) {
-        agregarTextoNegrita(document, "Histopatología:");
-        agregarSaltoLinea(document);
+        agregarTextoNegrita2(document, "Histopatología:");
 
-        agregarTexto(document, String.format("Tipo: %s | Estado Clínico: %s | Localización Tumoral: %s", 
-            safe(hp.getTipo()), safe(hp.getEstadoClinico()), safe(hp.getLocaliTumoral())));
+        agregarTextosMultiples(document, 
+            "Tipo", safe(hp.getTipo() != null ? String.valueOf(hp.getTipo()) : "N/A"), 
+            "Estado Clínico: ", safe(hp.getEstadoClinico() != null ? String.valueOf(hp.getEstadoClinico()) : "N/A"), 
+            "Localización Tumoral: ", safe(hp.getLocaliTumoral() != null ? String.valueOf(hp.getLocaliTumoral()) : "N/A"));
         agregarSaltoLinea(document);
     }
 
     private void agregarHabitos(XWPFDocument document, HabitosPaciente hp) {
-        agregarTextoNegrita(document, "Hábitos del Paciente:");
-        agregarSaltoLinea(document);
+        agregarTextoNegrita2(document, "Hábitos del Paciente:");
 
+        agregarTextoNegrita3(document,"Tabaco" ); 
 
-        agregarSubtitulo(document,"Tabaco" ); 
-
-        agregarTexto(document, String.format("Estado de Consumo: %s", 
-            hp.getEstadoConsumoTabaco()));
-        agregarTexto(document, String.format("Cantidad Promedio (unidades): %s | Tiempo en Consumo (meses): %s", 
-            hp.getCantPromTabaco(), hp.getTiempoTabaco())); 
-        agregarTexto(document, String.format("Tiempo sin consumir (años): %s", 
-            hp.getExConsumidorTabaco())); 
+        agregarTextoConEtiqueta(document, "Estado de Consumo: ", 
+            hp.getEstadoConsumoTabaco());
+        agregarTextoConEtiqueta(document, "Cantidad Promedio (Unidades): ", 
+            String.valueOf(hp.getCantPromTabaco())); 
+        agregarTextoConEtiqueta(document, "Ex Fumador: ", 
+            String.valueOf(hp.getExConsumidorTabaco())); 
 
         agregarSaltoLinea(document);
-        agregarSubtitulo(document,"Alcohol" ); 
-        agregarSaltoLinea(document);
+        agregarTextoNegrita3(document,"Alcohol" ); 
+        
+        agregarTextosMultiples(document, 
+            "Consumo Alcohol: ", safe(hp.getEstadoConsumoAlcohol() != null ? String.valueOf(hp.getEstadoConsumoAlcohol()) : "N/A"), 
+            "Frecuencia: ", safe(hp.getFrecuenciaAlcohol() != null ? String.valueOf(hp.getFrecuenciaAlcohol()) : "N/A"), 
+            "Cantidad Promedio: ", safe(hp.getCantidadAlcohol() != null ? String.valueOf(hp.getCantidadAlcohol()) : "N/A"));
 
-
-        agregarTexto(document, String.format("Consumo Alcohol: %s | Frecuencia: %s", 
-            hp.getEstadoConsumoAlcohol(), hp.getFrecuenciaAlcohol()));
-        agregarTexto(document, String.format("Cantidad: %s | Frecuencia (meses): %s | Tiempo Sin Consumo (meses): %s", 
-            hp.getCantidadAlcohol(), hp.getAniosConsumoAlcohol(), hp.getExConsumidorAlcohol()));
+        agregarTextosMultiples(document, 
+            "Años de Consumo: ", safe(hp.getAniosConsumoAlcohol() != null ? String.valueOf(hp.getAniosConsumoAlcohol()) : "N/A"), 
+            "Ex Alcohol: ", safe(hp.getExConsumidorAlcohol() != null ? String.valueOf(hp.getExConsumidorAlcohol()) : "N/A"));
 
         agregarSaltoLinea(document);
     }
 
     private void agregarFactoresDietariosAmbientales(XWPFDocument document, FactDietariosAmbientales fda){
-        agregarTextoNegrita(document, "Factores Dietario-Ambiental del Paciente:");
+        agregarTextoNegrita2(document, "Factores Dietario-Ambiental del Paciente:");
+
+        agregarTextosMultiples(document,
+            "Consumo Carnes Procesadas: ", safe(fda.getDietaCarnesCecinas() != null ? String.valueOf(fda.getDietaCarnesCecinas()) : "N/A"), 
+            "Consumo Alimentos Salados: ", safe(fda.getDietaAgregaSal() != null ? String.valueOf(fda.getDietaAgregaSal()) : "N/A"));
+        
+        agregarTextosMultiples(document,
+            "Consumo Frituras: ", safe(fda.getDietaFrituras() != null ? String.valueOf(fda.getDietaFrituras()) : "N/A"), 
+            "Consumo Alimentos Condimentados: ", safe(fda.getAliCondimentado() != null ? String.valueOf(fda.getAliCondimentado()) : "N/A")); 
+
+        agregarTextosMultiples(document,
+            "Consumo Frutas-Verduras: ", safe(fda.getDietaFrutasVerduras() != null ? String.valueOf(fda.getDietaFrutasVerduras()) : "N/A"), 
+            "Consumo Infusiones-Bebidas: ", safe(fda.getInfusionesBebidas() != null ? String.valueOf(fda.getInfusionesBebidas()) : "N/A"));
+
+        agregarTextosMultiples(document,
+            "Fumigaciones: ", safe(fda.getFumigaciones() != null ? String.valueOf(fda.getFumigaciones()) : "N/A"), 
+            "ExposicionPesticidas: ", safe(fda.getExposicionPesticidas() != null ? String.valueOf(fda.getExposicionPesticidas()) : "N/A"), 
+            "Humo Leña: ", safe(fda.getCombusLenaDiario() != null ? String.valueOf(fda.getExposicionQuimicos()) : "N/A"));
+
+        agregarTextosMultiples(document,
+            "Fuente de Agua: ", safe(fda.getAguaConsumoZona() != null ? String.valueOf(fda.getAguaConsumoZona()) : "N/A"), 
+            "Tratamiento de Agua: ", safe(fda.getTratamientoAgua() != null ? String.valueOf(fda.getTratamientoAgua()) : "N/A"));    
+
         agregarSaltoLinea(document);
-
-        agregarTexto(document, String.format("Consumo Agua: %s | Tratamiento Agua: %s", 
-            fda.getAguaConsumoZona(), fda.getTratamientoAgua()));
-
-        agregarTexto(document, String.format("Fumigaciones: %s | ExposicionPesticidas: %s | CombustiónLeña: %s", 
-            fda.getFumigaciones(), fda.getExposicionPesticidas(), fda.getCombusLenaDiario()));
-
-        agregarTexto(document, String.format("ExposiciónQuímicos: %s | AgregaSal: %s | ConsumoFrutaVerdura: %s", 
-            fda.getExposicionQuimicos(), fda.getDietaAgregaSal(), fda.getDietaFrutasVerduras()));
-
-        agregarTexto(document, String.format("ConsumoFrituras: %s | ConsumoCarnesCecinas: %s", 
-            fda.getDietaFrituras(), fda.getDietaCarnesCecinas()));
     }
 
+    // =========== MÉTODOS GENERALES DE WORD =============
     private void agregarPiePagina(XWPFDocument document) {
         XWPFParagraph paragraph = document.createParagraph();
         paragraph.setAlignment(ParagraphAlignment.CENTER);
@@ -619,11 +682,68 @@ public class WordExpServices {
         run.setFontSize(10);
     }
 
+    private void agregarTextoConEtiqueta(XWPFDocument document, String etiqueta, String valor) {
+    XWPFParagraph paragraph = document.createParagraph();
+    
+    XWPFRun runEtiqueta = paragraph.createRun();
+    runEtiqueta.setText(etiqueta);
+    runEtiqueta.setBold(true);
+    runEtiqueta.setFontSize(12.5);
+    
+    XWPFRun runValor = paragraph.createRun();
+    runValor.setText(valor != null ? valor : "N/A");
+    runValor.setFontSize(11);
+    }
+
+    private void agregarTextosMultiples(XWPFDocument document, String... etiquetasYValores) {
+    XWPFParagraph paragraph = document.createParagraph();
+    
+    // Validar que hay un número par de argumentos (etiqueta-valor)
+    if (etiquetasYValores.length % 2 != 0) {
+        throw new IllegalArgumentException("Debe haber un número par de argumentos (etiqueta-valor)");
+    }
+    
+    for (int i = 0; i < etiquetasYValores.length; i += 2) {
+        String etiqueta = etiquetasYValores[i];
+        String valor = etiquetasYValores[i + 1];
+        
+        // Agregar separador "|" si no es el primer campo
+        if (i > 0) {
+            XWPFRun separador = paragraph.createRun();
+            separador.setText(" | ");
+            separador.setFontSize(11);
+        }
+        
+        // Etiqueta en negrita
+        XWPFRun runEtiqueta = paragraph.createRun();
+        runEtiqueta.setText(etiqueta);
+        runEtiqueta.setBold(true);
+        runEtiqueta.setFontSize(12.5);
+        
+        // Valor en texto normal
+        XWPFRun runValor = paragraph.createRun();
+        runValor.setText(valor != null ? valor : "N/A");
+        runValor.setFontSize(11);
+    }
+}
+
     private String safe(Object obj) {
         return obj == null ? "N/A" : String.valueOf(obj);
     }
     
     private String safeDouble(Double d) {
         return d == null ? "N/A" : String.format("%.1f", d);
+    }
+
+    private String obtenerPacienteIdPorFormulario(Integer formularioId) {
+        try {
+            Formulario formulario = formularioRepository.findById(formularioId).orElse(null);
+            if (formulario != null && formulario.getPaciente() != null) {
+                return safe(formulario.getPaciente().getIdPaciente());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "N/A";
     }
 }
