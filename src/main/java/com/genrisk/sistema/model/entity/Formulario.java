@@ -36,4 +36,9 @@ public class Formulario{
     @JoinColumn(name = "paciente_id", nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Paciente paciente;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "miembro_id", nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private MiembroEquipo miembroEquipo;
 }
