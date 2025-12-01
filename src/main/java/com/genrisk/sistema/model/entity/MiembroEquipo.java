@@ -1,13 +1,19 @@
 package com.genrisk.sistema.model.entity;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import java.util.*;
 import lombok.Data;
 
 @Entity
 @Table(name = "miembro_equipo")
 @Data
-public class MiembroEquipo {
+public class MiembroEquipo implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_miembro")
@@ -33,4 +39,42 @@ public class MiembroEquipo {
     @Pattern(regexp = "^(Investigador|Administrador|Reclutador|Informatico|Medico)$", 
              message = "Rol inválido. Roles permitidos: Investigador, Administrador, Reclutador, Informatico, Medico")
     private String rolMiembro;
+
+    public void setClave(String clavePlana) {
+        this.clave = new BCryptPasswordEncoder().encode(clavePlana);
+    }
+
+    // ========= MÉTODOS RELACIONADOS A LA ENCRIPTACIÓN DE CLAVES ================ 
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + this.rolMiembro.toUpperCase()));
+    }
+
+    @Override
+    public String getPassword() {
+        return this.clave;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.correoMiembro;
+    }
+
+    @Override public boolean isAccountNonExpired() { 
+        return true; 
+    }
+    
+    @Override public boolean isAccountNonLocked() { 
+        return true; 
+    }
+
+    @Override public boolean isCredentialsNonExpired() 
+    { 
+        return true; 
+    }
+    @Override public boolean isEnabled() 
+    { 
+        return true; 
+    }
 }
