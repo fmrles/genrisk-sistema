@@ -35,6 +35,7 @@ public class DicotomizacionServiceTest { //Revisar los LocalDate en caso de fall
 
     private Paciente paciente1;
     private Formulario formulario101;
+    private MiembroEquipo miembroEqui;
     private DatosGenerales datosGenerales101;
     private HabitosPaciente habitos101;
     private DicotRegla reglaEdad;
@@ -44,9 +45,15 @@ public class DicotomizacionServiceTest { //Revisar los LocalDate en caso de fall
 
     @BeforeEach
     void setUp() {
-
+        miembroEqui = new MiembroEquipo();
+        miembroEqui.setIdMiembroEquipo(15);
+        miembroEqui.setNombreMiembro("Andrea Parra");
+        miembroEqui.setCorreoMiembro("andrea@example.cl");
+        miembroEqui.setClave("lalala"); // ← se hashea automáticamente
+        miembroEqui.setRolMiembro("Investigador");
+        
         paciente1 = new Paciente("pac1", "Paciente 1", "p1@t.cl", "dir1", "Caso", LocalDate.of(2025, 10, 11));
-        formulario101 = new Formulario(101, "Activo", "Caso", null, "pac1", paciente1);
+        formulario101 = new Formulario(101, "Activo", "Caso", null, "pac1", paciente1, miembroEqui);
         
         datosGenerales101 = new DatosGenerales();
         datosGenerales101.setEdad(55);
