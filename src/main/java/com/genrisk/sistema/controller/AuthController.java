@@ -6,8 +6,11 @@ import com.genrisk.sistema.repository.MiembroEquipoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -17,6 +20,9 @@ public class AuthController {
 
     @Autowired
     private MiembroEquipoRepository miembroEquipoRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
@@ -39,7 +45,7 @@ public class AuthController {
             System.out.println("RESULTADO: Usuario NO ENCONTRADO en la BD.");
             System.out.println("-------------------------------------");
             // Devolvemos 401 (No autorizado)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Correo no encontrado.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("Error!", "Correo no encontrado."));
         }
 
         // Si llegamos aquí, el usuario SÍ fue encontrado.
@@ -51,21 +57,23 @@ public class AuthController {
 
 
         // PASO 2: Comparar las contraseñas (la del front vs. la de la BD)
-        if (claveFront.equals(claveBD)) {
-            // ¡ÉXITO! Las claves coinciden.
-            System.out.println("RESULTADO: ¡LOGIN EXITOSO!");
-            System.out.println("-------------------------------------");
-
-            miembroEncontrado.setClave(null); // Borramos la clave antes de enviarla
-            return ResponseEntity.ok(miembroEncontrado); // Devolvemos 200 OK
-
-        } else {
-            // FALLO. Las claves NO coinciden.
-            System.out.println("RESULTADO: Contraseña INCORRECTA.");
-            System.out.println("-------------------------------------");
-
-            // Devolvemos 401 (No autorizado)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Contraseña incorrecta.");
+        if (!passwordEncoder.matches(claveFront, miembroEncontrado.getClave())) {
+            System.out.println("→ Contraseña incorrecta");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Credenciales inválidas"));
         }
+
+        System.out.println("→ Ingreso exitoso de Usuario: " + miembroEncontrado.getNombreMiembro());
+
+        Map<String, Object> respuesta = new HashMap<>();
+        respuesta.put("mensaje", "Login exitoso");
+
+        Map<String, Object> usuario = new HashMap<>();
+        usuario.put("id", miembroEncontrado.getIdMiembroEquipo());
+        usuario.put("nombre", miembroEncontrado.getNombreMiembro());
+        usuario.put("correo", miembroEncontrado.getCorreoMiembro());
+        usuario.put("rol", miembroEncontrado.getRolMiembro());
+        respuesta.put("usuario", usuario);
+
+        return ResponseEntity.ok(respuesta);
     }
 }

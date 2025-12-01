@@ -1,9 +1,13 @@
 package com.genrisk.sistema.controller;
 
 import com.genrisk.sistema.model.entity.*;
+import com.genrisk.sistema.model.dto.LoginRequest;
 import com.genrisk.sistema.services.*;
 import java.util.List;
-import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+import java.util.Optional;
+import java.util.HashMap;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
@@ -37,9 +41,36 @@ public class MiembroEquipoController {
         return miembroEquipoService.updatePut(miembroNew);
     }
 
+    @PostMapping("/login")  // o la ruta que ya tenías
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        Optional<MiembroEquipo> miembroOpt = miembroEquipoService.login(request);
+
+        if (miembroOpt.isEmpty()) {
+            return ResponseEntity.status(401)
+                    .body(Map.of("error", "Credenciales inválidas"));
+        }
+
+        MiembroEquipo miembro = miembroOpt.get();
+
+        Map<String, Object> respuesta = new HashMap<>();
+        respuesta.put("mensaje", "Login exitoso");
+        respuesta.put("usuario", Map.of(
+            "id", miembro.getIdMiembroEquipo(),
+            "nombre", miembro.getNombreMiembro(),
+            "correo", miembro.getCorreoMiembro(),
+            "rol", miembro.getRolMiembro()
+        ));
+
+        return ResponseEntity.ok(respuesta);
+}
     @PostMapping()
-    public ResponseEntity<MiembroEquipo> createMiembro(@Valid @RequestBody MiembroEquipo miembro){
-        return miembroEquipoService.createPost(miembro);
+    public ResponseEntity<?> createMiembro(@Valid @RequestBody MiembroEquipo miembro) {
+        try {
+            MiembroEquipo creado = miembroEquipoService.crearNuevoMiembro(miembro);
+            return ResponseEntity.status(201).body(creado);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("Error!", e.getMessage()));
+        }
     }
 
     @DeleteMapping("/{id}")
