@@ -31,42 +31,35 @@ public class ExcelExportService {
      * Estandariza los nombres de las categorías (columnas) para el reporte final de Excel.
      */
     private String estandarizarNombreCategoria(String categoria) {
+        if (categoria == null) return "Desconocido";
+        
         return switch (categoria) {
             // --- DATOS GENERALES ---
-            case "zona", "zona_residencial" -> "zonaResidencial";
-            case "anios_resi_actual" -> "aniosResiActual";
+            case "edad" -> "Edad";
+            case "edad_promedio" -> "Edad_promedio"; 
+            case "edad_mediana" -> "Edad_mediana";   
+            case "edad_50" -> "Edad_50";
+            case "sexo" -> "Sexo";
+            case "residencia_urbana_5" -> "Residencia_Urbana5"; 
+            case "residencia_rural_5" -> "Residencia_Rural5a"; 
             
-            // --- HÁBITOS PACIENTE ---
-            case "estado_cons_alcohol", "estado_consumo_alcohol" -> "estadoConsumoAlcohol";
-            case "estado_cons_tabaco", "estado_consumo_tabaco", "estado" -> "estadoConsumoTabaco";
-            case "edad_inicio_tabaco" -> "edadInicioTabaco";
-            case "cant_prom_tabaco" -> "cantPromTabaco";
-            case "tiempo_tabaco" -> "tiempoTabaco";
-            case "ex_consumidor_tabaco" -> "exConsumidorTabaco";
-            case "frecuencia_alcohol", "frecuencia" -> "frecuenciaAlcohol";
-            case "cantidad_alcohol" -> "cantidadAlcohol";
-            case "anios_consumo_alcohol" -> "aniosConsumoAlcohol";
-            case "ex_consumidor_alcohol" -> "exConsumidorAlcohol";
-            case "frecuencia_ejercicio" -> "frecuenciaEjercicio";
-
-            // --- DATOS CLÍNICOS ---
-            case "adeno_gastrico" -> "adenoGastrico";
-            case "ant_fam_cancer_gast" -> "antFamCancerGast";
-            case "hpylori_tiempo_test" -> "hpyloriTiempoTest";
-
-            // --- FACTORES DIETARIOS AMBIENTALES ---
-            case "trabajo_zona_rural" -> "trabajoZonaRural";
-            case "agua_consumo_zona" -> "aguaConsumoZona";
-            case "tratamiento_agua" -> "tratamientoAgua";
-            case "exposicion_pesticidas" -> "exposicionPesticidas";
-            case "combus_lena_diario" -> "combusLenaDiario";
-            case "exposicion_quimicos" -> "exposicionQuimicos";
-            case "dieta_agregasal" -> "dietaAgregaSal";
-            case "dieta_frutas_verduras" -> "dietaFrutasVerduras";
-            case "dieta_frituras" -> "dietaFrituras";
-            case "dieta_carnes_cecinas" -> "dietaCarnesCecinas";
+            // --- TABACO ---
+            case "tabaco_moderada_carga" -> "tabaco_moderada_carga"; 
+            case "tabaco_grave_carga" -> "tabaco_grave_carga";       
+            case "estado_consumo_tabaco" -> "tabaco_nunca_vs_otros";
             
-            default -> categoria; 
+            // --- ALCOHOL ---
+            case "alcohol_moderada_carga" -> "alcohol_moderada_carga";
+            
+            // --- DIETA ---
+            case "dieta_carnes_cecinas" -> "CarnesProcesadas_Menos3"; 
+            case "dieta_frutas_verduras" -> "FrutasVerduras_3oMas";
+            case "dieta_agregasal" -> "AñadeSal_Comida";
+            case "dieta_frituras" -> "Frituras_Frecuente";
+
+            // --- OTROS ---
+            case "hpylori_resultado" -> "HPylori_AlgunaVezPositivo";
+            default -> categoria;
         };
     }
     
@@ -102,15 +95,9 @@ public class ExcelExportService {
      */
     private byte[] crearExcel(List<DicotValor> valoresEncontrados) throws Exception {
         
-        // 1. Obtener la lista MAESTRA de todos los pacientes en el sistema
-        // Esto asegura que nadie quede fuera del Excel, tenga datos o no.
         List<Paciente> todosLosPacientes = pacienteRepository.findAll(); 
 
-        // 2. Procesar los valores dicotomizados existentes y agruparlos en un Mapa
-        // Mapa: PacienteID -> (Mapa: Variable -> ValorDicotomico)
         Map<String, Map<String, Integer>> datosPivot = new LinkedHashMap<>();
-        
-        // Usamos un Set ordenado para las columnas (variables) para que siempre salgan en el mismo orden
         Set<String> columnasCategorias = new TreeSet<>();
 
         for (DicotValor valor : valoresEncontrados) {

@@ -45,6 +45,7 @@ public class DatosGenerales{
     private String zonaResidencial;
 
     @Column(name="anios_resi_actual", nullable = true, updatable = true)
+    @Pattern(regexp = "^(<5|5\\s*[-–]\\s*10|>10)$", message = "Años de residencia inválido. Use: <5, 5-10, >10")
     private String aniosResiActual;
 
     @Column(name = "educacion", nullable = true, updatable = true)
@@ -80,6 +81,38 @@ public class DatosGenerales{
             double imcCalculado = this.peso / (estaturaMetros * estaturaMetros);
             this.imc = Math.round(imcCalculado * 10.0) / 10.0;
         }
+    }
+
+    public Integer getResidenciaUrbana5() {
+        boolean esUrbana = "Urbana".equalsIgnoreCase(this.zonaResidencial);
+        boolean esRural = "Rural".equalsIgnoreCase(this.zonaResidencial);
+        
+        boolean masDe5 = false;
+        if (this.aniosResiActual != null) {
+            if (this.aniosResiActual.contains("5") || this.aniosResiActual.contains(">10")) {
+                masDe5 = true; 
+            }
+        }
+        if (esUrbana && masDe5) return 1;
+        if (esRural && !masDe5) return 1;
+        
+        return 0;
+    }
+
+    public Integer getResidenciaRural5a() {
+        boolean esUrbana = "Urbana".equalsIgnoreCase(this.zonaResidencial);
+        boolean esRural = "Rural".equalsIgnoreCase(this.zonaResidencial);
+        
+        boolean masDe5 = false;
+        if (this.aniosResiActual != null) {
+            if (this.aniosResiActual.contains("5") || this.aniosResiActual.contains(">10")) {
+                masDe5 = true;
+            }
+        }
+        if (esRural && masDe5) return 1;
+        if (esUrbana && !masDe5) return 1;
+        
+        return 0;
     }
 
 }
