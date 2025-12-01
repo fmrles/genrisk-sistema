@@ -7,12 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.HashMap;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
-
-
 
 @RestController
 @RequestMapping("/miembro-equipo")
@@ -41,19 +38,19 @@ public class MiembroEquipoController {
         return miembroEquipoService.updatePut(miembroNew);
     }
 
-    @PostMapping("/login")  // o la ruta que ya tenías
+    @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         Optional<MiembroEquipo> miembroOpt = miembroEquipoService.login(request);
 
         if (miembroOpt.isEmpty()) {
             return ResponseEntity.status(401)
-                    .body(Map.of("error", "Credenciales inválidas"));
+                    .body(Map.of("Error!", "Las credenciales son inválidas"));
         }
 
         MiembroEquipo miembro = miembroOpt.get();
 
         Map<String, Object> respuesta = new HashMap<>();
-        respuesta.put("mensaje", "Login exitoso");
+        respuesta.put("mensaje", "Login Exitoso");
         respuesta.put("usuario", Map.of(
             "id", miembro.getIdMiembroEquipo(),
             "nombre", miembro.getNombreMiembro(),
@@ -78,10 +75,3 @@ public class MiembroEquipoController {
         return miembroEquipoService.deleteById(id);
     }
 }
-    
-
-    
-    
-
-
-
