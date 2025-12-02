@@ -5,6 +5,7 @@ import com.genrisk.sistema.repository.MiembroEquipoRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.genrisk.sistema.model.dto.LoginRequest;
+import com.genrisk.sistema.model.dto.MiembroEquipoDTO;
 
 import java.util.Optional;
 
@@ -48,4 +49,24 @@ public class MiembroEquipoService extends CrudServices<MiembroEquipo, Integer> {
         miembro.setClave(nuevaClave); // hasheo de forma automática
         miembroEquipoRepository.save(miembro);
     }
+
+    public MiembroEquipo dtoToEntity(MiembroEquipoDTO dto) {    
+    MiembroEquipo miembro = new MiembroEquipo();
+    
+    if (dto.nombreMiembro() != null && !dto.nombreMiembro().isBlank()) {
+        miembro.setNombreMiembro(dto.nombreMiembro());
+    }
+    if (dto.correoMiembro() != null && !dto.correoMiembro().isBlank()) {
+        miembro.setCorreoMiembro(dto.correoMiembro());
+    }
+    if (dto.rolMiembro() != null && !dto.rolMiembro().isBlank()) {
+        miembro.setRolMiembro(dto.rolMiembro());
+    }
+
+    if (dto.clave() != null && !dto.clave().isBlank()) {
+        miembro.setClave(dto.clave()); 
+    }
+
+    return miembro;
+}
 }

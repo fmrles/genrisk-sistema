@@ -1,7 +1,7 @@
 package com.genrisk.sistema.controller;
 
 import com.genrisk.sistema.model.entity.*;
-import com.genrisk.sistema.model.dto.LoginRequest;
+import com.genrisk.sistema.model.dto.*;
 import com.genrisk.sistema.services.*;
 import java.util.List;
 import java.util.Map;
@@ -31,11 +31,15 @@ public class MiembroEquipoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MiembroEquipo> putMiembro(@PathVariable Integer id, @Valid @RequestBody MiembroEquipo newMiembro){
-        PutCommand<MiembroEquipo, Integer> miembroNew = new PutCommand<>();
-        miembroNew.setId(id);
-        miembroNew.setNewData(newMiembro);
-        return miembroEquipoService.updatePut(miembroNew);
+    public ResponseEntity<MiembroEquipo> putMiembro(@PathVariable Integer id, @Valid @RequestBody MiembroEquipoDTO newMiembro){
+        PutCommand<MiembroEquipo, Integer> miembroNewCom = new PutCommand<>();
+        miembroNewCom.setId(id);
+        
+        MiembroEquipo miembroAct = miembroEquipoService.dtoToEntity(newMiembro);
+        miembroAct.setIdMiembroEquipo(id);
+        
+        miembroNewCom.setNewData(miembroAct);
+        return miembroEquipoService.updatePut(miembroNewCom);
     }
 
     @PostMapping("/login")
