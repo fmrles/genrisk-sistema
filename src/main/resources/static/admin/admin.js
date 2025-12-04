@@ -2,7 +2,7 @@ if (!localStorage.getItem("usuario")) {
   window.location.href = "/login/login.html";
 }
 
-const API_URL = "http://localhost:8081";
+const API_URL = "http://localhost:8080";
 
 // Variable global para almacenar el último formulario ID
 let ultimoFormularioId = null;
@@ -141,94 +141,119 @@ document.getElementById("formNuevoPaciente").addEventListener("submit", async (e
   }
 });
 
-// ==================== DATOS GENERALES (Botón "Siguiente") ====================
-// Ahora el evento se adjunta al botón "Siguiente"
+// ==================== DATOS GENERALES ====================
 document.getElementById("btnSiguienteDatosGenerales")?.addEventListener("click", async (e) => {
-  e.preventDefault();
-  
-  const pacienteId = document.getElementById("selectPacienteIngreso").value;
-  if (!pacienteId) {
-    alert("Selecciona un paciente primero");
-    return;
-  }
+  e.preventDefault();
+  
+  // 1. Validar Paciente
+  const pacienteId = document.getElementById("selectPacienteIngreso").value;
+  if (!pacienteId) {
+    alert("Selecciona un paciente primero");
+    return;
+  }
 
-  // Primero crear el formulario
-  try {
-    // Obtener datos del miembro logueado para asignarlo
-    const usuarioLogueado = JSON.parse(localStorage.getItem('usuario'));
-    if (!usuarioLogueado || !usuarioLogueado.idMiembro) {
-        alert("Error: No se pudo identificar al miembro del equipo logueado.");
-        return;
+  // 2. Obtener Usuario Logueado (Lógica Corregida)
+  const usuarioStr = localStorage.getItem("usuario");
+  if (!usuarioStr) {
+      alert("Error: No hay sesión activa.");
+      return;
+  }
+  
+  const objetoLocalStorage = JSON.parse(usuarioStr);
+  
+  // Detectamos si el usuario viene anidado o plano
+  const datosUsuario = objetoLocalStorage.usuario ? objetoLocalStorage.usuario : objetoLocalStorage;
+
+  // Buscamos el ID con el nombre que viene de la BD (id_miembro)
+  const idMiembroEncontrado = datosUsuario.id_miembro || datosUsuario.idMiembro || datosUsuario.id;
+
+  if (!idMiembroEncontrado) {
+      console.error("Usuario en sesión:", datosUsuario);
+      alert("Error crítico: No se encuentra el ID del miembro logueado.");
+      return;
+  }
+
+  // 3. Crear el Formulario
+  try {
+    const payloadFormulario = {
+        paciente: { idPaciente: pacienteId },
+        
+        // --- CORRECCIÓN CRÍTICA PARA JAVA ---
+        // Java espera 'miembroEquipo' (no 'miembro')
+        // Java espera 'idMiembroEquipo' (no 'idMiembro')
+        miembroEquipo: { idMiembroEquipo: idMiembroEncontrado }, 
+        
+        estadoFormulario: "En proceso",
+        tipoFormulario: "Inicial",
+        fechaFormulario: new Date().toISOString().split('T')[0]
+    };
+
+    const formRes = await fetch(`${API_URL}/formularios`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payloadFormulario)
+    });
+
+    if (!formRes.ok) {
+      const error = await formRes.json();
+      throw new Error("Error al crear formulario: " + (error.message || "Revisar consola Java"));
     }
 
-    const formRes = await fetch(`${API_URL}/formularios`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        paciente: { idPaciente: pacienteId },
-        estadoFormulario: "En proceso",
-        tipoFormulario: "Inicial",
-        fechaFormulario: new Date().toISOString().split('T')[0],
-        miembro: { idMiembro: usuarioLogueado.idMiembro } // Asignar el miembro logueado
-      })
-    });
+    const formulario = await formRes.json();
+    const formularioId = formulario.idFormulario;
+    ultimoFormularioId = formularioId; // Guardar ID globalmente
 
-    if (!formRes.ok) {
-      const error = await formRes.json();
-      alert("Error al crear formulario: " + (error.message || "Error desconocido"));
-      return;
-    }
+    // 4. CÁLCULO DE IMC (Nueva lógica mantenida)
+    const peso = parseFloat(document.getElementById("peso").value);
+    const estaturaCm = parseFloat(document.getElementById("estatura").value);
+    let imc = null;
+    
+    if (peso && estaturaCm) {
+      const estaturaM = estaturaCm / 100; // Convertir cm a metros
+      imc = peso / (estaturaM * estaturaM);
+    }
 
-    const formulario = await formRes.json();
-    const formularioId = formulario.idFormulario;
-    ultimoFormularioId = formularioId; // Guardar para usar en hábitos y datos clínicos
+    // 5. Guardar Datos Generales
+    const dataGenerales = {
+      idDatosGen: {
+        itemFormu: 3, 
+        formularioId: formularioId
+      },
+      edad: parseInt(document.getElementById("edad").value) || null,
+      sexo: document.getElementById("sexo").value || null,
+      peso: peso || null,
+      imc: imc ? parseFloat(imc.toFixed(2)) : null, // Enviamos el IMC calculado
+      estatura: estaturaCm || null, 
+      zonaResidencial: document.getElementById("zonaResidencial").value || null,
+      educacion: document.getElementById("educacion").value || null,
+      ocupacion: document.getElementById("ocupacion").value || null
+    };
 
-    // CÁLCULO DE IMC
-    const peso = parseFloat(document.getElementById("peso").value);
-    const estaturaCm = parseFloat(document.getElementById("estatura").value);
-    let imc = null;
-    if (peso && estaturaCm) {
-      const estaturaM = estaturaCm / 100; // Convertir cm a metros
-      imc = peso / (estaturaM * estaturaM);
-    }
+    const res = await fetch(`${API_URL}/datos-generales`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dataGenerales)
+    });
 
-    const data = {
-      idDatosGen: {
-        itemFormu: 3, // Valor fijo según la base de datos
-        formularioId: formularioId
-      },
-      edad: parseInt(document.getElementById("edad").value) || null,
-      sexo: document.getElementById("sexo").value || null,
-      peso: peso || null,
-      imc: imc ? parseFloat(imc.toFixed(2)) : null, // Incluir IMC
-      estatura: estaturaCm || null, // en CM
-      zonaResidencial: document.getElementById("zonaResidencial").value || null,
-      educacion: document.getElementById("educacion").value || null,
-      ocupacion: document.getElementById("ocupacion").value || null
-    };
+    if (res.ok) {
+      alert("Datos generales guardados con éxito.");
+      
+      // Lógica para AVANZAR A LA PESTAÑA "Hábitos"
+      const nextTabElement = document.getElementById('habitos-tab');
+      if (nextTabElement) {
+        // Usamos la API de Bootstrap para cambiar el tab visualmente
+        const tabInstance = new bootstrap.Tab(nextTabElement);
+        tabInstance.show();
+      }
+    } else {
+      const error = await res.json();
+      throw new Error("Error al guardar datos generales: " + JSON.stringify(error));
+    }
 
-    const res = await fetch(`${API_URL}/datos-generales`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-
-    if (res.ok) {
-      alert("Datos generales guardados con éxito.");
-      
-      // Lógica para AVANZAR A LA PESTAÑA "Hábitos"
-      const nextTabElement = document.getElementById('habitos-tab');
-      if (nextTabElement) {
-        new bootstrap.Tab(nextTabElement).show();
-      }
-    } else {
-      const error = await res.json();
-      alert("Error al guardar datos generales: " + JSON.stringify(error));
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Error de conexión: " + err.message);
-  }
+  } catch (err) {
+    console.error(err);
+    alert("Error: " + err.message);
+  }
 });
 
 // ==================== HÁBITOS ====================

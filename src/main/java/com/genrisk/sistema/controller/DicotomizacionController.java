@@ -19,7 +19,7 @@ public class DicotomizacionController {
 
     /**
      * Endpoint para ejecutar el proceso de dicotomización para un conjunto de reglas dado.
-     * URL: POST http://localhost:8081/api/v1/dicotomizacion/ejecutar/{idDicotConjunto}
+     * URL: POST http://localhost:8080/api/v1/dicotomizacion/ejecutar/{idDicotConjunto}
      * @param idDicotConjunto El ID del conjunto de reglas a ejecutar.
      * @return Una lista de los DicotValor generados.
      */
