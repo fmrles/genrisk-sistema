@@ -33,9 +33,13 @@
                 </div>
                 <div class="mb-4">
                     <label for="password" class="form-label-purple">Ingrese su contraseña</label>
-                    <input type="password" class="form-control form-control-purple" id="password" required>
+                    <div class="input-group">
+                        <input type="password" class="form-control form-control-purple" id="password" required>
+                        <button class="btn btn-outline-secondary" type="button" id="togglePassword" aria-label="Mostrar contraseña">
+                            <i class="bi bi-eye-slash-fill"></i>
+                        </button>
+                    </div>
                 </div>
-
                 <div id="error-mensaje" class="alert alert-danger d-none" role="alert">
                     Correo o contraseña incorrectos.
                 </div>
@@ -58,7 +62,7 @@ document.getElementById('login-form').addEventListener('submit', async function(
     const error = document.getElementById('error-mensaje');
 
     try {
-        const res = await fetch('http://localhost:8080/api/auth/login', {
+        const res = await fetch('http://localhost:8081/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ correo: email, clave: password })
@@ -78,6 +82,21 @@ document.getElementById('login-form').addEventListener('submit', async function(
         error.classList.remove('d-none');
         error.textContent = 'Error de conexión';
     }
+});
+
+// --- CÓDIGO AÑADIDO PARA MOSTRAR/OCULTAR CONTRASEÑA ---
+const togglePassword = document.getElementById('togglePassword');
+const passwordInput = document.getElementById('password');
+
+togglePassword.addEventListener('click', function() {
+    // Alternar el tipo de input entre 'password' y 'text'
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+
+    // Alternar el icono del ojo abierto/cerrado (Bootstrap Icons)
+    const icon = togglePassword.querySelector('i');
+    icon.classList.toggle('bi-eye-slash-fill'); // Ocultar
+    icon.classList.toggle('bi-eye-fill');       // Mostrar
 });
 </script>
 </body>
