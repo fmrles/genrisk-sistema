@@ -129,44 +129,71 @@ document.getElementById("formNuevoPaciente").addEventListener("submit", async (e
 document.getElementById("formDatosGenerales").addEventListener("submit", async (e) => {
   e.preventDefault();
   
+  // 1. Validar Paciente
   const pacienteId = document.getElementById("selectPacienteIngreso").value;
   if (!pacienteId) {
     alert("Selecciona un paciente primero");
     return;
   }
 
-  // Primero crear el formulario
+  // 2. Obtener Usuario Logueado
+  const usuarioStr = localStorage.getItem("usuario");
+  if (!usuarioStr) {
+      alert("Sesión expirada. Por favor inicia sesión nuevamente.");
+      window.location.href = "/login/login.html";
+      return;
+  }
+  const objetoLocalStorage = JSON.parse(usuarioStr);
+  
+  // --- CORRECCIÓN CLAVE AQUÍ ---
+  // Detectamos si el usuario viene dentro de una propiedad "usuario" o está suelto
+  const datosUsuario = objetoLocalStorage.usuario ? objetoLocalStorage.usuario : objetoLocalStorage;
+
+  // Buscamos el ID en el lugar correcto (probamos todas las variantes por seguridad)
+  const idMiembro = datosUsuario.id_miembro || datosUsuario.idMiembro || datosUsuario.id;
+  // -----------------------------
+
+  if (!idMiembro) {
+      console.error("Datos del usuario encontrados:", datosUsuario);
+      alert("Error crítico: No se encuentra el ID (id_miembro) dentro del objeto de usuario.");
+      return;
+  }
+
+  // 3. Crear el Formulario
   try {
-    const formRes = await fetch(`${API_URL}/formularios`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    const payloadFormulario = {
         paciente: { idPaciente: pacienteId },
+        miembroEquipo: { idMiembroEquipo: idMiembro }, // Enviamos el ID recuperado
         estadoFormulario: "En proceso",
         tipoFormulario: "Inicial",
         fechaFormulario: new Date().toISOString().split('T')[0]
-      })
+    };
+
+    const formRes = await fetch(`${API_URL}/formularios`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payloadFormulario)
     });
 
     if (!formRes.ok) {
       const error = await formRes.json();
-      alert("Error al crear formulario: " + (error.message || "Error desconocido"));
-      return;
+      throw new Error("Error al crear formulario: " + (error.message || "Revisar consola Java"));
     }
 
     const formulario = await formRes.json();
     const formularioId = formulario.idFormulario;
-    ultimoFormularioId = formularioId; // Guardar para usar en hábitos y datos clínicos
+    ultimoFormularioId = formularioId; 
 
-    const data = {
+    // 4. Guardar los Datos Generales
+    const dataGenerales = {
       idDatosGen: {
-        itemFormu: 3, // Valor fijo según la base de datos
+        itemFormu: 3, 
         formularioId: formularioId
       },
       edad: parseInt(document.getElementById("edad").value) || null,
       sexo: document.getElementById("sexo").value || null,
       peso: parseFloat(document.getElementById("peso").value) || null,
-      estatura: parseFloat(document.getElementById("estatura").value) || null, // en CM
+      estatura: parseFloat(document.getElementById("estatura").value) || null, 
       zonaResidencial: document.getElementById("zonaResidencial").value || null,
       educacion: document.getElementById("educacion").value || null,
       ocupacion: document.getElementById("ocupacion").value || null
@@ -175,19 +202,20 @@ document.getElementById("formDatosGenerales").addEventListener("submit", async (
     const res = await fetch(`${API_URL}/datos-generales`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
+      body: JSON.stringify(dataGenerales)
     });
 
     if (res.ok) {
-      alert("Datos generales guardados con éxito. IMC calculado automáticamente.");
+      alert("Datos guardados con éxito.");
       e.target.reset();
     } else {
       const error = await res.json();
-      alert("Error al guardar datos generales: " + JSON.stringify(error));
+      throw new Error("Error al guardar detalles: " + JSON.stringify(error));
     }
+
   } catch (err) {
     console.error(err);
-    alert("Error de conexión: " + err.message);
+    alert("Error: " + err.message);
   }
 });
 
