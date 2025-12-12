@@ -3,6 +3,9 @@ package com.genrisk.sistema.controller;
 import com.genrisk.sistema.model.dto.LoginRequest;
 import com.genrisk.sistema.model.entity.MiembroEquipo;
 import com.genrisk.sistema.repository.MiembroEquipoRepository;
+import com.genrisk.sistema.services.MiembroEquipoService;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -23,6 +27,9 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired 
+    private MiembroEquipoService miembroEquipoService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
@@ -76,4 +83,60 @@ public class AuthController {
 
         return ResponseEntity.ok(respuesta);
     }
+
+
+    // Nuevos endpoints para recuperación de claves
+
+    @PostMapping("/olvidar-contrasenia")
+    public ResponseEntity<?> solicitarRecuperacion(@RequestBody Map<String, String> request){
+        String correo = request.get("correo");
+
+        if(correo == null || correo.trim().isEmpty()){
+            return ResponseEntity.badRequest().body(Map.of("Error!", "El correo es obligatorio"));
+        }
+
+        correo = correo.trim().toLowerCase();
+        System.out.println("Correo solicitado: " + correo);
+
+        try {
+            miembroEquipoService.solicitarNuevaClave(correo);
+            System.out.println("Correo de recuperación enviado exitosamente a: " + correo);
+            return ResponseEntity.ok(Map.of( "mensaje", "Si el correo tiene dominio Gmail/Outlook, recibirá un enlace de recuperación"));
+
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error controlado: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            System.out.println("Error inesperado al enviar correo: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of("error", "Error interno del servidor"));
+        }
+    }
+
+    @PostMapping("/reestablecer-contrasenia")
+    public ResponseEntity<?> restablecerClave(@RequestBody Map<String, String> request) {
+        String token = request.get("token");
+        String nuevaClave = request.get("nuevaClave");
+
+        if (token == null || token.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Token requerido"));
+        }
+
+        if (nuevaClave == null || nuevaClave.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "La nueva contraseña es obligatoria"));
+        }
+
+        System.out.println("Token recibido: " + token);
+
+        try {
+            miembroEquipoService.restablecerClave(token.trim(), nuevaClave.trim());
+            System.out.println("Contraseña cambiada exitosamente");
+            return ResponseEntity.ok(Map.of("mensaje", "Contraseña cambiada con éxito"));
+
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
 }
