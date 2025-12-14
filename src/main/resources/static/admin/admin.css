@@ -316,3 +316,16 @@ body {
   background-color: #d1ecf1;
   color: #0c5460;
 }
+/* Panel deshabilitado hasta seleccionar paciente */
+.panel-disabled {
+  pointer-events: none;          /* Bloquea clicks */
+  opacity: 0.45;                 /* Se ve apagado */
+  filter: grayscale(40%);
+}
+
+.panel-disabled input,
+.panel-disabled select,
+.panel-disabled button,
+.panel-disabled textarea {
+  cursor: not-allowed;
+}

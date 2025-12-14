@@ -2,7 +2,7 @@ if (!localStorage.getItem("usuario")) {
   window.location.href = "/login/login.html";
 }
 
-const API_URL = "http://localhost:8080";
+const API_URL = "http://localhost:8081";
 
 // Variable global para almacenar el último formulario ID
 let ultimoFormularioId = null;
@@ -795,3 +795,35 @@ toggleFormFields(false);
 if (selectPaciente && selectPaciente.value !== '') {
     toggleFormFields(true);
 }
+document.addEventListener("DOMContentLoaded", () => {
+    const panelDatos = document.getElementById("panelIngresoDatos");
+    const selectPaciente = document.getElementById("selectPacienteIngreso");
+
+    if (!panelDatos) {
+        console.error("❌ No se encontró panelIngresoDatos");
+        return;
+    }
+
+    //  BLOQUEAR TODO AL CARGAR
+    const bloquearFormulario = (bloquear) => {
+        const campos = panelDatos.querySelectorAll("input, select, textarea, button");
+        campos.forEach(el => {
+            if (el.id !== "selectPacienteIngreso" && el.id !== "btnNuevoPaciente") {
+                el.disabled = bloquear;
+            }
+        });
+    };
+
+    bloquearFormulario(true);
+    console.log(" Formulario bloqueado al iniciar");
+
+    //  DESBLOQUEAR CUANDO SE SELECCIONA PACIENTE
+    selectPaciente?.addEventListener("change", () => {
+        if (selectPaciente.value !== "") {
+            bloquearFormulario(false);
+            console.log("🔓 Paciente seleccionado, formulario habilitado");
+        } else {
+            bloquearFormulario(true);
+        }
+    });
+});
