@@ -71,11 +71,11 @@ body {
   line-height: 1.2;
   text-align: center;
 
-  display: flex;              /*  clave */
-  align-items: center;        /* vertical */
-  justify-content: center;    /* horizontal */
-  min-height: 96px;        /* 👈 AÑADIR */
-  box-sizing: border-box; /* 👈 AÑADIR */
+  display: flex;              
+  align-items: center;        
+  justify-content: center;  
+  min-height: 96px;        
+  box-sizing: border-box; 
   letter-spacing: 1px;
   border-bottom: 1px solid rgba(255,255,255,0.25);
 }
@@ -100,11 +100,11 @@ body {
   border-left: 4px solid white;
   font-weight: 600;
 }
-/*Agregado*/
-/* Alineación correcta ícono + texto (una o dos líneas) */
+
+/* Alineacion correcta icono + texto (una o dos líneas) */
 .list-group-item {
-  display: flex;              /* 👈 clave */
-  align-items: flex-start;    /* 👈 evita desalineación */
+  display: flex;              
+  align-items: flex-start;    
   gap: 10px;
 }
 
@@ -348,8 +348,8 @@ body {
 }
 /* Panel deshabilitado hasta seleccionar paciente */
 .panel-disabled {
-  pointer-events: none;          /* Bloquea clicks */
-  opacity: 0.45;                 /* Se ve apagado */
+  pointer-events: none;         
+  opacity: 0.45;                
   filter: grayscale(40%);
 }
 
@@ -358,4 +358,16 @@ body {
 .panel-disabled button,
 .panel-disabled textarea {
   cursor: not-allowed;
+}
+/* Card header más delgado SOLO para Seleccionar Paciente */
+#section-ingreso .card-header {
+  padding: 8px 16px;      
+  min-height: auto;
+}
+
+#section-ingreso .card-header h5 {
+  font-size: 0.95rem;     
+  margin: 0;              
+  align-items: center;
+  gap: 6px;
 }
