@@ -59,20 +59,24 @@
             <h5 class="mb-0"><i class="bi bi-person-badge me-2"></i>Seleccionar Paciente</h5>
           </div>
           <div class="card-body">
-            <div class="row">
-              <div class="col-md-8">
-                <label class="form-label fw-bold">ID Paciente</label>
-                <select class="form-select" id="selectPacienteIngreso">
-                  <option value="">Cargando pacientes...</option>
-                </select>
-              </div>
-              <div class="col-md-4 d-flex align-items-end">
-                <!-- Se agrega ID btnNuevoPaciente para facilitar la lógica JS si es necesario -->
-                <button class="btn btn-success w-100" id="btnNuevoPaciente" data-bs-toggle="modal" data-bs-target="#modalNuevoPaciente">
-                  <i class="bi bi-person-plus me-2"></i>Nuevo Paciente
-                </button>
-              </div>
-            </div>
+            <div class="row align-items-end">
+  <div class="col-md-8">
+    <label class="form-label fw-bold">ID Paciente</label>
+    <select class="form-select" id="selectPacienteIngreso">
+      <option value="">Cargando pacientes...</option>
+    </select>
+  </div>
+
+  <div class="col-md-4">
+    <button class="btn btn-success btn-lg w-100 py-2 mt-2 mt-md-0"
+            id="btnNuevoPaciente"
+            data-bs-toggle="modal"
+            data-bs-target="#modalNuevoPaciente">
+      <i class="bi bi-person-plus me-2"></i>Nuevo Paciente
+    </button>
+  </div>
+</div>
+
           </div>
         </div>
 
@@ -171,7 +175,7 @@
                                     <input type="text" class="form-control" id="ocupacion">
                                 </div>
                                 <!-- CAMBIO: Botón "Guardar Datos Generales" se convierte en "Siguiente" -->
-                                <button type="button" class="btn btn-primary w-100" id="btnSiguienteDatosGenerales">
+                                <button type="button" class="btn btn-purple w-100" id="btnSiguienteDatosGenerales">
                                     <i class="bi bi-arrow-right-circle me-2"></i>Siguiente
                                 </button>
                             </form>
@@ -242,7 +246,7 @@
                                     <small class="text-muted">Si es Ex bebedor</small>
                                 </div>
 
-                                <button type="submit" class="btn btn-primary w-100 mt-3">
+                                <button type="submit" class="btn btn-purple w-100 mt-3">
                                     <i class="bi bi-arrow-right-circle me-2"></i>Siguiente
                                 </button>
                             </form>
@@ -358,7 +362,7 @@
                                     </div>
                                 </div>
                                 
-                                <button type="submit" class="btn btn-primary w-100 mt-3">
+                                <button type="submit" class="btn btn-purple w-100 mt-3">
                                     <i class="bi bi-arrow-right-circle me-2"></i>Siguiente
                                 </button>
                             </form>
@@ -395,7 +399,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <button type="submit" class="btn btn-primary w-100 mt-3">
+                                <button type="submit" class="btn btn-purple w-100 mt-3">
                                     <i class="bi bi-arrow-right-circle me-2"></i>Siguiente
                                 </button>
                             </form>
