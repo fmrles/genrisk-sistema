@@ -84,7 +84,8 @@ document.getElementById('selectPacienteIngreso')?.addEventListener('change', fun
     idDisplay.value = pacienteId || '';
   }
   // Lógica para habilitar/inhabilitar el formulario
-  toggleFormFields(pacienteId !== ''); 
+  toggleFormFields(pacienteId !== '');
+  refrescarPacienteEnCrearFormulario(); 
 });
 
 async function cargarPacientesEditar() {
@@ -142,9 +143,12 @@ document.getElementById("formNuevoPaciente").addEventListener("submit", async (e
 });
 
 // ==================== DATOS GENERALES ====================
-document.getElementById("btnSiguienteDatosGenerales")?.addEventListener("click", async (e) => {
+// ==================== DATOS GENERALES ====================
+document.getElementById("btnSiguienteDatosGenerales")
+  ?.addEventListener("click", async (e) => {
+
   e.preventDefault();
-  
+
   // 1. Validar Paciente
   const pacienteId = document.getElementById("selectPacienteIngreso").value;
   if (!pacienteId) {
@@ -152,78 +156,72 @@ document.getElementById("btnSiguienteDatosGenerales")?.addEventListener("click",
     return;
   }
 
-  // 2. Obtener Usuario Logueado (Lógica Corregida)
+  // 2. Obtener Usuario Logueado
   const usuarioStr = localStorage.getItem("usuario");
   if (!usuarioStr) {
-      alert("Error: No hay sesión activa.");
-      return;
+    alert("Error: No hay sesión activa.");
+    return;
   }
-  
-  const objetoLocalStorage = JSON.parse(usuarioStr);
-  
-  // Detectamos si el usuario viene anidado o plano
-  const datosUsuario = objetoLocalStorage.usuario ? objetoLocalStorage.usuario : objetoLocalStorage;
 
-  // Buscamos el ID con el nombre que viene de la BD (id_miembro)
-  const idMiembroEncontrado = datosUsuario.id_miembro || datosUsuario.idMiembro || datosUsuario.id;
+  const objetoLocalStorage = JSON.parse(usuarioStr);
+  const datosUsuario = objetoLocalStorage.usuario ?? objetoLocalStorage;
+  const idMiembroEncontrado =
+    datosUsuario.id_miembro || datosUsuario.idMiembro || datosUsuario.id;
 
   if (!idMiembroEncontrado) {
-      console.error("Usuario en sesión:", datosUsuario);
-      alert("Error crítico: No se encuentra el ID del miembro logueado.");
-      return;
+    alert("Error crítico: no se encontró el ID del miembro.");
+    return;
   }
 
-  // 3. Crear el Formulario
   try {
-    const payloadFormulario = {
+    // 3. Crear Formulario (solo una vez)
+    if (!ultimoFormularioId) {
+      const payloadFormulario = {
         paciente: { idPaciente: pacienteId },
-        
-        // --- CORRECCIÓN CRÍTICA PARA JAVA ---
-        // Java espera 'miembroEquipo' (no 'miembro')
-        // Java espera 'idMiembroEquipo' (no 'idMiembro')
-        miembroEquipo: { idMiembroEquipo: idMiembroEncontrado }, 
-        
+        miembroEquipo: { idMiembroEquipo: idMiembroEncontrado },
         estadoFormulario: "En proceso",
         tipoFormulario: "Inicial",
-        fechaFormulario: new Date().toISOString().split('T')[0]
-    };
+        fechaFormulario: new Date().toISOString().split("T")[0]
+      };
 
-    const formRes = await fetch(`${API_URL}/formularios`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payloadFormulario)
-    });
+      const formRes = await fetch(`${API_URL}/formularios`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payloadFormulario)
+      });
 
-    if (!formRes.ok) {
-      const error = await formRes.json();
-      throw new Error("Error al crear formulario: " + (error.message || "Revisar consola Java"));
+      if (!formRes.ok) {
+        const error = await formRes.json();
+        throw new Error(JSON.stringify(error));
+      }
+
+      const formulario = await formRes.json();
+      ultimoFormularioId = formulario.idFormulario;
+
+      console.log("✅ Formulario creado:", ultimoFormularioId);
     }
 
-    const formulario = await formRes.json();
-    const formularioId = formulario.idFormulario;
-    ultimoFormularioId = formularioId; // Guardar ID globalmente
-
-    // 4. CÁLCULO DE IMC (Nueva lógica mantenida)
+    // 4. Cálculo IMC
     const peso = parseFloat(document.getElementById("peso").value);
     const estaturaCm = parseFloat(document.getElementById("estatura").value);
     let imc = null;
-    
+
     if (peso && estaturaCm) {
-      const estaturaM = estaturaCm / 100; // Convertir cm a metros
+      const estaturaM = estaturaCm / 100;
       imc = peso / (estaturaM * estaturaM);
     }
 
     // 5. Guardar Datos Generales
     const dataGenerales = {
       idDatosGen: {
-        itemFormu: 3, 
-        formularioId: formularioId
+        itemFormu: 3,
+        formularioId: ultimoFormularioId
       },
       edad: parseInt(document.getElementById("edad").value) || null,
       sexo: document.getElementById("sexo").value || null,
       peso: peso || null,
-      imc: imc ? parseFloat(imc.toFixed(2)) : null, // Enviamos el IMC calculado
-      estatura: estaturaCm || null, 
+      imc: imc ? parseFloat(imc.toFixed(2)) : null,
+      estatura: estaturaCm || null,
       zonaResidencial: document.getElementById("zonaResidencial").value || null,
       educacion: document.getElementById("educacion").value || null,
       ocupacion: document.getElementById("ocupacion").value || null
@@ -235,26 +233,21 @@ document.getElementById("btnSiguienteDatosGenerales")?.addEventListener("click",
       body: JSON.stringify(dataGenerales)
     });
 
-    if (res.ok) {
-      alert("Datos generales guardados con éxito.");
-      
-      // Lógica para AVANZAR A LA PESTAÑA "Hábitos"
-      const nextTabElement = document.getElementById('habitos-tab');
-      if (nextTabElement) {
-        // Usamos la API de Bootstrap para cambiar el tab visualmente
-        const tabInstance = new bootstrap.Tab(nextTabElement);
-        tabInstance.show();
-      }
-    } else {
+    if (!res.ok) {
       const error = await res.json();
-      throw new Error("Error al guardar datos generales: " + JSON.stringify(error));
+      throw new Error(JSON.stringify(error));
     }
+
+    alert("Datos generales guardados con éxito");
+    new bootstrap.Tab(document.getElementById("habitos-tab")).show();
 
   } catch (err) {
     console.error(err);
     alert("Error: " + err.message);
+    return;
   }
 });
+
 
 // ==================== HÁBITOS ====================
 document.getElementById("formHabitos")?.addEventListener("submit", async (e) => {
@@ -802,6 +795,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!panelDatos) {
         console.error("❌ No se encontró panelIngresoDatos");
         return;
+        
     }
 
     //  BLOQUEAR TODO AL CARGAR
@@ -821,9 +815,38 @@ document.addEventListener("DOMContentLoaded", () => {
     selectPaciente?.addEventListener("change", () => {
         if (selectPaciente.value !== "") {
             bloquearFormulario(false);
-            console.log("🔓 Paciente seleccionado, formulario habilitado");
+            refrescarPacienteEnCrearFormulario();
+            console.log(" Paciente seleccionado, formulario habilitado");
         } else {
             bloquearFormulario(true);
         }
     });
+    refrescarPacienteEnCrearFormulario();
 });
+// ==================== REFRESCAR PACIENTE EN CREAR FORMULARIO ====================
+function refrescarPacienteEnCrearFormulario() {
+  const select = document.getElementById("selectPacienteIngreso");
+  const inputPaciente = document.getElementById("pacienteSeleccionadoForm");
+  const inputMiembro = document.getElementById("miembroAsignadoForm");
+
+  if (!select || !inputPaciente) return;
+
+  const selectedOption = select.options[select.selectedIndex];
+
+  if (!selectedOption || !select.value) {
+    inputPaciente.value = "";
+    if (inputMiembro) inputMiembro.value = "";
+    return;
+  }
+
+  // Mostrar texto completo del paciente
+  inputPaciente.value = selectedOption.textContent;
+
+  // Mostrar miembro logueado
+  const usuarioStr = localStorage.getItem("usuario");
+  if (usuarioStr && inputMiembro) {
+    const obj = JSON.parse(usuarioStr);
+    const user = obj.usuario ?? obj;
+    inputMiembro.value = user.nombreMiembro || user.nombre || "Usuario actual";
+  }
+}
