@@ -77,20 +77,44 @@ async function cargarPacientes() {
 }
 
 // Evento para actualizar el campo de ID cuando se selecciona un paciente
-document.getElementById('selectPacienteIngreso')?.addEventListener('change', function() {
-  const pacienteId = this.value;
-  const idDisplay = document.getElementById('idPacienteDisplay');
-  if (idDisplay) {
-    idDisplay.value = pacienteId || '';
-  }
-  // Lógica para habilitar/inhabilitar el formulario
+document.getElementById('selectPacienteIngreso')?.addEventListener('change', function () {
+  const pacienteId = this.value;
+
+  // Mostrar ID paciente
+  const idDisplay = document.getElementById('idPacienteDisplay');
+  if (idDisplay) {
+    idDisplay.value = pacienteId || '';
+  }
+
+  // Habilitar / inhabilitar formulario
   toggleFormFields(pacienteId !== '');
-  refrescarPacienteEnCrearFormulario(); 
+  refrescarPacienteEnCrearFormulario();
+
+  // ==================== AUTOSELECCIÓN TIPO FORMULARIO ====================
+  const selectTipoFormulario = document.getElementById('tipoFormulario');
+  if (!selectTipoFormulario) return;
+
+  const selectedOption = this.options[this.selectedIndex];
+  if (!selectedOption || !this.value) {
+    selectTipoFormulario.value = '';
+    selectTipoFormulario.disabled = false;
+    return;
+  }
+
+  const textoPaciente = selectedOption.textContent;
+
+  if (textoPaciente.includes('(Control)')) {
+    selectTipoFormulario.value = 'CONTROL';
+    selectTipoFormulario.disabled = true;
+  } else if (textoPaciente.includes('(Caso)')) {
+    selectTipoFormulario.value = 'CASO';
+    selectTipoFormulario.disabled = true;
+  } else {
+    selectTipoFormulario.value = '';
+    selectTipoFormulario.disabled = false;
+  }
 });
 
-async function cargarPacientesEditar() {
-  await cargarPacientes();
-}
 
 // ==================== NUEVO PACIENTE ====================
 document.getElementById("formNuevoPaciente").addEventListener("submit", async (e) => {
