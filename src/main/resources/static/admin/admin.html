@@ -649,50 +649,70 @@
                 </div>
 
               <!-- SECCIÓN: EXPORTAR DATOS -->
-              <div id="section-exportar" class="content-section d-none">
-                  <h2 class="mb-4 text-purple fw-bold">Exportar Datos</h2>
-                  <div class="row g-4">
-                      <div class="col-md-4">
-                          <div class="card shadow border-0 h-100">
-                              <div class="card-header bg-success text-white">
-                                  <h5 class="mb-0"><i class="bi bi-file-earmark-excel me-2"></i>Exportar a Excel</h5>
-                                </div>
-                              <div class="card-body">
-                                  <p>Exporta los datos dicotomizados a un archivo Excel (.xlsx)</p>
-                                  <button class="btn btn-success w-100" id="btnExportarExcel">
-                                      <i class="bi bi-download me-2"></i>Descargar Excel
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                      <div class="col-md-4">
-                          <div class="card shadow border-0 h-100">
-                              <div class="card-header bg-danger text-white">
-                                  <h5 class="mb-0"><i class="bi bi-filetype-pdf me-2"></i>Exportar a PDF</h5>
-                                </div>
-                              <div class="card-body">
-                                  <p>Exporta la lista de pacientes a un archivo PDF</p>
-                                  <button class="btn btn-danger w-100" id="btnExportarPdf">
-                                      <i class="bi bi-download me-2"></i>Descargar PDF
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                      <div class="col-md-4">
-                          <div class="card shadow border-0 h-100">
-                              <div class="card-header bg-info text-white">
-                                  <h5 class="mb-0"><i class="bi bi-file-earmark-word me-2"></i>Más Opciones</h5>
-                                </div>
-                              <div class="card-body">
-                                  <p>Más opciones de exportación disponibles próximamente</p>
-                                  <button class="btn btn-secondary w-100" disabled>
-                                      <i class="bi bi-gear me-2"></i>Próximamente
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div id="section-exportar" class="content-section d-none">
+          <h2 class="mb-4 text-purple fw-bold">Exportar Datos</h2>
+
+          <div class="row g-4">
+
+            <!-- EXPORTAR EXCEL -->
+            <div class="col-md-4">
+              <div class="card shadow border-0 h-100">
+                <div class="card-header bg-success text-white">
+                  <h5 class="mb-0">
+                    <i class="bi bi-file-earmark-excel me-2"></i>Exportar a Excel
+                  </h5>
+                </div>
+
+                <div class="card-body d-flex flex-column">
+                  <p>Exporta los datos dicotomizados a un archivo Excel (.xlsx)</p>
+
+                  <button class="btn btn-success w-100 mt-auto" id="btnExportarExcel">
+                    <i class="bi bi-download me-2"></i>Descargar Excel
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- EXPORTAR PDF -->
+            <div class="col-md-4">
+              <div class="card shadow border-0 h-100">
+                <div class="card-header bg-danger text-white">
+                  <h5 class="mb-0">
+                    <i class="bi bi-filetype-pdf me-2"></i>Exportar a PDF
+                  </h5>
+                </div>
+
+                <div class="card-body d-flex flex-column">
+                  <p>Exporta la lista de pacientes a un archivo PDF</p>
+
+                  <button class="btn btn-danger w-100 mt-auto" id="btnExportarPdf">
+                    <i class="bi bi-download me-2"></i>Descargar PDF
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- MÁS OPCIONES -->
+            <div class="col-md-4">
+              <div class="card shadow border-0 h-100">
+                <div class="card-header bg-info text-white">
+                  <h5 class="mb-0">
+                    <i class="bi bi-file-earmark-word me-2"></i>Más Opciones
+                  </h5>
+                </div>
+
+                <div class="card-body d-flex flex-column">
+                  <p>Más opciones de exportación disponibles próximamente</p>
+
+                  <button class="btn btn-secondary w-100 mt-auto" disabled>
+                    <i class="bi bi-gear me-2"></i>Próximamente
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
 
               <!-- SECCIÓN: EDITAR DATOS -->
               <div id="section-editar" class="content-section d-none">
@@ -758,7 +778,7 @@
         </div>
   </div>
 
-  <!-- MODAL: NUEVO PACIENTE -->
+
   <!-- MODAL: NUEVO PACIENTE -->
   <div class="modal fade" id="modalNuevoPaciente" tabindex="-1">
     <div class="modal-dialog">
