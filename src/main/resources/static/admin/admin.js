@@ -142,7 +142,7 @@ document.getElementById("formNuevoPaciente").addEventListener("submit", async (e
   }
 });
 
-// ==================== DATOS GENERALES ====================
+
 // ==================== DATOS GENERALES ====================
 document.getElementById("btnSiguienteDatosGenerales")
   ?.addEventListener("click", async (e) => {
@@ -417,67 +417,91 @@ document.getElementById("formHistopatologia")?.addEventListener("submit", async 
 
 // ==================== ROLES ====================
 async function cargarMiembros() {
-  try {
-    const res = await fetch(`${API_URL}/miembro-equipo`);
-    const miembros = await res.json();
-    
-    const tbody = document.querySelector("#tablaMiembros tbody");
-    tbody.innerHTML = "";
-    
-    if (miembros.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" class="text-center">No hay miembros registrados</td></tr>';
-      return;
-    }
-    
-    miembros.forEach(m => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${m.idMiembro}</td>
-        <td>${m.nombreMiembro}</td>
-        <td><span class="badge bg-purple">${m.rol}</span></td>
-        <td>${m.correo || 'N/A'}</td>
-        <td>
-          <button class="btn btn-sm btn-danger" onclick="eliminarMiembro(${m.idMiembro})">
-            <i class="bi bi-trash"></i>
-          </button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
-  } catch (err) {
-    console.error("Error cargando miembros", err);
-  }
+  try {
+    const res = await fetch(`${API_URL}/miembro-equipo`);
+    const miembros = await res.json();
+
+    const tbody = document.querySelector("#tablaMiembros tbody");
+    tbody.innerHTML = "";
+
+    if (!miembros || miembros.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="text-center">No hay miembros registrados</td>
+        </tr>`;
+      return;
+    }
+
+    miembros.forEach(m => {
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+  <td>${m.idMiembro}</td>
+  <td>${m.nombreMiembro}</td>
+  <td>
+    <span class="badge bg-purple">
+      ${m.rolMiembro}
+    </span>
+  </td>
+  <td>${m.correoMiembro || 'N/A'}</td>
+  <td class="d-flex gap-2">
+    <!-- BOTÓN EDITAR -->
+    <button class="btn btn-sm btn-warning"
+            title="Editar rol"
+            onclick="editarRol(${m.idMiembro}, '${m.rolMiembro}')">
+      <i class="bi bi-pencil"></i>
+    </button>
+
+    <!-- BOTÓN ELIMINAR -->
+    <button class="btn btn-sm btn-danger"
+            title="Eliminar miembro"
+            onclick="eliminarMiembro(${m.idMiembro})">
+      <i class="bi bi-trash"></i>
+    </button>
+  </td>
+`;
+
+
+      tbody.appendChild(tr);
+    });
+
+  } catch (err) {
+    console.error("❌ Error cargando miembros", err);
+  }
+}
+// ==================== EDITAR ROL DE MIEMBRO ====================
+async function editarRol(idMiembro, rolActual) {
+  const nuevoRol = prompt(
+    "Editar rol del miembro:",
+    rolActual
+  );
+
+  // Cancelado o sin cambios
+  if (!nuevoRol || nuevoRol === rolActual) return;
+
+  try {
+    const res = await fetch(`${API_URL}/miembro-equipo/${idMiembro}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        rolMiembro: nuevoRol
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    alert("Rol actualizado correctamente");
+    cargarMiembros(); //  refresca tabla
+
+  } catch (err) {
+    console.error("❌ Error al editar rol", err);
+    alert("Error al actualizar el rol del miembro");
+  }
 }
 
-document.getElementById("formRoles")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  
-  const data = {
-    nombreMiembro: document.getElementById("nombreMiembro").value,
-    rol: document.getElementById("rolMiembro").value,
-    correo: document.getElementById("correoMiembro").value
-  };
-
-  try {
-    const res = await fetch(`${API_URL}/miembro-equipo`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-
-    if (res.ok) {
-      alert("Rol asignado con éxito");
-      e.target.reset();
-      cargarMiembros();
-    } else {
-      const error = await res.json();
-      alert("Error al asignar rol: " + (error.message || "Error desconocido"));
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Error de conexión");
-  }
-});
 
 async function eliminarMiembro(id) {
   if (!confirm("¿Estás seguro de eliminar este miembro?")) return;
