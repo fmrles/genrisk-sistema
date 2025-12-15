@@ -20,7 +20,7 @@
         <i class="bi bi-clipboard-plus me-2"></i>Ingresar Datos
       </a>
       <a href="#" class="list-group-item bg-purple text-white" data-section="roles">
-        <i class="bi bi-person-gear me-2"></i>Asignar Roles
+        <i class="bi bi-person-gear me-2"></i>Editar Miembros
       </a>
       <a href="#" class="list-group-item bg-purple text-white" data-section="dicotomizar">
         <i class="bi bi-diagram-3 me-2"></i>Dicotomizar
@@ -493,61 +493,71 @@
 
       </div>
 
-      <!-- SECCION: ASIGNAR ROLES -->
-      <div id="section-roles" class="content-section d-none">
-        <h2 class="mb-4 text-purple fw-bold">Asignar Roles</h2>
-        <div class="card shadow border-0">
-          <div class="card-body">
-            <form id="formRoles">
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label class="form-label fw-bold">Nombre del Miembro</label>
-                  <input type="text" class="form-control" id="nombreMiembro" required>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label fw-bold">Rol</label>
-                  <select class="form-select" id="rolMiembro" required>
-                    <option value="">Seleccionar...</option>
-                    <option value="Administrador">Administrador</option>
-                    <option value="Investigador">Investigador</option>
-                    <option value="Digitador">Digitador</option>
-                    <option value="Médico">Médico</option>
-                  </select>
-                </div>
-              </div>
-              <div class="mb-3">
-                <label class="form-label fw-bold">Correo Electrónico</label>
-                <input type="email" class="form-control" id="correoMiembro">
-              </div>
-              <button type="submit" class="btn btn-purple w-100">
-                <i class="bi bi-person-check me-2"></i>Asignar Rol
-              </button>
-            </form>
-            
-            <hr class="my-4">
-            
-            <h5 class="text-purple mb-3">Miembros del Equipo</h5>
-            <div class="table-responsive">
-              <table class="table table-hover" id="tablaMiembros">
-                <thead class="table-purple">
-                  <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Rol</th>
-                    <th>Correo</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td colspan="5" class="text-center">Cargando...</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
+     <!-- SECCION: EDITAR MIEMBROS -->
+<div id="section-roles" class="content-section d-none">
+  <h2 class="mb-4 text-purple fw-bold">Editar Miembros</h2>
+
+  <div class="card shadow border-0">
+    <div class="card-body">
+
+      <!-- FORMULARIO -->
+      <form id="formRoles">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label class="form-label fw-bold">Nombre del Miembro</label>
+            <input type="text" class="form-control" id="nombreMiembro" required>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label class="form-label fw-bold">Rol</label>
+            <select class="form-select" id="rolMiembro" required>
+              <option value="">Seleccionar...</option>
+              <option value="Administrador">Administrador</option>
+              <option value="Investigador">Investigador</option>
+              <option value="Digitador">Digitador</option>
+              <option value="Médico">Médico</option>
+            </select>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label class="form-label fw-bold">Correo Electrónico</label>
+            <input type="email" class="form-control" id="correoMiembro">
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-purple w-100 mt-2">
+          <i class="bi bi-person-check me-2"></i>Asignar Rol
+        </button>
+      </form>
+
+      <hr class="my-4">
+
+      <!-- TABLA -->
+      <h5 class="text-purple mb-3">Miembros del Equipo</h5>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle" id="tablaMiembros">
+          <thead class="table-purple">
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Rol</th>
+              <th>Correo</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="5" class="text-center">Cargando...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 
       <!-- SECCIÓN: DICOTOMIZAR -->
       <div id="section-dicotomizar" class="content-section d-none">
