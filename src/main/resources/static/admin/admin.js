@@ -6,6 +6,11 @@ const API_URL = "http://localhost:8081";
 
 // Variable global para almacenar el último formulario ID
 let ultimoFormularioId = null;
+// Estado
+let formularioCreado = false;
+let panelDatos;
+
+
 
 // ==================== NAVEGACIÓN ENTRE SECCIONES ====================
 document.querySelectorAll('.list-group-item').forEach(item => {
@@ -76,45 +81,8 @@ async function cargarPacientes() {
   }
 }
 
-// Evento para actualizar el campo de ID cuando se selecciona un paciente
-document.getElementById('selectPacienteIngreso')?.addEventListener('change', function () {
-  const pacienteId = this.value;
 
-  // Mostrar ID paciente
-  const idDisplay = document.getElementById('idPacienteDisplay');
-  if (idDisplay) {
-    idDisplay.value = pacienteId || '';
-  }
-
-  // Habilitar / inhabilitar formulario
-  toggleFormFields(pacienteId !== '');
-  refrescarPacienteEnCrearFormulario();
-
-  // ==================== AUTOSELECCIÓN TIPO FORMULARIO ====================
-  const selectTipoFormulario = document.getElementById('tipoFormulario');
-  if (!selectTipoFormulario) return;
-
-  const selectedOption = this.options[this.selectedIndex];
-  if (!selectedOption || !this.value) {
-    selectTipoFormulario.value = '';
-    selectTipoFormulario.disabled = false;
-    return;
-  }
-
-  const textoPaciente = selectedOption.textContent;
-
-  if (textoPaciente.includes('(Control)')) {
-    selectTipoFormulario.value = 'CONTROL';
-    selectTipoFormulario.disabled = true;
-  } else if (textoPaciente.includes('(Caso)')) {
-    selectTipoFormulario.value = 'CASO';
-    selectTipoFormulario.disabled = true;
-  } else {
-    selectTipoFormulario.value = '';
-    selectTipoFormulario.disabled = false;
-  }
-});
-
+ 
 
 // ==================== NUEVO PACIENTE ====================
 document.getElementById("formNuevoPaciente").addEventListener("submit", async (e) => {
@@ -198,32 +166,11 @@ document.getElementById("btnSiguienteDatosGenerales")
   }
 
   try {
-    // 3. Crear Formulario (solo una vez)
-    if (!ultimoFormularioId) {
-      const payloadFormulario = {
-        paciente: { idPaciente: pacienteId },
-        miembroEquipo: { idMiembroEquipo: idMiembroEncontrado },
-        estadoFormulario: "En proceso",
-        tipoFormulario: "Inicial",
-        fechaFormulario: new Date().toISOString().split("T")[0]
-      };
+   if (!ultimoFormularioId) {
+  alert("Primero debes crear el formulario con el botón 'Crear Formulario'");
+  return;
+}
 
-      const formRes = await fetch(`${API_URL}/formularios`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payloadFormulario)
-      });
-
-      if (!formRes.ok) {
-        const error = await formRes.json();
-        throw new Error(JSON.stringify(error));
-      }
-
-      const formulario = await formRes.json();
-      ultimoFormularioId = formulario.idFormulario;
-
-      console.log("✅ Formulario creado:", ultimoFormularioId);
-    }
 
     // 4. Cálculo IMC
     const peso = parseFloat(document.getElementById("peso").value);
@@ -793,15 +740,8 @@ function cerrarSesion() {
 }
 
 // Cargar pacientes al iniciar
-cargarPacientes();
 
-// ==================== LÓGICA DE USABILIDAD (INHABILITACIÓN) ====================
 
-// Identificadores (ESTOS COINCIDEN CON LOS IDs AGREGADOS EN admin.html)
-const panelDatos = document.getElementById('panelIngresoDatos'); // Contenedor del Formulario
-const selectPaciente = document.getElementById('selectPacienteIngreso'); 
-const btnSiguienteGeneral = document.getElementById('btnSiguienteDatosGenerales'); 
-const btnGuardarFinal = document.getElementById('btnGuardarFormularioCompleto'); 
 
 // Función para habilitar/inhabilitar todos los campos del formulario
 function toggleFormFields(enable) {
@@ -817,60 +757,75 @@ function toggleFormFields(enable) {
         }
     });
     
-    // Controlar el botón "Siguiente" de Datos Generales
-    if (btnSiguienteGeneral) {
-        btnSiguienteGeneral.disabled = !enable;
-    }
-
-    // Controlar el botón "Ingresar Formulario Completo" (Guardar Final)
-    if (btnGuardarFinal) {
-         btnGuardarFinal.disabled = !enable; 
-    }
+   
 }
 
 // 1. Inhabilitación inicial
 // Se ejecuta al final del script para asegurar que todos los elementos existan
-toggleFormFields(false);
+
 
 // 2. MEJORA: Habilitar campos si hay un paciente seleccionado al cargar (esto se maneja en cargarPacientes/change event)
-if (selectPaciente && selectPaciente.value !== '') {
-    toggleFormFields(true);
-}
-document.addEventListener("DOMContentLoaded", () => {
-    const panelDatos = document.getElementById("panelIngresoDatos");
-    const selectPaciente = document.getElementById("selectPacienteIngreso");
 
-    if (!panelDatos) {
-        console.error("❌ No se encontró panelIngresoDatos");
-        return;
-        
-    }
+//aqui
 
-    //  BLOQUEAR TODO AL CARGAR
-    const bloquearFormulario = (bloquear) => {
-        const campos = panelDatos.querySelectorAll("input, select, textarea, button");
-        campos.forEach(el => {
-            if (el.id !== "selectPacienteIngreso" && el.id !== "btnNuevoPaciente") {
-                el.disabled = bloquear;
-            }
-        });
-    };
 
-    bloquearFormulario(true);
-    console.log(" Formulario bloqueado al iniciar");
+// Estado
 
-    //  DESBLOQUEAR CUANDO SE SELECCIONA PACIENTE
-    selectPaciente?.addEventListener("change", () => {
-        if (selectPaciente.value !== "") {
-            bloquearFormulario(false);
-            refrescarPacienteEnCrearFormulario();
-            console.log(" Paciente seleccionado, formulario habilitado");
-        } else {
-            bloquearFormulario(true);
-        }
+
+//  Bloquear todo al inicio
+function bloquearTodo() {
+  if (!panelDatos) return;
+
+  panelDatos
+    .querySelectorAll("input, select, textarea, button")
+    .forEach(el => {
+      if (
+        el.id !== "selectPacienteIngreso" &&
+        el.id !== "btnNuevoPaciente"
+      ) {
+        el.disabled = true;
+      }
     });
-    refrescarPacienteEnCrearFormulario();
-});
+}
+
+//  Habilitar solo el panel superior (crear formulario)
+function habilitarCrearFormulario() {
+  if (!panelDatos) return;
+
+  panelDatos
+    .querySelectorAll("input, select, textarea, button")
+    .forEach(el => {
+      if (
+        el.id === "selectPacienteIngreso" ||
+        el.id === "btnNuevoPaciente"
+      ) {
+        el.disabled = false;
+        return;
+      }
+
+      // Solo se habilita el botón crear formulario
+      if (el.id === "btnCrearFormulario") {
+        el.disabled = false;
+      } else {
+        el.disabled = true;
+      }
+    });
+}
+
+//  Habilitar tabs y formularios inferiores
+function habilitarFormularioCompleto() {
+  document
+    .querySelectorAll(".tab-pane input, .tab-pane select, .tab-pane textarea, .tab-pane button")
+    .forEach(el => el.disabled = false);
+
+  document
+    .querySelectorAll("[data-bs-toggle='tab']")
+    .forEach(tab => tab.disabled = false);
+}
+
+
+ 
+
 // ==================== REFRESCAR PACIENTE EN CREAR FORMULARIO ====================
 function refrescarPacienteEnCrearFormulario() {
   const select = document.getElementById("selectPacienteIngreso");
@@ -898,3 +853,65 @@ function refrescarPacienteEnCrearFormulario() {
     inputMiembro.value = user.nombreMiembro || user.nombre || "Usuario actual";
   }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+
+   panelDatos = document.getElementById("panelIngresoDatos");
+  const selectPaciente = document.getElementById("selectPacienteIngreso");
+  const btnCrearFormulario = document.getElementById("btnCrearFormulario");
+
+  // cargar pacientes
+  cargarPacientes();
+
+  // bloquear todo al inicio
+  bloquearTodo();
+
+  // al seleccionar paciente
+  // al seleccionar paciente
+selectPaciente?.addEventListener("change", function () {
+  const pacienteId = this.value;
+
+  if (!pacienteId) {
+    bloquearTodo();
+    return;
+  }
+
+  // AUTOCOMPLETAR CASO / CONTROL
+  const selectTipoFormulario = document.getElementById("tipoFormulario");
+  const texto = this.options[this.selectedIndex]?.textContent || "";
+
+  if (selectTipoFormulario) {
+    if (texto.includes("(Caso)")) {
+      selectTipoFormulario.value = "CASO";
+      selectTipoFormulario.disabled = true;
+    } else if (texto.includes("(Control)")) {
+      selectTipoFormulario.value = "CONTROL";
+      selectTipoFormulario.disabled = true;
+    } else {
+      selectTipoFormulario.value = "";
+      selectTipoFormulario.disabled = false;
+    }
+  }
+
+  // COMPLETAR PACIENTE Y MIEMBRO
+  habilitarCrearFormulario();
+  refrescarPacienteEnCrearFormulario();
+});
+
+
+  });
+
+  // botón crear formulario
+  btnCrearFormulario?.addEventListener("click", () => {
+    alert("Formulario creado correctamente ✅");
+    formularioCreado = true;
+    habilitarFormularioCompleto();
+
+    const tabGenerales = document.getElementById("generales-tab");
+    if (tabGenerales) {
+      new bootstrap.Tab(tabGenerales).show();
+    }
+  });
+
+
+
