@@ -5,12 +5,8 @@ import com.genrisk.sistema.services.WordExpServices;
 import com.genrisk.sistema.services.ExcelExportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -241,15 +237,7 @@ public class ExportacionesController {
     public ResponseEntity<byte[]> exportarPacienteWord(@PathVariable String id) {
         try {
             byte[] wordBytes = wordExportService.exportarPacienteAWord(id);
-            
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDispositionFormData("attachment", 
-                "paciente_" + id + "_" + getTimestamp() + ".docx");
-            headers.setContentLength(wordBytes.length);
-
-            return new ResponseEntity<>(wordBytes, headers, HttpStatus.OK);
-            
+            return construirRespuestaWord(wordBytes, "Reporte_Paciente_" + id);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -260,15 +248,7 @@ public class ExportacionesController {
     public ResponseEntity<byte[]> exportarPacienteWordReclutadores(@PathVariable String id) {
         try {
             byte[] wordBytes = wordExportService.exportarPacienteAWordReclutador(id);
-            
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDispositionFormData("attachment", 
-                "paciente_" + id + "_" + getTimestamp() + ".docx");
-            headers.setContentLength(wordBytes.length);
-
-            return new ResponseEntity<>(wordBytes, headers, HttpStatus.OK);
-            
+            return construirRespuestaWord(wordBytes, "paciente_" + id + "_reclutador");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -283,15 +263,7 @@ public class ExportacionesController {
     public ResponseEntity<byte[]> exportarListaPacientesWord() {
         try {
             byte[] wordBytes = wordExportService.exportarListaPacientesAWord();
-            
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDispositionFormData("attachment", 
-                "lista_pacientes_" + getTimestamp() + ".docx");
-            headers.setContentLength(wordBytes.length);
-
-            return new ResponseEntity<>(wordBytes, headers, HttpStatus.OK);
-            
+            return construirRespuestaWord(wordBytes, "Listado_Pacientes");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -325,15 +297,7 @@ public class ExportacionesController {
     public ResponseEntity<byte[]> exportarDatosGeneralesWord() {
         try {
             byte[] wordBytes = wordExportService.exportarDatosGeneralesAWord();
-            
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDispositionFormData("attachment", 
-                "datos_generales_" + getTimestamp() + ".docx");
-            headers.setContentLength(wordBytes.length);
-
-            return new ResponseEntity<>(wordBytes, headers, HttpStatus.OK);
-            
+            return construirRespuestaWord(wordBytes, "datos_generales");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -343,16 +307,8 @@ public class ExportacionesController {
     @GetMapping("/datos-clinicos/word")
     public ResponseEntity<byte[]> exportarDatosClinicosWord() {
         try {
-            byte[] wordBytes2 = wordExportService.exportarDatosClinicosAWord();
-            
-            HttpHeaders headers2 = new HttpHeaders();
-            headers2.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers2.setContentDispositionFormData("attachment", 
-                "datos_clinicos_" + getTimestamp() + ".docx");
-            headers2.setContentLength(wordBytes2.length);
-
-            return new ResponseEntity<>(wordBytes2, headers2, HttpStatus.OK);
-            
+            byte[] wordBytes = wordExportService.exportarDatosClinicosAWord();
+            return construirRespuestaWord(wordBytes, "datos_clinicos");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -363,15 +319,7 @@ public class ExportacionesController {
     public ResponseEntity<byte[]> exportarHabitosPacientesWord() {
         try {
             byte[] wordBytes = wordExportService.exportarHabitosPacienteAWord();
-            
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDispositionFormData("attachment", 
-                "habitos_pacientes_" + getTimestamp() + ".docx");
-            headers.setContentLength(wordBytes.length);
-
-            return new ResponseEntity<>(wordBytes, headers, HttpStatus.OK);
-            
+            return construirRespuestaWord(wordBytes, "habitos_pacientes");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -382,15 +330,7 @@ public class ExportacionesController {
     public ResponseEntity<byte[]> exportarFactDietariosAmbientalesWord() {
         try {
             byte[] wordBytes = wordExportService.exportarFactDietarioAmbientalAWord();
-            
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDispositionFormData("attachment", 
-                "fact_dietario_ambiental" + getTimestamp() + ".docx");
-            headers.setContentLength(wordBytes.length);
-
-            return new ResponseEntity<>(wordBytes, headers, HttpStatus.OK);
-            
+            return construirRespuestaWord(wordBytes, "fact_dietario_ambiental");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -401,15 +341,7 @@ public class ExportacionesController {
     public ResponseEntity<byte[]> exportarHistopatologiasWord() {
         try {
             byte[] wordBytes = wordExportService.exportarHistopatologiaAWord();
-            
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDispositionFormData("attachment", 
-                "histopatologia" + getTimestamp() + ".docx");
-            headers.setContentLength(wordBytes.length);
-
-            return new ResponseEntity<>(wordBytes, headers, HttpStatus.OK);
-            
+            return construirRespuestaWord(wordBytes, "histopatologia");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -485,6 +417,17 @@ public class ExportacionesController {
 
     private String getTimestamp() {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+    }
+
+    private ResponseEntity<byte[]> construirRespuestaWord(byte[] contenido, String nombreBase) {
+        String filename = nombreBase + "_" + getTimestamp() + ".docx";
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
+        headers.setContentDispositionFormData("attachment", filename);
+        headers.setContentLength(contenido.length);
+
+        return new ResponseEntity<>(contenido, headers, HttpStatus.OK);
     }
 
     /**

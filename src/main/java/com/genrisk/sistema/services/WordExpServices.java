@@ -8,742 +8,243 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Lazy
 public class WordExpServices {
 
-    @Autowired
-    private PacienteRepository pacienteRepository;
+    @Autowired private PacienteRepository pacienteRepository;
+    @Autowired private FormularioRepository formularioRepository;
+    @Autowired private DatosGeneralesRepository datosGeneralesRepository;
+    @Autowired private DatosClinicosRepository datosClinicosRepository;
+    @Autowired private HabitosPacienteRepository habitosPacienteRepository;
+    @Autowired private FactDietariosAmbientalesRepository factDietariosAmbientalesRepository;
+    @Autowired private HistopatologiaRepository histopatologiaRepository;
 
-    @Autowired
-    private FormularioRepository formularioRepository;
+    // =================================================================================
+    // 1. REPORTES INDIVIDUALES (FICHA PACIENTE)
+    // =================================================================================
 
-    @Autowired
-    private DatosGeneralesRepository datosGeneralesRepository;
+    public byte[] exportarPacienteAWordReclutador(String idPaciente) throws Exception {
+        return generarFichaOffline(idPaciente, "FICHA DE DATOS DEL PACIENTE (MODO OFFLINE)");
+    }
 
-    @Autowired
-    private DatosClinicosRepository datosClinicosRepository;
-
-    @Autowired
-    private HabitosPacienteRepository habitosPacienteRepository;
-
-    @Autowired 
-    private FactDietariosAmbientalesRepository factDietariosAmbientalesRepository; 
-
-    @Autowired 
-    private HistopatologiaRepository histopatologiaRepository;
-
-    /**
-     * Exporta un reporte completo de paciente a Word
-     */
     public byte[] exportarPacienteAWord(String idPaciente) throws Exception {
+        return generarFichaOffline(idPaciente, "REPORTE DETALLADO DEL PACIENTE");
+    }
+
+    private byte[] generarFichaOffline(String idPaciente, String titulo) throws Exception {
         XWPFDocument document = new XWPFDocument();
-        
         try {
             Paciente paciente = pacienteRepository.findById(idPaciente)
                     .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
 
-            agregarTitulo(document, "Reporte Detallado de Paciente");
-            agregarSaltoLinea(document);
+            agregarTitulo(document, titulo);
+            agregarInstrucciones(document);
 
-            agregarSeccionPaciente(document, paciente);
-            agregarSaltoLinea(document);
+            // --- TABLA 1: IDENTIFICACIÓN (6 Filas) ---
+            Map<String, String> datosPaciente = new LinkedHashMap<>();
+            datosPaciente.put("ID Paciente (NO EDITAR)", paciente.getIdPaciente());
+            datosPaciente.put("Nombre Completo", paciente.getNombrePaciente());
+            datosPaciente.put("Correo", paciente.getCorreoPaciente());
+            datosPaciente.put("Dirección", paciente.getDireccionPaciente());
+            datosPaciente.put("Tipo (Caso/Control)", paciente.getTipoPaciente());
+            datosPaciente.put("Fecha Inclusión (YYYY-MM-DD)", safe(paciente.getFechaInclusion()));
+            crearTablaSeccion(document, "1. IDENTIFICACIÓN DEL PACIENTE", datosPaciente);
 
-            List<Formulario> formularios = formularioRepository.findByPacienteIdPaciente(idPaciente);
+            Formulario formulario = formularioRepository.findTopByPacienteOrderByIdFormularioDesc(paciente)
+                    .stream().findFirst().orElse(null);
 
-            // Se itera sobre todos los formularios del paciente
-            for (Formulario formulario : formularios) {
-                agregarSeccionFormulario(document, formulario);
-                agregarSaltoLinea(document);
+            if (formulario != null) {
+                Integer formId = formulario.getIdFormulario();
+
+                // --- TABLA 2: DATOS GENERALES (13 Filas) ---
+                DatosGenerales dg = datosGeneralesRepository.findByIdDatosGen_FormularioId(formId).orElse(new DatosGenerales());
+                Map<String, String> mapaGen = new LinkedHashMap<>();
+                mapaGen.put("Edad", safe(dg.getEdad()));
+                mapaGen.put("Sexo (Hombre/Mujer)", safe(dg.getSexo()));
+                mapaGen.put("Peso (kg)", safeDouble(dg.getPeso()));
+                mapaGen.put("Estatura (cm)", safeDouble(dg.getEstatura()));
+                mapaGen.put("Zona (Urbana/Rural)", safe(dg.getZonaResidencial()));
+                mapaGen.put("Años Residencia (<5, 5-10, >10)", safe(dg.getAniosResiActual()));
+                mapaGen.put("Educación", safe(dg.getEducacion()));
+                mapaGen.put("Ocupación", safe(dg.getOcupacion()));
+                mapaGen.put("Previsión Salud", safe(dg.getPrevisionSalud()));
+                mapaGen.put("Nacionalidad", safe(dg.getNacionalidad()));
+                mapaGen.put("Dirección (Residencia)", safe(dg.getDireccion()));
+                mapaGen.put("Comuna", safe(dg.getComuna()));
+                mapaGen.put("Ciudad", safe(dg.getCiudad()));
+                crearTablaSeccion(document, "2. DATOS SOCIODEMOGRÁFICOS", mapaGen);
+
+                // --- TABLA 3: DATOS CLÍNICOS (18 Filas) ---
+                DatosClinicos dc = datosClinicosRepository.findByIdDatosCli_FormularioId(formId).orElse(new DatosClinicos());
+                Map<String, String> mapaCli = new LinkedHashMap<>();
+                mapaCli.put("Adenocarcinoma (Sí/No)", safe(dc.getAdenoGastrico()));
+                mapaCli.put("Fecha Diagnóstico (YYYY-MM-DD)", safe(dc.getFechaAdenoGastrico()));
+                mapaCli.put("Ant. Fam. Cáncer Gástrico", safe(dc.getAntFamCancerGast()));
+                mapaCli.put("Otros Cánceres Familiares", safe(dc.getAntFamOtroCancer()));
+                mapaCli.put("Medicamentos", safe(dc.getMedicamentos()));
+                mapaCli.put("Otras Enfermedades", safe(dc.getOtrasEnfermedades()));
+                mapaCli.put("Cirugía Gástrica Previa", safe(dc.getCirugiaGastricaPrevia())); 
+                
+                // HPylori Actual
+                mapaCli.put("HPylori Resultado Actual", safe(dc.getHpyloriResultado()));
+                mapaCli.put("Tipo Prueba Actual", safe(dc.getHpyloriPrueba()));
+                mapaCli.put("Tiempo Test Actual (Meses)", safe(dc.getHpyloriTiempoTest())); 
+                
+                // HPylori Pasado
+                mapaCli.put("HPylori Pasado (Sí/No)", safe(dc.getPositivoPasadoHPylori()));
+                mapaCli.put("Tipo Examen Pasado", safe(dc.getTipoExamenPasadoHPy())); 
+                mapaCli.put("Año Positivo Pasado", safe(dc.getAnioPositivoPasado())); 
+                
+                // Tratamiento
+                mapaCli.put("Tratamiento Erradicación", safe(dc.getTrataErradicacion()));
+                mapaCli.put("Esquema Tratamiento", safe(dc.getEsquemaTratamientoErra())); 
+                mapaCli.put("Año Tratamiento", safe(dc.getAnioTrataEradica())); 
+                mapaCli.put("Uso Antibióticos/IBP", safe(dc.getAntibioticosIBP()));
+                crearTablaSeccion(document, "3. ANTECEDENTES CLÍNICOS", mapaCli);
+
+                // --- TABLA 4: HÁBITOS (9 Filas) ---
+                HabitosPaciente hp = habitosPacienteRepository.findByIdHabPaciente_FormularioId(formId).orElse(new HabitosPaciente());
+                Map<String, String> mapaHab = new LinkedHashMap<>();
+                mapaHab.put("Tabaco Estado", safe(hp.getEstadoConsumoTabaco()));
+                mapaHab.put("Cigarrillos Promedio Día", safe(hp.getCantPromTabaco()));
+                mapaHab.put("Tiempo Fumando", safe(hp.getTiempoTabaco()));
+                mapaHab.put("Años Ex-Fumador", safe(hp.getExConsumidorTabaco()));
+                mapaHab.put("Alcohol Estado", safe(hp.getEstadoConsumoAlcohol()));
+                mapaHab.put("Frecuencia Alcohol", safe(hp.getFrecuenciaAlcohol()));
+                mapaHab.put("Cantidad Tragos/Ocasión", safe(hp.getCantidadAlcohol()));
+                mapaHab.put("Años Consumo Alcohol", safe(hp.getAniosConsumoAlcohol()));
+                mapaHab.put("Años Ex-Bebedor", safe(hp.getExConsumidorAlcohol()));
+                crearTablaSeccion(document, "4. HÁBITOS Y ESTILO DE VIDA", mapaHab);
+
+                // --- TABLA 5: FACTORES DIETARIOS (11 Filas) ---
+                FactDietariosAmbientales fda = factDietariosAmbientalesRepository.findByIdFact_FormularioId(formId).orElse(new FactDietariosAmbientales());
+                Map<String, String> mapaDiet = new LinkedHashMap<>();
+                mapaDiet.put("Carnes Procesadas", safe(fda.getDietaCarnesCecinas()));
+                mapaDiet.put("Agrega Sal", safe(fda.getDietaAgregaSal()));
+                mapaDiet.put("Frituras", safe(fda.getDietaFrituras()));
+                mapaDiet.put("Alim. Condimentados", safe(fda.getAliCondimentado()));
+                mapaDiet.put("Frutas y Verduras", safe(fda.getDietaFrutasVerduras()));
+                mapaDiet.put("Bebidas Calientes", safe(fda.getInfusionesBebidas()));
+                mapaDiet.put("Fuente de Agua", safe(fda.getAguaConsumoZona()));
+                mapaDiet.put("Tratamiento Agua", safe(fda.getTratamientoAgua()));
+                mapaDiet.put("Fumigaciones (Sí/No)", safe(fda.getFumigaciones())); 
+                mapaDiet.put("Exposición Pesticidas", safe(fda.getExposicionPesticidas()));
+                mapaDiet.put("Humo Leña", safe(fda.getCombusLenaDiario()));
+                crearTablaSeccion(document, "5. FACTORES DIETARIOS Y AMBIENTALES", mapaDiet);
+
+                // --- TABLA 6: HISTOPATOLOGÍA (3 Filas) ---
+                Histopatologia histo = histopatologiaRepository.findByHistoID_FormularioId(formId).orElse(new Histopatologia());
+                Map<String, String> mapaHisto = new LinkedHashMap<>();
+                mapaHisto.put("Tipo Histológico", safe(histo.getTipo()));
+                mapaHisto.put("Estadio Clínico", safe(histo.getEstadoClinico()));
+                mapaHisto.put("Localización Tumoral", safe(histo.getLocaliTumoral()));
+                crearTablaSeccion(document, "6. HISTOPATOLOGÍA", mapaHisto);
             }
-
-            agregarPiePagina(document);
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             document.write(baos);
+            document.close();
             return baos.toByteArray();
-
         } finally {
             document.close();
         }
     }
 
-    public byte[] exportarPacienteAWordReclutador(String idPaciente) throws Exception { //Nuevo Método
-        XWPFDocument document = new XWPFDocument();
-        
-        try {
-            Paciente paciente = pacienteRepository.findById(idPaciente)
-                    .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
-
-            agregarTitulo(document, "Reporte Detallado de Paciente");
-            agregarSaltoLinea(document);
-
-            agregarSeccionPacienteReclutador(document, paciente);
-            agregarSaltoLinea(document);
-
-            List<Formulario> formularios = formularioRepository.findByPacienteIdPaciente(idPaciente);
-
-            // Se itera sobre todos los formularios del paciente
-            for (Formulario formulario : formularios) {
-                agregarSeccionFormulario(document, formulario);
-                agregarSaltoLinea(document);
-            }
-
-            agregarPiePagina(document);
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            document.write(baos);
-            return baos.toByteArray();
-
-        } finally {
-            document.close();
-        }
-    }
-
-    /**
-     * Exporta lista de pacientes a Word
-     */
+    // =================================================================================
+    // 2. REPORTES DE LISTADOS (TABLAS GENERALES) 
+    // =================================================================================
     public byte[] exportarListaPacientesAWord() throws Exception {
-        XWPFDocument document = new XWPFDocument();
-        
-        try {
-            agregarTitulo(document, "Listado General de Pacientes");
-            List<Paciente> pacientes = pacienteRepository.findAll();
-            
-            // Crear tabla
-            XWPFTable table = document.createTable(pacientes.size() + 1, 5);
-            table.setWidth("100%"); // **OPTIMIZACIÓN:** Asegura que la tabla no se desborde
-
-            // Encabezados
-            XWPFTableRow headerRow = table.getRow(0);
-            configurarCeldaEncabezado(headerRow.getCell(0), "ID");
-            configurarCeldaEncabezado(headerRow.getCell(1), "Nombre");
-            configurarCeldaEncabezado(headerRow.getCell(2), "Correo");
-            configurarCeldaEncabezado(headerRow.getCell(3), "Dirección");
-            configurarCeldaEncabezado(headerRow.getCell(4), "Tipo");
-
-            // Datos
-            int rowIndex = 1;
-            for (Paciente paciente : pacientes) {
-                XWPFTableRow row = table.getRow(rowIndex++);
-                configurarCeldaDatos(row.getCell(0), paciente.getIdPaciente());
-                configurarCeldaDatos(row.getCell(1), paciente.getNombrePaciente());
-                configurarCeldaDatos(row.getCell(2), paciente.getCorreoPaciente());
-                configurarCeldaDatos(row.getCell(3), paciente.getDireccionPaciente());
-                configurarCeldaDatos(row.getCell(4), paciente.getTipoPaciente());
-            }
-
-            agregarSaltoLinea(document);
-            agregarPiePagina(document);
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            document.write(baos);
-            return baos.toByteArray();
-
-        } finally {
-            document.close();
-        }
+        return generarReporteListado("Listado General de Pacientes", 
+            new String[]{"ID", "Nombre", "Correo", "Tipo", "Fecha Ingreso"}, 
+            pacienteRepository.findAll(), 
+            (table, p) -> {
+                XWPFTableRow row = table.createRow();
+                row.getCell(0).setText(safe(p.getIdPaciente()));
+                row.getCell(1).setText(safe(p.getNombrePaciente()));
+                row.getCell(2).setText(safe(p.getCorreoPaciente()));
+                row.getCell(3).setText(safe(p.getTipoPaciente()));
+                row.getCell(4).setText(safe(p.getFechaInclusion()));
+            });
     }
 
     public byte[] exportarListaPacientesAWordReclutadores() throws Exception {
-        XWPFDocument document = new XWPFDocument();
-        
-        try {
-            agregarTitulo(document, "Listado General de Pacientes");
-            List<Paciente> pacientes = pacienteRepository.findAll();
-            
-            // Crear tabla
-            XWPFTable table = document.createTable(pacientes.size() + 1, 5);
-            table.setWidth("100%"); // **OPTIMIZACIÓN:** Asegura que la tabla no se desborde
-
-            // Encabezados
-            XWPFTableRow headerRow = table.getRow(0);
-            configurarCeldaEncabezado(headerRow.getCell(0), "ID");
-            configurarCeldaEncabezado(headerRow.getCell(1), "Tipo");
-
-            // Datos
-            int rowIndex = 1;
-            for (Paciente paciente : pacientes) {
-                XWPFTableRow row = table.getRow(rowIndex++);
-                configurarCeldaDatos(row.getCell(0), paciente.getIdPaciente());
-                configurarCeldaDatos(row.getCell(1), paciente.getTipoPaciente());
-            }
-
-            agregarSaltoLinea(document);
-            agregarPiePagina(document);
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            document.write(baos);
-            return baos.toByteArray();
-
-        } finally {
-            document.close();
-        }
+        return generarReporteListado("Listado Pacientes", new String[]{"ID", "Tipo"}, pacienteRepository.findAll(), 
+            (table, p) -> { XWPFTableRow row = table.createRow(); row.getCell(0).setText(safe(p.getIdPaciente())); row.getCell(1).setText(safe(p.getTipoPaciente())); });
     }
 
-    /**
-     * Exporta datos generales de todos los formularios
-     */
-   public byte[] exportarDatosGeneralesAWord() throws Exception {
-        XWPFDocument document = new XWPFDocument();
-        try {
-            agregarTitulo(document, "Datos Generales de Pacientes");
-            List<DatosGenerales> datosGenerales = datosGeneralesRepository.findAll();
-            
-            XWPFTable table = document.createTable(datosGenerales.size() + 1, 10);
-            table.setWidth("100%");
-
-            String[] headers = new String[] {
-                "Form ID", "Edad", "Sexo", "Peso", "IMC", "Estatura", 
-                "Zona", "Años Resi.", "Educación", "Ocupación"
-            };
-            
-            XWPFTableRow headerRow = table.getRow(0);
-            for (int i = 0; i < headers.length; i++) {
-                configurarCeldaEncabezado(headerRow.getCell(i), headers[i]);
-            }
-
-            int rowIndex = 1;
-            for (DatosGenerales dg : datosGenerales) {
-                XWPFTableRow row = table.getRow(rowIndex++);
-                configurarCeldaDatos(row.getCell(0), String.valueOf(dg.getIdDatosGen().getFormularioId()));
-                configurarCeldaDatos(row.getCell(1), safe(dg.getEdad()));
-                configurarCeldaDatos(row.getCell(2), safe(dg.getSexo()));
-                configurarCeldaDatos(row.getCell(3), safeDouble(dg.getPeso()));
-                configurarCeldaDatos(row.getCell(4), safeDouble(dg.getImc()));
-                configurarCeldaDatos(row.getCell(5), safeDouble(dg.getEstatura()));
-                configurarCeldaDatos(row.getCell(6), safe(dg.getZonaResidencial()));
-                configurarCeldaDatos(row.getCell(7), safe(dg.getEducacion()));
-                configurarCeldaDatos(row.getCell(8), safe(dg.getOcupacion()));
-            }
-
-            agregarSaltoLinea(document);
-            agregarPiePagina(document);
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            document.write(baos);
-            return baos.toByteArray();
-
-        } finally {
-            document.close();
-        }
+    public byte[] exportarDatosGeneralesAWord() throws Exception {
+        return generarReporteListado("Reporte Datos Generales", new String[]{"Form ID", "Edad", "Sexo", "Peso", "IMC"}, datosGeneralesRepository.findAll(), 
+            (table, dg) -> { XWPFTableRow row = table.createRow(); row.getCell(0).setText(safe(dg.getIdDatosGen().getFormularioId())); row.getCell(1).setText(safe(dg.getEdad())); row.getCell(2).setText(safe(dg.getSexo())); row.getCell(3).setText(safeDouble(dg.getPeso())); row.getCell(4).setText(safeDouble(dg.getImc())); });
     }
 
     public byte[] exportarDatosClinicosAWord() throws Exception {
-        XWPFDocument document = new XWPFDocument();
-        
-        try {
-            agregarTitulo(document, "Datos Clínicos de Pacientes");
-            List<DatosClinicos> datosClinicos = datosClinicosRepository.findAll();
-            
-            // Reducir columnas de 11 a 9 para evitar desborde y consolidar datos
-            XWPFTable table = document.createTable(datosClinicos.size() + 1, 9);
-            table.setWidth("100%");
-
-            String[] headers = new String[] {
-                "Form ID", "AdenoGástrico", "Fecha Adeno", "Ant. Fam. Cáncer Gástrico", 
-                "H. Pylori (Prueba/Resultado)", "Tiempo Test (meses)", 
-                "Medicamentos", "Otras Enf.", "Ant. Fam. Otro Cáncer"
-            };
-
-            XWPFTableRow headerRow = table.getRow(0);
-            for (int i = 0; i < headers.length; i++) {
-                configurarCeldaEncabezado(headerRow.getCell(i), headers[i]);
-            }
-
-            int rowIndex = 1;
-            for (DatosClinicos dc : datosClinicos) {
-                XWPFTableRow row = table.getRow(rowIndex++);
-                configurarCeldaDatos(row.getCell(0), String.valueOf(dc.getIdDatosCli().getFormularioId()));
-                configurarCeldaDatos(row.getCell(1), safe(dc.getAdenoGastrico()));
-                configurarCeldaDatos(row.getCell(2), safe(dc.getFechaAdenoGastrico()));
-                configurarCeldaDatos(row.getCell(3), safe(dc.getAntFamCancerGast()));
-                // Consolidación de H. Pylori para ahorrar espacio
-                configurarCeldaDatos(row.getCell(4), safe(dc.getHpyloriPrueba()) + " / " + safe(dc.getHpyloriResultado()));
-                configurarCeldaDatos(row.getCell(5), safe(dc.getHpyloriTiempoTest()));
-                configurarCeldaDatos(row.getCell(6), safe(dc.getMedicamentos()));
-                configurarCeldaDatos(row.getCell(7), safe(dc.getOtrasEnfermedades()));
-                configurarCeldaDatos(row.getCell(8), safe(dc.getAntFamOtroCancer()));
-            }
-
-            agregarSaltoLinea(document);
-            agregarPiePagina(document);
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            document.write(baos);
-            return baos.toByteArray();
-
-        } finally {
-            document.close();
-        }
+        return generarReporteListado("Reporte Datos Clínicos", new String[]{"Form ID", "Adeno", "H.Pylori"}, datosClinicosRepository.findAll(), 
+            (table, dc) -> { XWPFTableRow row = table.createRow(); row.getCell(0).setText(safe(dc.getIdDatosCli().getFormularioId())); row.getCell(1).setText(safe(dc.getAdenoGastrico())); row.getCell(2).setText(safe(dc.getHpyloriResultado())); });
     }
 
     public byte[] exportarHabitosPacienteAWord() throws Exception {
-        XWPFDocument document = new XWPFDocument();
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            agregarTitulo(document, "Hábitos de Pacientes");
-
-            List<HabitosPaciente> list = habitosPacienteRepository.findAll();
-
-            String[] headers = new String[] {
-                "Form ID", "Estado Tabaco", "Cant. Prom.", 
-                "Tiempo Consumo (meses)", "Consumo Alcohol", "Frecuencia Alcohol", 
-                "Años Consumo"
-            };
-
-            XWPFTable table = document.createTable(list.size() + 1, headers.length);
-            table.setWidth("100%"); 
-
-            // Encabezados
-            XWPFTableRow headerRow = table.getRow(0);
-            for (int i = 0; i < headers.length; i++) {
-                configurarCeldaEncabezado(headerRow.getCell(i), headers[i]);
-            }
-
-            // Datos
-            if (!list.isEmpty()) {
-                int rowIndex = 1;
-                for (HabitosPaciente h : list) {
-                    XWPFTableRow row = table.getRow(rowIndex++);
-                    configurarCeldaDatos(row.getCell(0), String.valueOf(h.getIdHabPaciente().getFormularioId()));
-                    configurarCeldaDatos(row.getCell(1), safe(h.getEstadoConsumoTabaco()));
-                    configurarCeldaDatos(row.getCell(2), safe(h.getCantPromTabaco()));
-                    configurarCeldaDatos(row.getCell(3), safe(h.getTiempoTabaco()));
-                    configurarCeldaDatos(row.getCell(4), safe(h.getEstadoConsumoAlcohol()));
-                    configurarCeldaDatos(row.getCell(5), safe(h.getFrecuenciaAlcohol()));
-                    configurarCeldaDatos(row.getCell(6), safe(h.getAniosConsumoAlcohol()));
-                }
-            } else {
-                configurarCeldaDatos(table.getRow(1).getCell(0), "Sin registros");
-            }
-
-            agregarSaltoLinea(document);
-            agregarPiePagina(document);
-
-            document.write(baos);
-            return baos.toByteArray();
-        } finally {
-            document.close();
-        }
+        return generarReporteListado("Reporte Hábitos", new String[]{"Form ID", "Tabaco", "Alcohol"}, habitosPacienteRepository.findAll(), 
+            (table, hp) -> { XWPFTableRow row = table.createRow(); row.getCell(0).setText(safe(hp.getIdHabPaciente().getFormularioId())); row.getCell(1).setText(safe(hp.getEstadoConsumoTabaco())); row.getCell(2).setText(safe(hp.getEstadoConsumoAlcohol())); });
     }
 
     public byte[] exportarFactDietarioAmbientalAWord() throws Exception {
-        XWPFDocument document = new XWPFDocument();
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            agregarTitulo(document, "Factores Dietario / Ambientales");
-
-            List<FactDietariosAmbientales> list = factDietariosAmbientalesRepository.findAll();
-
-            // Reducir headers para caber en una página
-            String[] headers = new String[] {
-                "Form ID", "Agua Consumo", "Tratamiento Agua", 
-                "Fumigaciones", "Exposición Químicos", "Dieta Sal", "Dieta Frituras"
-            };
-
-            XWPFTable table = document.createTable(list.size() + 1, headers.length);
-            table.setWidth("100%");
-
-            XWPFTableRow headerRow = table.getRow(0);
-            for (int i = 0; i < headers.length; i++) {
-                configurarCeldaEncabezado(headerRow.getCell(i), headers[i]);
-            }
-
-            if (!list.isEmpty()) {
-                int r = 1;
-                for (FactDietariosAmbientales f : list) {
-                    XWPFTableRow row = table.getRow(r++);
-                    configurarCeldaDatos(row.getCell(0), safe(f.getIdFact().getFormularioId()));
-                    configurarCeldaDatos(row.getCell(1), safe(f.getAguaConsumoZona()));
-                    configurarCeldaDatos(row.getCell(2), safe(f.getTratamientoAgua()));
-                    configurarCeldaDatos(row.getCell(3), safe(f.getFumigaciones()));
-                    configurarCeldaDatos(row.getCell(4), safe(f.getExposicionQuimicos()));
-                    configurarCeldaDatos(row.getCell(5), safe(f.getDietaAgregaSal()));
-                    configurarCeldaDatos(row.getCell(6), safe(f.getDietaFrituras()));
-                }
-            } else {
-                configurarCeldaDatos(table.getRow(1).getCell(0), "Sin registros");
-            }
-
-            agregarSaltoLinea(document);
-            agregarPiePagina(document);
-
-            document.write(baos);
-            return baos.toByteArray();
-        } finally {
-            document.close();
-        }
+        return generarReporteListado("Reporte Dietario/Ambiental", new String[]{"Form ID", "Agua", "Frituras"}, factDietariosAmbientalesRepository.findAll(), 
+            (table, fda) -> { XWPFTableRow row = table.createRow(); row.getCell(0).setText(safe(fda.getIdFact().getFormularioId())); row.getCell(1).setText(safe(fda.getAguaConsumoZona())); row.getCell(2).setText(safe(fda.getDietaFrituras())); });
     }
 
     public byte[] exportarHistopatologiaAWord() throws Exception {
-        XWPFDocument document = new XWPFDocument();
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            agregarTitulo(document, "Histopatología");
-
-            List<Histopatologia> list = histopatologiaRepository.findAll();
-
-            String[] headers = new String[] { "Form ID", "Tipo", "Estado Clínico", "Localización Tumoral" };
-
-            XWPFTable table = document.createTable(list.size() + 1, headers.length);
-            table.setWidth("100%"); 
-
-            XWPFTableRow headerRow = table.getRow(0);
-            for (int i = 0; i < headers.length; i++) {
-                configurarCeldaEncabezado(headerRow.getCell(i), headers[i]);
-            }
-
-            if (!list.isEmpty()) {
-              int r = 1;
-                for (Histopatologia h : list) {
-                    XWPFTableRow row = table.getRow(r++);
-                    configurarCeldaDatos(row.getCell(0), safe(h.getHistoID().getFormularioId()));
-                    configurarCeldaDatos(row.getCell(1), safe(h.getTipo()));
-                    configurarCeldaDatos(row.getCell(2), safe(h.getEstadoClinico()));
-                    configurarCeldaDatos(row.getCell(3), safe(h.getLocaliTumoral()));
-                }
-            } else {
-                configurarCeldaDatos(table.getRow(1).getCell(0), "Sin registros");
-            }
-
-            agregarSaltoLinea(document);
-            agregarPiePagina(document);
-
-            document.write(baos);
-            return baos.toByteArray();
-        } finally {
-            document.close();
-        }
+        return generarReporteListado("Reporte Histopatología", new String[]{"Form ID", "Tipo", "Estadio"}, histopatologiaRepository.findAll(), 
+            (table, h) -> { XWPFTableRow row = table.createRow(); row.getCell(0).setText(safe(h.getHistoID().getFormularioId())); row.getCell(1).setText(safe(h.getTipo())); row.getCell(2).setText(safe(h.getEstadoClinico())); });
     }
 
-    // ================== LLAMADAS PARA IMPORTAR DATOS ================0
-
-    private void agregarSeccionFormulario(XWPFDocument document, Formulario formulario) {
-        agregarSubtitulo(document, "Formulario ID: " + formulario.getIdFormulario() + " (" + safe(formulario.getTipoFormulario()) + ")");
-
-        // Nota: Las llamadas a los repositorios usan .ifPresent(dto::setter) que ya es seguro
-        datosGeneralesRepository.findByIdDatosGen_FormularioId(formulario.getIdFormulario())
-            .ifPresent(dg -> agregarDatosGenerales(document, dg));
-
-        datosClinicosRepository.findByIdDatosCli_FormularioId(formulario.getIdFormulario())
-            .ifPresent(dc -> agregarDatosClinicos(document, dc));
-
-        habitosPacienteRepository.findByIdHabPaciente_FormularioId(formulario.getIdFormulario())
-            .ifPresent(hp -> agregarHabitos(document, hp));
-
-        factDietariosAmbientalesRepository.findByIdFact_FormularioId(formulario.getIdFormulario()) 
-            .ifPresent(fda -> agregarFactoresDietariosAmbientales(document, fda));   
-            
-        histopatologiaRepository.findByHistoID_FormularioId(formulario.getIdFormulario())
-             .ifPresent(h -> agregarHistopatologia(document, h));
-    }
-    // ===================== MÉTODOS PARA CONFIGURAR ESTÉTICA =====================
-    private void agregarTitulo(XWPFDocument document, String titulo) {
-        XWPFParagraph paragraph = document.createParagraph();
-        paragraph.setAlignment(ParagraphAlignment.CENTER);
-        
-        XWPFRun run = paragraph.createRun();
-        run.setText(titulo);
-        run.setBold(true);
-        run.setFontSize(18);
-        run.setColor("033664");
-    }
-
-    private void agregarSubtitulo(XWPFDocument document, String subtitulo) {
-        XWPFParagraph paragraph = document.createParagraph();
-        
-        XWPFRun run = paragraph.createRun();
-        run.setText(subtitulo);
-        run.setBold(true);
-        run.setFontSize(15);
-        run.setColor("077C9C");
-    }
-
-    private void agregarTexto(XWPFDocument document, String texto) {
-        XWPFParagraph paragraph = document.createParagraph();
-        XWPFRun run = paragraph.createRun();
-        run.setText(texto);
-        run.setFontSize(11);
-    }
-
-    private void agregarTextoNegrita2(XWPFDocument document, String texto) {
-        XWPFParagraph paragraph = document.createParagraph();
-        XWPFRun run = paragraph.createRun();
-        run.setText(texto);
-        run.setBold(true);
-        run.setFontSize(14);
-        run.setColor("701E05");
-    }
-
-    private void agregarTextoNegrita3(XWPFDocument document, String texto) {
-        XWPFParagraph paragraph = document.createParagraph();
-        XWPFRun run = paragraph.createRun();
-        run.setText(texto);
-        run.setBold(true);
-        run.setFontSize(12);
-        run.setColor("6370F8");
-    }
-
-    private void agregarSaltoLinea(XWPFDocument document) {
-        document.createParagraph();
-    }
-
-    // ============== MÉTODOS PARA EXPORTAR PACIENTES ============
-    private void agregarSeccionPaciente(XWPFDocument document, Paciente paciente) {
-        agregarSubtitulo(document, "Información del Paciente");
-        
-        agregarTextoConEtiqueta(document, "ID: ", paciente.getIdPaciente());
-        agregarTextoConEtiqueta(document, "Nombre: ", paciente.getNombrePaciente());
-        agregarTextoConEtiqueta(document, "Correo: ", paciente.getCorreoPaciente());
-        agregarTextoConEtiqueta(document, "Dirección: ", paciente.getDireccionPaciente());
-        agregarTextoConEtiqueta(document, "Tipo: ", paciente.getTipoPaciente());
-        agregarTextoConEtiqueta(document, "Fecha de Inclusión: ", String.valueOf(paciente.getFechaInclusion()));
-    }
-
-    private void agregarSeccionPacienteReclutador(XWPFDocument document, Paciente paciente) { //Nuevo Método
-        agregarSubtitulo(document, "Información del Paciente");
-        
-        agregarTextoConEtiqueta(document, "ID: ", paciente.getIdPaciente());
-        agregarTextoConEtiqueta(document, "Tipo: ", paciente.getTipoPaciente());
-        agregarTextoConEtiqueta(document, "Fecha de Inclusión: ", String.valueOf(paciente.getFechaInclusion()));
-    }
-
-    // =========== MÉTODOS DE FORMULARIO PARA WORD POR CADA PACIENTE =================
-    private void agregarDatosGenerales(XWPFDocument document, DatosGenerales dg) {
-        agregarTextoNegrita2(document, "Datos Generales:");
-        
-        agregarTextosMultiples(document,
-        "Edad: ", String.format("%d años", dg.getEdad() != null ? dg.getEdad() : 0),
-        "Sexo: ", safe(dg.getSexo()),
-        "IMC: ", dg.getImc() != null ? String.format("%.1f", dg.getImc()) : "N/A");
-
-        agregarTextosMultiples(document,
-            "Peso: ", dg.getPeso() != null ? String.format("%.1f kg", dg.getPeso()) : "N/A",
-            "Estatura: ", dg.getEstatura() != null ? String.format("%.1f cm", dg.getEstatura()) : "N/A");
-
-        agregarTextoConEtiqueta(document, "Nacionalidad: ", safe(dg.getNacionalidad()));
-
-        agregarTextosMultiples(document,"Dirección: ", safe(dg.getDireccion()), 
-                "Comuna: ", safe(dg.getComuna()),"Ciudad: ", safe(dg.getCiudad()));
-        
-        agregarTextosMultiples(document,
-            "Zona Residencial: ", safe(dg.getZonaResidencial()),
-            "Años Residencia: ", safe(dg.getAniosResiActual())
-        );
-
-        agregarTextosMultiples(document,
-            "Educación: ", safe(dg.getEducacion()),
-            "Ocupación: ", safe(dg.getOcupacion())
-        );
-
-        agregarTextoConEtiqueta(document, "Previsión de Salud: ", safe(dg.getPrevisionSalud()));
-        
-        agregarSaltoLinea(document);
-    }
-
-    private void agregarDatosClinicos(XWPFDocument document, DatosClinicos dc) {
-        agregarTextoNegrita2(document, "Datos Clínicos:");
-        
-        agregarTextosMultiples(document,
-            "Adenocarcinoma Gástrico: ", safe(dc.getAdenoGastrico()),
-            "Fecha Adeno Gástrico: ", dc.getFechaAdenoGastrico() != null ? dc.getFechaAdenoGastrico().toString() : "N/A"
-        );
-        agregarTextoConEtiqueta(document, "Antecedentes Fam. Cáncer Gástrico: ", dc.getAntFamCancerGast());
-        agregarTextoConEtiqueta(document, "Antecedentes Fam. Cáncer: ", dc.getAntFamOtroCancer());
-        agregarTextoConEtiqueta(document, "Otras Enfermedades: ", dc.getOtrasEnfermedades());
-        agregarTextosMultiples(document, "Medicamentos: ", safe(dc.getMedicamentos()), 
-        "Ciruguia Gástrica Previa: ", safe(dc.getCirugiaGastricaPrevia()));
-
-        agregarSaltoLinea(document);
-
-        agregarTextosMultiples(document,
-            "Resultado HPylori Actual: ", safe(dc.getHpyloriResultado()),
-            "Tipo de Prueba: ", dc.getHpyloriPrueba() != null ? dc.getHpyloriPrueba().toString() : "N/A",
-            "Tiempo de Test: ", dc.getHpyloriTiempoTest() != null ? String.valueOf(dc.getHpyloriTiempoTest()) : "N/A"
-        );
-
-        agregarTextosMultiples(document,
-    "Resultado HPylori Pasado: ", safe(dc.getPositivoPasadoHPylori()),
-            "Tipo de Prueba: ", dc.getTipoExamenPasadoHPy() != null ? dc.getTipoExamenPasadoHPy().toString() : "N/A",
-            "Tiempo de Test (años): ", dc.getAnioPositivoPasado() != null ? String.valueOf(dc.getAnioPositivoPasado()) : "N/A");
-
-        agregarTextosMultiples(document,
-    "Tratamiento Erradicación: ", safe(dc.getTrataErradicacion()),
-            "Esquema Erradicación: ", dc.getEsquemaTratamientoErra() != null ? dc.getEsquemaTratamientoErra().toString() : "N/A",
-            "Año Aproximado: ", dc.getAnioTrataEradica() != null ? String.valueOf(dc.getAnioTrataEradica()) : "N/A");
-        
-        agregarTextosMultiples(document,"Uso de antibióticos o inhibidores IBP: ", safe(dc.getAntibioticosIBP() 
-            != null ?  String.valueOf(dc.getAntibioticosIBP()): "N/A"));
-
-        agregarTextosMultiples(document, "Repetición Examen HPylori: ",
-            safe(dc.getRepeticionExamen() != null ?  String.valueOf(dc.getRepeticionExamen()): "N/A"), 
-            "Fecha: ", dc.getFechaRepetiExamen() != null ? String.valueOf(dc.getFechaRepetiExamen()): "N/A", 
-            "Resultado: ", dc.getResultadosExamen() != null ? String.valueOf(dc.getResultadosExamen()): "N/A"); 
-
-        agregarSaltoLinea(document);
-    }
-
-    private void agregarHistopatologia(XWPFDocument document, Histopatologia hp) {
-        agregarTextoNegrita2(document, "Histopatología:");
-
-        agregarTextosMultiples(document, 
-            "Tipo", safe(hp.getTipo() != null ? String.valueOf(hp.getTipo()) : "N/A"), 
-            "Estado Clínico: ", safe(hp.getEstadoClinico() != null ? String.valueOf(hp.getEstadoClinico()) : "N/A"), 
-            "Localización Tumoral: ", safe(hp.getLocaliTumoral() != null ? String.valueOf(hp.getLocaliTumoral()) : "N/A"));
-        agregarSaltoLinea(document);
-    }
-
-    private void agregarHabitos(XWPFDocument document, HabitosPaciente hp) {
-        agregarTextoNegrita2(document, "Hábitos del Paciente:");
-
-        agregarTextoNegrita3(document,"Tabaco" ); 
-
-        agregarTextoConEtiqueta(document, "Estado de Consumo: ", 
-            hp.getEstadoConsumoTabaco());
-        agregarTextoConEtiqueta(document, "Cantidad Promedio (Unidades): ", 
-            String.valueOf(hp.getCantPromTabaco())); 
-        agregarTextoConEtiqueta(document, "Ex Fumador: ", 
-            String.valueOf(hp.getExConsumidorTabaco())); 
-
-        agregarSaltoLinea(document);
-        agregarTextoNegrita3(document,"Alcohol" ); 
-        
-        agregarTextosMultiples(document, 
-            "Consumo Alcohol: ", safe(hp.getEstadoConsumoAlcohol() != null ? String.valueOf(hp.getEstadoConsumoAlcohol()) : "N/A"), 
-            "Frecuencia: ", safe(hp.getFrecuenciaAlcohol() != null ? String.valueOf(hp.getFrecuenciaAlcohol()) : "N/A"), 
-            "Cantidad Promedio: ", safe(hp.getCantidadAlcohol() != null ? String.valueOf(hp.getCantidadAlcohol()) : "N/A"));
-
-        agregarTextosMultiples(document, 
-            "Años de Consumo: ", safe(hp.getAniosConsumoAlcohol() != null ? String.valueOf(hp.getAniosConsumoAlcohol()) : "N/A"), 
-            "Ex Alcohol: ", safe(hp.getExConsumidorAlcohol() != null ? String.valueOf(hp.getExConsumidorAlcohol()) : "N/A"));
-
-        agregarSaltoLinea(document);
-    }
-
-    private void agregarFactoresDietariosAmbientales(XWPFDocument document, FactDietariosAmbientales fda){
-        agregarTextoNegrita2(document, "Factores Dietario-Ambiental del Paciente:");
-
-        agregarTextosMultiples(document,
-            "Consumo Carnes Procesadas: ", safe(fda.getDietaCarnesCecinas() != null ? String.valueOf(fda.getDietaCarnesCecinas()) : "N/A"), 
-            "Consumo Alimentos Salados: ", safe(fda.getDietaAgregaSal() != null ? String.valueOf(fda.getDietaAgregaSal()) : "N/A"));
-        
-        agregarTextosMultiples(document,
-            "Consumo Frituras: ", safe(fda.getDietaFrituras() != null ? String.valueOf(fda.getDietaFrituras()) : "N/A"), 
-            "Consumo Alimentos Condimentados: ", safe(fda.getAliCondimentado() != null ? String.valueOf(fda.getAliCondimentado()) : "N/A")); 
-
-        agregarTextosMultiples(document,
-            "Consumo Frutas-Verduras: ", safe(fda.getDietaFrutasVerduras() != null ? String.valueOf(fda.getDietaFrutasVerduras()) : "N/A"), 
-            "Consumo Infusiones-Bebidas: ", safe(fda.getInfusionesBebidas() != null ? String.valueOf(fda.getInfusionesBebidas()) : "N/A"));
-
-        agregarTextosMultiples(document,
-            "Fumigaciones: ", safe(fda.getFumigaciones() != null ? String.valueOf(fda.getFumigaciones()) : "N/A"), 
-            "ExposicionPesticidas: ", safe(fda.getExposicionPesticidas() != null ? String.valueOf(fda.getExposicionPesticidas()) : "N/A"), 
-            "Humo Leña: ", safe(fda.getCombusLenaDiario() != null ? String.valueOf(fda.getExposicionQuimicos()) : "N/A"));
-
-        agregarTextosMultiples(document,
-            "Fuente de Agua: ", safe(fda.getAguaConsumoZona() != null ? String.valueOf(fda.getAguaConsumoZona()) : "N/A"), 
-            "Tratamiento de Agua: ", safe(fda.getTratamientoAgua() != null ? String.valueOf(fda.getTratamientoAgua()) : "N/A"));    
-
-        agregarSaltoLinea(document);
-    }
-
-    // =========== MÉTODOS GENERALES DE WORD =============
-    private void agregarPiePagina(XWPFDocument document) {
-        XWPFParagraph paragraph = document.createParagraph();
-        paragraph.setAlignment(ParagraphAlignment.CENTER);
-        
-        XWPFRun run = paragraph.createRun();
-        run.setText("Generado el: " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) +
-                   " | Sistema GenRisk");
-        run.setFontSize(9);
-        run.setItalic(true);
-        run.setColor("808080");
-    }
-
-    private void configurarCeldaEncabezado(XWPFTableCell cell, String texto) {
-        cell.setColor("2C3E50");
-        XWPFParagraph paragraph = cell.getParagraphs().get(0);
-        paragraph.setAlignment(ParagraphAlignment.CENTER);
-        
-        XWPFRun run = paragraph.createRun();
-        run.setText(texto);
-        run.setBold(true);
-        run.setColor("FFFFFF");
-        run.setFontSize(10);
-    }
-
-    private void configurarCeldaDatos(XWPFTableCell cell, String texto) {
-        XWPFParagraph paragraph = cell.getParagraphs().get(0);
-        
-        XWPFRun run = paragraph.createRun();
-        run.setText(texto != null ? texto : "N/A");
-        run.setFontSize(10);
-    }
-
-    private void agregarTextoConEtiqueta(XWPFDocument document, String etiqueta, String valor) {
-    XWPFParagraph paragraph = document.createParagraph();
+    // =================================================================================
+    // 3. HELPERS
+    // =================================================================================
     
-    XWPFRun runEtiqueta = paragraph.createRun();
-    runEtiqueta.setText(etiqueta);
-    runEtiqueta.setBold(true);
-    runEtiqueta.setFontSize(12.5);
-    
-    XWPFRun runValor = paragraph.createRun();
-    runValor.setText(valor != null ? valor : "N/A");
-    runValor.setFontSize(11);
-    }
+    @FunctionalInterface private interface RowFiller<T> { void fill(XWPFTable table, T item); }
 
-    private void agregarTextosMultiples(XWPFDocument document, String... etiquetasYValores) {
-    XWPFParagraph paragraph = document.createParagraph();
-    
-    // Validar que hay un número par de argumentos (etiqueta-valor)
-    if (etiquetasYValores.length % 2 != 0) {
-        throw new IllegalArgumentException("Debe haber un número par de argumentos (etiqueta-valor)");
-    }
-    
-    for (int i = 0; i < etiquetasYValores.length; i += 2) {
-        String etiqueta = etiquetasYValores[i];
-        String valor = etiquetasYValores[i + 1];
-        
-        // Agregar separador "|" si no es el primer campo
-        if (i > 0) {
-            XWPFRun separador = paragraph.createRun();
-            separador.setText(" | ");
-            separador.setFontSize(11);
-        }
-        
-        // Etiqueta en negrita
-        XWPFRun runEtiqueta = paragraph.createRun();
-        runEtiqueta.setText(etiqueta);
-        runEtiqueta.setBold(true);
-        runEtiqueta.setFontSize(12.5);
-        
-        // Valor en texto normal
-        XWPFRun runValor = paragraph.createRun();
-        runValor.setText(valor != null ? valor : "N/A");
-        runValor.setFontSize(11);
-    }
-}
-
-    private String safe(Object obj) {
-        return obj == null ? "N/A" : String.valueOf(obj);
-    }
-    
-    private String safeDouble(Double d) {
-        return d == null ? "N/A" : String.format("%.1f", d);
-    }
-
-    private String obtenerPacienteIdPorFormulario(Integer formularioId) {
+    private <T> byte[] generarReporteListado(String titulo, String[] headers, List<T> data, RowFiller<T> filler) throws Exception {
+        XWPFDocument doc = new XWPFDocument();
         try {
-            Formulario formulario = formularioRepository.findById(formularioId).orElse(null);
-            if (formulario != null && formulario.getPaciente() != null) {
-                return safe(formulario.getPaciente().getIdPaciente());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "N/A";
+            agregarTitulo(doc, titulo);
+            XWPFTable table = doc.createTable(); table.setWidth("100%");
+            XWPFTableRow headerRow = table.getRow(0);
+            configurarCeldaEncabezado(headerRow.getCell(0), headers[0]);
+            for (int i = 1; i < headers.length; i++) configurarCeldaEncabezado(headerRow.addNewTableCell(), headers[i]);
+            for (T item : data) filler.fill(table, item);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(); doc.write(baos); return baos.toByteArray();
+        } finally { doc.close(); }
     }
+
+    private void crearTablaSeccion(XWPFDocument doc, String tituloSeccion, Map<String, String> datos) {
+        XWPFParagraph p = doc.createParagraph(); p.setSpacingBefore(300);
+        XWPFRun r = p.createRun(); r.setText(tituloSeccion); r.setBold(true); r.setFontSize(14); r.setColor("2E74B5");
+        XWPFTable table = doc.createTable(); table.setWidth("100%");
+        XWPFTableRow header = table.getRow(0);
+        configurarCelda(header.getCell(0), "CAMPO (NO MODIFICAR)", true, "E7E6E6");
+        configurarCelda(header.addNewTableCell(), "VALOR (EDITAR AQUÍ)", true, "E7E6E6");
+        for (Map.Entry<String, String> entry : datos.entrySet()) {
+            XWPFTableRow row = table.createRow();
+            configurarCelda(row.getCell(0), entry.getKey(), true, null);
+            configurarCelda(row.getCell(1), entry.getValue(), false, null);
+        }
+    }
+
+    private void configurarCelda(XWPFTableCell cell, String texto, boolean bold, String colorHex) {
+        if (colorHex != null) cell.setColor(colorHex);
+        XWPFParagraph p = cell.getParagraphs().isEmpty() ? cell.addParagraph() : cell.getParagraphs().get(0);
+        for (int i = p.getRuns().size() - 1; i >= 0; i--) p.removeRun(i);
+        XWPFRun r = p.createRun(); r.setText(texto); r.setBold(bold); r.setFontSize(10);
+    }
+
+    private void configurarCeldaEncabezado(XWPFTableCell cell, String texto) { configurarCelda(cell, texto, true, "2C3E50"); cell.getParagraphs().get(0).getRuns().get(0).setColor("FFFFFF"); }
+    private void agregarTitulo(XWPFDocument doc, String t) { XWPFParagraph p = doc.createParagraph(); p.setAlignment(ParagraphAlignment.CENTER); XWPFRun r = p.createRun(); r.setText(t); r.setBold(true); r.setFontSize(18); r.setColor("033664"); }
+    private void agregarInstrucciones(XWPFDocument doc) { XWPFParagraph p = doc.createParagraph(); XWPFRun r = p.createRun(); r.setText("INSTRUCCIONES: Edite ÚNICAMENTE la columna derecha. No borre filas."); r.setItalic(true); r.setFontSize(9); r.setColor("FF0000"); }
+    private String safe(Object obj) { return obj == null ? "" : String.valueOf(obj); }
+    private String safeDouble(Double d) { return d == null ? "" : String.format("%.1f", d); }
 }
