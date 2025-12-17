@@ -510,47 +510,16 @@
         </div>
 
              <!-- SECCION: EDITAR MIEMBROS -->
-        <div id="section-roles" class="content-section d-none">
-          <h2 class="mb-4 text-purple fw-bold">Editar Miembros</h2>
+       <div id="section-roles" class="content-section d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-purple fw-bold mb-0">Gestión de Miembros</h2>
+            <button class="btn btn-purple" onclick="abrirModalCrear()">
+              <i class="bi bi-plus-circle me-2"></i>Nuevo Miembro
+            </button>
+          </div>
 
           <div class="card shadow border-0">
             <div class="card-body">
-
-              <!-- FORMULARIO -->
-              <form id="formRoles">
-                <div class="row">
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label fw-bold">Nombre del Miembro</label>
-                    <input type="text" class="form-control" id="nombreMiembro" required>
-                  </div>
-
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label fw-bold">Rol</label>
-                    <select class="form-select" id="rolMiembro" required>
-                      <option value="">Seleccionar...</option>
-                      <option value="Administrador">Administrador</option>
-                      <option value="Investigador">Investigador</option>
-                      <option value="Digitador">Digitador</option>
-                      <option value="Médico">Médico</option>
-                    </select>
-                  </div>
-
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label fw-bold">Correo Electrónico</label>
-                    <input type="email" class="form-control" id="correoMiembro">
-                  </div>
-                </div>
-
-                <button type="submit" class="btn btn-purple w-100 mt-2">
-                  <i class="bi bi-person-check me-2"></i>Asignar Rol
-                </button>
-              </form>
-
-              <hr class="my-4">
-
-              <!-- TABLA -->
-              <h5 class="text-purple mb-3">Miembros del Equipo</h5>
-
               <div class="table-responsive">
                 <table class="table table-hover align-middle" id="tablaMiembros">
                   <thead class="table-purple">
@@ -559,7 +528,7 @@
                       <th>Nombre</th>
                       <th>Rol</th>
                       <th>Correo</th>
-                      <th class="text-center">Acciones</th>
+                      <th>Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -569,7 +538,6 @@
                   </tbody>
                 </table>
               </div>
-
             </div>
           </div>
         </div>
@@ -837,6 +805,55 @@
           </button>
         </div>
 
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalMiembro" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-purple text-white">
+          <h5 class="modal-title" id="tituloModalMiembro">Gestión de Miembro</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="formModalMiembro">
+            <input type="hidden" id="modalIdMiembro">
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Nombre Completo</label>
+              <input type="text" class="form-control" id="modalNombre" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Correo Electrónico</label>
+              <input type="email" class="form-control" id="modalCorreo" required>
+            </div>
+
+            <div class="mb-3" id="divModalClave">
+              <label class="form-label fw-bold" id="labelModalClave">Contraseña</label>
+              <input type="password" class="form-control" id="modalClave" placeholder="Ingresa una contraseña">
+              <small class="text-muted d-none" id="helpModalClave">Dejar en blanco para mantener la actual</small>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Rol</label>
+              <select class="form-select" id="modalRol" required>
+                <option value="">Seleccionar...</option>
+                <option value="Administrador">Administrador</option>
+                <option value="Investigador">Investigador</option>
+                <option value="Digitador">Digitador</option>
+                <option value="Médico">Médico</option>
+                <option value="Informatico">Informatico</option>
+                <option value="Reclutador">Reclutador</option>
+              </select>
+            </div>
+          
+            <div class="d-grid">
+              <button type="submit" class="btn btn-purple">Guardar Cambios</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
