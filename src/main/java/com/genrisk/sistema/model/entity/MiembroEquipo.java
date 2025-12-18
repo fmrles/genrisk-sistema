@@ -36,7 +36,7 @@ public class MiembroEquipo implements UserDetails {
 
     @Column(name = "rol_miembro")
     @NotBlank(message = "El rol es obligatorio")
-    @Pattern(regexp = "^(Investigador|Administrador|Reclutador|Informatico|Medico)$", 
+    @Pattern(regexp = "^(Investigador|Administrador|Reclutador|Informatico|Medico|Digitador)$", 
              message = "Rol inválido. Roles permitidos: Investigador, Administrador, Reclutador, Informatico, Medico")
     private String rolMiembro;
 
