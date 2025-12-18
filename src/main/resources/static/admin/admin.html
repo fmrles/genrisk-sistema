@@ -97,6 +97,13 @@
             <div class="card-body">
               <form id="formCrearFormulario">
                 <div class="row">
+
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label fw-bold">ID Formulario</label>
+                    <input type="text" class="form-control bg-light" id="idFormularioDisplay" disabled readonly 
+                          placeholder="Automático">
+                  </div>
+
                   <div class="col-md-4 mb-3">
                     <label class="form-label fw-bold">Tipo de Formulario</label>
                     <select class="form-select" id="tipoFormulario" required disabled>
@@ -131,14 +138,26 @@
                 <input type="hidden" id="pacienteIdHidden">
                 <input type="hidden" id="miembroIdHidden">
 
-                <button type="button" id="btnCrearFormulario" class="btn btn-purple btn-lg w-100 mt-2">
+                <!-- Selector de formulario existente -->
+              <div class="row mb-4">
+                <div class="col-12">
+                  <label class="form-label fw-bold">Formulario existente del paciente</label>
+                  <select class="form-select form-select-lg" id="selectFormularioExistente">
+                    <option value="">-- Cargando formularios... --</option>
+                  </select>
+                  <small class="text-muted">Si el paciente ya tiene formulario, selecciónelo aquí para editarlo.</small>
+                </div>
+              </div>
 
-                  <i class="bi bi-check-circle me-2"></i>Crear Formulario
+              <!-- Contenedor del botón Crear (se oculta si ya existe formulario) -->
+              <div id="contenedorCrearFormulario">
+                <button type="button" id="btnCrearFormulario" class="btn btn-purple btn-lg w-100 mt-3">
+                  <i class="bi bi-check-circle me-2"></i>Crear Formulario Nuevo
                 </button>
-              </form>
-            </div>
+              </div>
+            </form>
           </div>
-
+        </div>
 
           <!-- Se envuelve todo el contenido de las pestañas en un div con ID para inhabilitar -->
           <div id="panelIngresoDatos">

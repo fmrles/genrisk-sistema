@@ -1053,7 +1053,7 @@ function habilitarCrearFormulario() {
       }
 
       // Solo se habilita el botón crear formulario
-      if (el.id === "btnCrearFormulario") {
+      if (el.id === "btnCrearFormulario" || el.id === "selectFormularioExistente") {
         el.disabled = false;
       } else {
         el.disabled = true;
@@ -1072,95 +1072,318 @@ function habilitarFormularioCompleto() {
     .forEach(tab => tab.disabled = false);
 }
 
-
- 
-
-// ==================== REFRESCAR PACIENTE EN CREAR FORMULARIO ====================
+// Refrescar los campos de paciente seleccionado y miembro asignado
 function refrescarPacienteEnCrearFormulario() {
-  const select = document.getElementById("selectPacienteIngreso");
-  const inputPaciente = document.getElementById("pacienteSeleccionadoForm");
-  const inputMiembro = document.getElementById("miembroAsignadoForm");
-
-  if (!select || !inputPaciente) return;
-
-  const selectedOption = select.options[select.selectedIndex];
-
-  if (!selectedOption || !select.value) {
-    inputPaciente.value = "";
-    if (inputMiembro) inputMiembro.value = "";
-    return;
+  const selectPaciente = document.getElementById("selectPacienteIngreso");
+  const pacienteDisplay = document.getElementById("pacienteSeleccionadoForm");
+  const miembroDisplay = document.getElementById("miembroAsignadoForm");
+  
+  // Mostrar nombre del paciente seleccionado
+  if (selectPaciente && pacienteDisplay) {
+    const textoSeleccionado = selectPaciente.options[selectPaciente.selectedIndex]?.textContent || "";
+    pacienteDisplay.value = textoSeleccionado;
   }
-
-  // Mostrar texto completo del paciente
-  inputPaciente.value = selectedOption.textContent;
-
-  // Mostrar miembro logueado
-  const usuarioStr = localStorage.getItem("usuario");
-  if (usuarioStr && inputMiembro) {
-    const obj = JSON.parse(usuarioStr);
-    const user = obj.usuario ?? obj;
-    inputMiembro.value = user.nombreMiembro || user.nombre || "Usuario actual";
+  
+  // Mostrar nombre del miembro logueado
+  if (miembroDisplay) {
+    const usuarioStr = localStorage.getItem("usuario");
+    if (usuarioStr) {
+      const usuario = JSON.parse(usuarioStr).usuario || JSON.parse(usuarioStr);
+      miembroDisplay.value = usuario.nombre || usuario.nombreMiembro || "Usuario";
+    }
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+// ==================== REFRESCAR PACIENTE Y CARGAR FORMULARIOS EXISTENTES ====================
+async function cargarFormulariosDelPaciente(pacienteId) {
+  const selectFormulario = document.getElementById("selectFormularioExistente");
+  const contenedorCrear = document.getElementById("contenedorCrearFormulario");
 
-   panelDatos = document.getElementById("panelIngresoDatos");
-  const selectPaciente = document.getElementById("selectPacienteIngreso");
-  const btnCrearFormulario = document.getElementById("btnCrearFormulario");
-
-  // cargar pacientes
-  cargarPacientes();
-
-  // bloquear todo al inicio
-  bloquearTodo();
-
-  // al seleccionar paciente
-  // al seleccionar paciente
-selectPaciente?.addEventListener("change", function () {
-  const pacienteId = this.value;
-
-  if (!pacienteId) {
-    bloquearTodo();
+  if (!selectFormulario || !contenedorCrear) {
+    console.error("No se encontraron elementos selectFormularioExistente o contenedorCrearFormulario");
     return;
   }
 
-  // AUTOCOMPLETAR CASO / CONTROL
-  const selectTipoFormulario = document.getElementById("tipoFormulario");
-  const texto = this.options[this.selectedIndex]?.textContent || "";
+  // Habilitar el select mientras carga
+  selectFormulario.disabled = false;
+  selectFormulario.innerHTML = '<option value="">-- Cargando formularios... --</option>';
 
-  if (selectTipoFormulario) {
-    if (texto.includes("(Caso)")) {
-      selectTipoFormulario.value = "CASO";
-      selectTipoFormulario.disabled = true;
-    } else if (texto.includes("(Control)")) {
-      selectTipoFormulario.value = "CONTROL";
-      selectTipoFormulario.disabled = true;
-    } else {
-      selectTipoFormulario.value = "";
-      selectTipoFormulario.disabled = false;
-    }
+  if (!pacienteId) {
+    selectFormulario.innerHTML = '<option value="">-- Seleccione un paciente --</option>';
+    contenedorCrear.style.display = "block";
+    return;
   }
 
-  // COMPLETAR PACIENTE Y MIEMBRO
-  habilitarCrearFormulario();
-  refrescarPacienteEnCrearFormulario();
-});
+  try {
+    const response = await fetch(`${API_URL}/formularios`);
+    if (!response.ok) throw new Error("Error al cargar formularios");
 
+    const todosFormularios = await response.json();
+    console.log("Todos los formularios:", todosFormularios);
+    
+    // El JSON devuelve paciente_id directamente (no anidado como paciente.idPaciente)
+    const formulariosPaciente = todosFormularios.filter(f => f.paciente_id === pacienteId);
+    console.log("Formularios del paciente " + pacienteId + ":", formulariosPaciente);
 
+    selectFormulario.innerHTML = "";
+    
+    if (formulariosPaciente.length === 0) {
+      selectFormulario.innerHTML = '<option value="">-- No tiene formularios, cree uno nuevo --</option>';
+      contenedorCrear.style.display = "block";
+      limpiarTodasLasPestanas();
+    } else {
+      // Agregar opción por defecto
+      const optDefault = document.createElement("option");
+      optDefault.value = "";
+      optDefault.textContent = "-- Seleccione un formulario --";
+      selectFormulario.appendChild(optDefault);
+      
+      // Agregar formularios existentes
+      formulariosPaciente.forEach(form => {
+        const opt = document.createElement("option");
+        opt.value = form.idFormulario;
+        opt.textContent = `ID ${form.idFormulario} - ${form.tipoFormulario} (${form.estadoFormulario || "En progreso"}) - ${form.fechaFormulario}`;
+        selectFormulario.appendChild(opt);
+      });
+      
+      // Ocultar botón crear si ya tiene formularios (opcional: puedes dejarlo visible)
+      contenedorCrear.style.display = "none";
+      
+      // Seleccionar y cargar automáticamente el último formulario
+      const ultimo = formulariosPaciente[formulariosPaciente.length - 1];
+      selectFormulario.value = ultimo.idFormulario;
+      
+      // Cargar datos y habilitar formulario completo
+      await cargarDatosFormulario(ultimo.idFormulario);
+    }
+  } catch (err) {
+    console.error("Error cargando formularios:", err);
+    selectFormulario.innerHTML = '<option value="">Error al cargar formularios</option>';
+    contenedorCrear.style.display = "block";
+  }
+}
+// ==================== CARGAR DATOS DEL FORMULARIO SELECCIONADO ====================
+async function cargarDatosFormulario(formularioId) {
+  if (!formularioId) {
+    // Limpiar todas las pestañas
+    limpiarTodasLasPestanas();
+    return;
+  }
+
+  ultimoFormularioId = formularioId;
+  habilitarFormularioCompleto();
+
+  // Mostrar el ID del formulario
+  const idFormularioDisplay = document.getElementById("idFormularioDisplay");
+  if (idFormularioDisplay) {
+    idFormularioDisplay.value = formularioId;
+  }
+  
+  // Mostrar el ID del paciente desde el select
+  const selectPaciente = document.getElementById("selectPacienteIngreso");
+  const idPacienteDisplay = document.getElementById("idPacienteDisplay");
+  if (selectPaciente && idPacienteDisplay) {
+    idPacienteDisplay.value = selectPaciente.value || "";
+  }
+
+  try {
+    // Cargar cada sección (itemFormu = 1 para todas tus weak entities)
+    const promesas = [
+      fetch(`${API_URL}/datos-generales/3/${formularioId}`),
+      fetch(`${API_URL}/habitos-paciente/4/${formularioId}`),
+      fetch(`${API_URL}/datos-clinicos/2/${formularioId}`),
+      fetch(`${API_URL}/factores-dietarios-hambientales/5/${formularioId}`),
+      fetch(`${API_URL}/histopatologia/1/${formularioId}`)
+    ];
+
+    const [genRes, habRes, cliRes, dietRes, histoRes] = await Promise.all(promesas);
+
+    // === Datos Generales ===
+    if (genRes.ok) {
+      const datos = await genRes.json();
+      document.getElementById("idPacienteDisplay").value = datos.idDatosGen?.pacienteId || "";
+      document.getElementById("edad").value = datos.edad || "";
+      document.getElementById("sexo").value = datos.sexo || "";
+      document.getElementById("peso").value = datos.peso || "";
+      document.getElementById("estatura").value = datos.estatura || "";
+      document.getElementById("zonaResidencial").value = datos.zonaResidencial || "";
+      document.getElementById("educacion").value = datos.educacion || "";
+      document.getElementById("ocupacion").value = datos.ocupacion || "";
+    }
+
+    // === Datos Clínicos ===
+    if (cliRes.ok) {
+      const datos = await cliRes.json();
+      document.getElementById("adenoGastrico").value = datos.adenoGastrico || "";
+      document.getElementById("fechaAdenoGastrico").value = datos.fechaAdenoGastrico || "";
+      document.getElementById("antFamCancerGast").value = datos.antFamCancerGast || "";
+      document.getElementById("medicamentos").value = datos.medicamentos || "";
+      document.getElementById("otrasEnfermedades").value = datos.otrasEnfermedades || "";
+      document.getElementById("antFamOtroCancer").value = datos.antFamOtroCancer || "";
+      document.getElementById("cirugiaGastrica").value = datos.cirugiaGastricaPrevia || "";
+      document.getElementById("hpyloriPrueba").value = datos.hpyloriPrueba || "";
+      document.getElementById("hpyloriResultado").value = datos.hpyloriResultado || "";
+      document.getElementById("hpyloriTiempoTest").value = datos.hpyloriTiempoTest || "";
+    }
+
+    // === Hábitos ===
+    if (habRes.ok) {
+      const datos = await habRes.json();
+      document.getElementById("estadoConsumoTabaco").value = datos.estadoConsumoTabaco || "";
+      document.getElementById("cantPromTabaco").value = datos.cantPromTabaco || "";
+      document.getElementById("exConsumidorTabaco").value = datos.exConsumidorTabaco || "";
+      document.getElementById("tiempoTabaco").value = datos.tiempoTabaco || "";
+      document.getElementById("estadoConsumoAlcohol").value = datos.estadoConsumoAlcohol || "";
+      document.getElementById("frecuenciaAlcohol").value = datos.frecuenciaAlcohol || "";
+      document.getElementById("cantidadAlcohol").value = datos.cantidadAlcohol || "";
+      document.getElementById("aniosConsumoAlcohol").value = datos.aniosConsumoAlcohol || "";
+      document.getElementById("exConsumidorAlcohol").value = datos.exConsumidorAlcohol || "";
+    }
+
+    // === Datos Clínicos, Dietarios, Histopatología ===
+    // (Se agregan cuando los campos estén definidos en el HTML)
+
+    // Abrir pestaña Generales
+    new bootstrap.Tab(document.getElementById("generales-tab")).show();
+
+  } catch (err) {
+    console.error("Error cargando datos del formulario:", err);
+    alert("Error al cargar los datos del formulario");
+  }
+}
+
+function limpiarTodasLasPestanas() {
+  // Limpiar campos de todas las pestañas
+  document.querySelectorAll("#panelIngresoDatos input, #panelIngresoDatos select").forEach(el => {
+    if (el.type !== "hidden" && !el.disabled) el.value = "";
   });
 
-  // botón crear formulario
-  btnCrearFormulario?.addEventListener("click", () => {
-    alert("Formulario creado correctamente ✅");
-    formularioCreado = true;
-    habilitarFormularioCompleto();
+  // Limpiar también los campos de solo lectura
+  const idFormularioDisplay = document.getElementById("idFormularioDisplay");
+  if (idFormularioDisplay) idFormularioDisplay.value = "";
+  
+  const idPacienteDisplay = document.getElementById("idPacienteDisplay");
+  if (idPacienteDisplay) idPacienteDisplay.value = "";
 
-    const tabGenerales = document.getElementById("generales-tab");
-    if (tabGenerales) {
-      new bootstrap.Tab(tabGenerales).show();
+  
+  bloquearTodo();  // Opcional: bloquear hasta crear/seleccionar formulario
+}
+
+// ==================== EVENTOS ====================
+  document.addEventListener("DOMContentLoaded", () => {
+  panelDatos = document.getElementById("panelIngresoDatos");
+  const selectPaciente = document.getElementById("selectPacienteIngreso");
+  const btnCrearFormulario = document.getElementById("btnCrearFormulario");
+  const selectFormularioExistente = document.getElementById("selectFormularioExistente");
+
+  cargarPacientes(); // Ya lo tienes
+  bloquearTodo();
+
+  // Cuando cambia el paciente
+  selectPaciente?.addEventListener("change", async function () {
+    const pacienteId = this.value;
+    const texto = this.options[this.selectedIndex]?.textContent || "";
+
+    if (!pacienteId) {
+      bloquearTodo();
+      return;
+    }
+
+    // Autocompletar tipo (Caso/Control)
+    const selectTipoFormulario = document.getElementById("tipoFormulario");
+    if (selectTipoFormulario) {
+      if (texto.includes("(Caso)")) {
+        selectTipoFormulario.value = "CASO";
+        selectTipoFormulario.disabled = true;
+      } else if (texto.includes("(Control)")) {
+        selectTipoFormulario.value = "CONTROL";
+        selectTipoFormulario.disabled = true;
+      } else {
+        selectTipoFormulario.value = "";
+        selectTipoFormulario.disabled = false;
+      }
+    }
+
+    // Refrescar nombre paciente y miembro logueado
+    refrescarPacienteEnCrearFormulario();
+
+    habilitarCrearFormulario(); // Solo si no tiene formulario
+
+    // Cargar formularios existentes del paciente
+    await cargarFormulariosDelPaciente(pacienteId);
+  });
+
+  // Cuando cambia el formulario existente seleccionado
+  selectFormularioExistente?.addEventListener("change", function () {
+    const formularioId = this.value;
+    if (formularioId) {
+      cargarDatosFormulario(formularioId);
+    } else {
+      limpiarTodasLasPestanas();
     }
   });
 
+  // ==================== BOTÓN CREAR FORMULARIO NUEVO ====================
+  btnCrearFormulario?.addEventListener("click", async () => {
+    const pacienteId = document.getElementById("selectPacienteIngreso").value;
+    const tipoFormulario = document.getElementById("tipoFormulario").value;
+
+    if (!pacienteId || !tipoFormulario) {
+      alert("Selecciona un paciente y tipo de formulario válido");
+      return;
+    }
+
+    const usuarioStr = localStorage.getItem("usuario");
+    const usuario = usuarioStr ? JSON.parse(usuarioStr).usuario || JSON.parse(usuarioStr) : null;
+    const miembroId = usuario?.id || usuario?.idMiembroEquipo || usuario?.idMiembro || null;
+
+    console.log("Usuario en localStorage:", usuario);
+    console.log("Miembro ID detectado:", miembroId);
+
+    if (!miembroId) {
+      alert("No se detectó usuario logueado");
+      return;
+    }
+
+    const nuevoFormulario = {
+      estadoFormulario: "En Progreso",
+      tipoFormulario: tipoFormulario.toUpperCase(),
+      fechaFormulario: new Date().toISOString().split('T')[0], // Hoy: 2025-12-18
+      paciente: { idPaciente: pacienteId },
+      miembroEquipo: { idMiembroEquipo: miembroId }
+    };
+
+    try {
+      const response = await fetch(`${API_URL}/formularios`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(nuevoFormulario)
+      });
+
+      if (response.ok) {
+        const formCreado = await response.json();
+        ultimoFormularioId = formCreado.idFormulario;
+
+        alert(`Formulario creado correctamente para (ID: ${ultimoFormularioId})`);
+
+        // Actualizar UI
+        formularioCreado = true;
+        habilitarFormularioCompleto();
 
 
+        await cargarFormulariosDelPaciente(pacienteId); // Refresca lista
+        document.getElementById("selectFormularioExistente").value = ultimoFormularioId;
+        cargarDatosFormulario(ultimoFormularioId); // Carga pestañas vacías listas para rellenar
+
+        const tabGenerales = document.getElementById("generales-tab");
+        if (tabGenerales) new bootstrap.Tab(tabGenerales).show();
+      } else {
+        const error = await response.text();
+        alert("Error al crear formulario: " + error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error de conexión con el servidor");
+    }
+  });
+});
