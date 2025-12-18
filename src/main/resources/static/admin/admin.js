@@ -688,6 +688,16 @@ document.getElementById("formNuevoConjunto")?.addEventListener("submit", async (
 
 // ==================== GESTIÓN DE REGLAS ====================
 
+//diccionario de datos
+const LIMITES_VARIABLES = {
+    edad: { min: 18, max: 120, step: 1, msg: "Edad entre 18 y 120 años" },
+    peso: { min: 30, max: 300, step: 0.1, msg: "Peso entre 30 y 300 kg" },
+    estatura: { min: 100, max: 250, step: 1, msg: "Estatura en cm (100-250)" },
+    imc: { min: 10, max: 60, step: 0.1, msg: "IMC válido (10-60)" },
+    cantPromTabaco: { min: 0, max: 100, step: 1, msg: "Máximo 100 cigarros" },
+    tiempoTabaco: { min: 0, max: 80, step: 1, msg: "Años fumando (0-80)" }
+};
+
 let conjuntoActualId = null;
 
 window.verReglas = async function(conjuntoId) {
@@ -742,6 +752,9 @@ window.mostrarFormularioRegla = function() {
     document.getElementById("vistaTablaReglas").classList.add("d-none");
     document.getElementById("vistaFormularioRegla").classList.remove("d-none");
     document.getElementById("formNuevaRegla").reset();
+    
+    document.getElementById("infoVariable").textContent = "Selecciona una variable";
+    document.getElementById("reglaValor").classList.remove("is-invalid");
 }
 
 window.cancelarRegla = function() {
@@ -749,27 +762,81 @@ window.cancelarRegla = function() {
     document.getElementById("vistaTablaReglas").classList.remove("d-none");
 }
 
+window.configurarInput = function() {
+    const variable = document.getElementById("reglaVariable").value;
+    const input = document.getElementById("reglaValor");
+    const info = document.getElementById("infoVariable");
+    
+    input.value = "";
+    input.classList.remove("is-invalid");
+
+    const config = LIMITES_VARIABLES[variable];
+
+    if (config) {
+        input.min = config.min;
+        input.max = config.max;
+        input.step = config.step;
+        input.placeholder = `${config.min} - ${config.max}`;
+        info.textContent = config.msg; 
+    } else {
+        input.removeAttribute("min");
+        input.removeAttribute("max");
+        input.step = "any";
+        input.placeholder = "Valor";
+        info.textContent = "Variable sin rango estricto";
+    }
+}
+
+window.invertirValor = function(origen) {
+    const si = document.getElementById("reglaValorSi");
+    const no = document.getElementById("reglaValorNo");
+    
+    if (origen === 'si') {
+        no.value = (si.value === "1") ? "0" : "1";
+    } else {
+        si.value = (no.value === "1") ? "0" : "1";
+    }
+}
+
 document.getElementById("formNuevaRegla").addEventListener("submit", async (e) => {
     e.preventDefault();
 
     if (!conjuntoActualId) {
-        alert("Error: No se ha identificado el conjunto.");
+        alert("Error: No se ha identificado el conjunto. Cierra y vuelve a abrir las reglas.");
         return;
+    }
+
+    const variable = document.getElementById("reglaVariable").value;
+    const valorRaw = parseFloat(document.getElementById("reglaValor").value);
+    const valor = Math.round(valorRaw); 
+    
+    const config = LIMITES_VARIABLES[variable];
+    if (config) {
+        if (valor < config.min || valor > config.max) {
+            alert(`Error en ${variable}:\nEl valor debe estar entre ${config.min} y ${config.max}.`);
+            document.getElementById("reglaValor").classList.add("is-invalid");
+            document.getElementById("reglaValor").focus();
+            return; 
+        }
     }
 
     const nuevaRegla = {
         entidadObj: "datos_generales",
-        atributoObj: document.getElementById("reglaVariable").value,
+        atributoObj: variable,
         operador: document.getElementById("reglaOperador").value,
-        valorInf: parseInt(document.getElementById("reglaValor").value),
+        
+        valorInf: valor, 
+        
         valorSiCumple: parseInt(document.getElementById("reglaValorSi").value),
         valorNoCumple: parseInt(document.getElementById("reglaValorNo").value),
         valorCategoria: document.getElementById("reglaCategoria").value,
         
         dicotConjunto: { 
-            idDicotconjunto: conjuntoActualId 
+            idDicotConjunto: conjuntoActualId 
         }
     };
+
+    console.log("Enviando regla:", nuevaRegla);
 
     try {
         const res = await fetch(`${API_URL}/dicot-reglas`, {
@@ -784,11 +851,11 @@ document.getElementById("formNuevaRegla").addEventListener("submit", async (e) =
             await cargarTablaReglas(conjuntoActualId);
         } else {
             const error = await res.json();
-            alert("Error al guardar: " + (error.message || "Revisa la consola"));
+            alert("Error al guardar: " + (error.message || "Error interno del servidor"));
         }
     } catch (err) {
         console.error(err);
-        alert("Error de conexión");
+        alert("Error de conexión (Revisa la consola con F12)");
     }
 });
 
@@ -811,7 +878,6 @@ async function eliminarConjunto(id) {
     alert("Error de conexión");
   }
 }
-
 // ==================== EXPORTAR DATOS ====================
 document.getElementById("btnExportarExcel")?.addEventListener("click", async () => {
   try {
