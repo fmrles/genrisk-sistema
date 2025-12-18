@@ -571,51 +571,35 @@
 
               <!-- SECCIÓN: EDITAR VARIABLES DICOTOMIZACIÓN -->
               <div id="section-variables" class="content-section d-none">
-                  <h2 class="mb-4 text-purple fw-bold">Editar Variables de Dicotomización</h2>
-                  <div class="card shadow border-0 mb-4">
-                      <div class="card-header bg-purple text-white">
-                          <h5 class="mb-0">Crear Nuevo Conjunto de Reglas</h5>
-                        </div>
-                      <div class="card-body">
-                          <form id="formNuevoConjunto">
-                              <div class="mb-3">
-                                  <label class="form-label fw-bold">Nombre del Conjunto</label>
-                                  <input type="text" class="form-control" id="nombreConjunto" required>
-                                </div>
-                              <div class="mb-3">
-                                  <label class="form-label fw-bold">Descripción</label>
-                                  <textarea class="form-control" id="descripcionConjunto" rows="2"></textarea>
-                                </div>
-                              <button type="submit" class="btn btn-success">
-                                  <i class="bi bi-plus-circle me-2"></i>Crear Conjunto
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <h2 class="text-purple fw-bold mb-0">Variables de Dicotomización</h2>
+                  <button class="btn btn-purple" onclick="abrirModalConjunto()">
+                    <i class="bi bi-plus-circle me-2"></i>Nuevo Conjunto
+                  </button>
+                </div>
 
-                  <div class="card shadow border-0">
-                      <div class="card-body">
-                          <h5 class="text-purple mb-3">Conjuntos Existentes</h5>
-                          <div class="table-responsive">
-                              <table class="table table-hover" id="tablaConjuntos">
-                                  <thead class="table-purple">
-                                      <tr>
-                                          <th>ID</th>
-                                          <th>Nombre</th>
-                                          <th>Descripción</th>
-                                          <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                  <tbody>
-                                      <tr>
-                                          <td colspan="4" class="text-center">Cargando...</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <div class="card shadow border-0">
+                  <div class="card-body">
+                    <div class="table-responsive">
+                      <table class="table table-hover align-middle" id="tablaConjuntos">
+                        <thead class="table-purple">
+                          <tr>
+                            <th>ID</th>
+                            <th>Nombre del Conjunto</th>
+                            <th>Descripción</th>
+                            <th class="text-center">Acciones</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td colspan="4" class="text-center">Cargando...</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               <!-- SECCIÓN: EXPORTAR DATOS -->
         <div id="section-exportar" class="content-section d-none">
@@ -851,6 +835,34 @@
           
             <div class="d-grid">
               <button type="submit" class="btn btn-purple">Guardar Cambios</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalConjunto" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-purple text-white">
+          <h5 class="modal-title">Nuevo Conjunto de Reglas</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="formNuevoConjunto">
+            <div class="mb-3">
+              <label class="form-label fw-bold">Nombre del Conjunto</label>
+              <input type="text" class="form-control" id="nombreConjunto" required placeholder="Ej: Estudio Cáncer 2025">
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Descripción</label>
+              <textarea class="form-control" id="descripcionConjunto" rows="3" placeholder="Descripción breve de las reglas..."></textarea>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-purple">
+                <i class="bi bi-save me-2"></i>Guardar Conjunto
+              </button>
             </div>
           </form>
         </div>
