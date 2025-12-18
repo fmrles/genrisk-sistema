@@ -684,67 +684,113 @@ document.getElementById("formNuevoConjunto")?.addEventListener("submit", async (
   }
 });
 
-// ==================== VER REGLAS ====================
-window.verReglas = async function(conjuntoId) {
-  const tbody = document.getElementById("bodyReglas");
-  
-  tbody.innerHTML = '<tr><td colspan="5" class="text-center">Cargando datos...</td></tr>';
 
-  const modalEl = document.getElementById('modalVerReglas');
-  const modal = new bootstrap.Modal(modalEl);
+
+// ==================== GESTIÓN DE REGLAS ====================
+
+let conjuntoActualId = null;
+
+window.verReglas = async function(conjuntoId) {
+  conjuntoActualId = conjuntoId;
+  
+  document.getElementById("vistaTablaReglas").classList.remove("d-none");
+  document.getElementById("vistaFormularioRegla").classList.add("d-none");
+  
+  const tbody = document.getElementById("bodyReglas");
+  tbody.innerHTML = '<tr><td colspan="5" class="text-center">Cargando...</td></tr>';
+
+  const modal = new bootstrap.Modal(document.getElementById('modalVerReglas'));
   modal.show();
 
+  await cargarTablaReglas(conjuntoId);
+}
+
+async function cargarTablaReglas(id) {
+  const tbody = document.getElementById("bodyReglas");
   try {
     const res = await fetch(`${API_URL}/dicot-reglas`);
-
-    if (!res.ok) {
-      throw new Error("Error al consultar las reglas (DicotReglaController).");
-    }
-
-    const todasLasReglas = await res.json();
-
-    const reglasDelConjunto = todasLasReglas.filter(r => r.dicotConjuntoID === conjuntoId);
+    if (!res.ok) throw new Error("Error al obtener reglas");
+    
+    const todas = await res.json();
+    const filtradas = todas.filter(r => r.dicotConjuntoID === id);
 
     tbody.innerHTML = "";
-
-    if (reglasDelConjunto.length === 0) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="5" class="text-center text-muted">
-            <i class="bi bi-folder-x me-2"></i>Este conjunto no tiene reglas asignadas.
-          </td>
-        </tr>`;
+    if (filtradas.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No hay reglas definidas.</td></tr>';
       return;
     }
 
-    reglasDelConjunto.forEach(r => {
-      const variable = r.atributoObj || "---";
-      const operador = r.operador || "=";
-      const valor = r.valorInf || r.valorSup || 0;
-      const resultado = r.valorSiCumple;
-      const categoria = r.valorCategoria || "";
-
+    filtradas.forEach(r => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-          <td><strong>${variable}</strong></td>
-          <td class="text-center"><span class="badge bg-info text-dark">${operador}</span></td>
-          <td class="text-center">${valor}</td>
-          <td class="text-center fw-bold">${resultado}</td>
-          <td>${categoria}</td>
+          <td><strong>${r.atributoObj || '---'}</strong></td>
+          <td class="text-center"><span class="badge bg-info text-dark">${r.operador || '='}</span></td>
+          <td class="text-center">${r.valorInf || r.valorSup || 0}</td>
+          <td class="text-center fw-bold">${r.valorSiCumple}</td>
+          <td>${r.valorCategoria || ''}</td>
       `;
       tbody.appendChild(tr);
     });
 
   } catch (err) {
     console.error(err);
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="5" class="text-center text-danger">
-          <strong>Error:</strong> ${err.message}
-        </td>
-      </tr>`;
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error de conexión</td></tr>';
   }
 }
+
+window.mostrarFormularioRegla = function() {
+    document.getElementById("vistaTablaReglas").classList.add("d-none");
+    document.getElementById("vistaFormularioRegla").classList.remove("d-none");
+    document.getElementById("formNuevaRegla").reset();
+}
+
+window.cancelarRegla = function() {
+    document.getElementById("vistaFormularioRegla").classList.add("d-none");
+    document.getElementById("vistaTablaReglas").classList.remove("d-none");
+}
+
+document.getElementById("formNuevaRegla").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!conjuntoActualId) {
+        alert("Error: No se ha identificado el conjunto.");
+        return;
+    }
+
+    const nuevaRegla = {
+        entidadObj: "datos_generales",
+        atributoObj: document.getElementById("reglaVariable").value,
+        operador: document.getElementById("reglaOperador").value,
+        valorInf: parseInt(document.getElementById("reglaValor").value),
+        valorSiCumple: parseInt(document.getElementById("reglaValorSi").value),
+        valorNoCumple: parseInt(document.getElementById("reglaValorNo").value),
+        valorCategoria: document.getElementById("reglaCategoria").value,
+        
+        dicotConjunto: { 
+            idDicotconjunto: conjuntoActualId 
+        }
+    };
+
+    try {
+        const res = await fetch(`${API_URL}/dicot-reglas`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(nuevaRegla)
+        });
+
+        if (res.ok) {
+            alert("Regla agregada correctamente");
+            cancelarRegla();
+            await cargarTablaReglas(conjuntoActualId);
+        } else {
+            const error = await res.json();
+            alert("Error al guardar: " + (error.message || "Revisa la consola"));
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Error de conexión");
+    }
+});
 
 async function eliminarConjunto(id) {
   if (!confirm("¿Estás seguro de eliminar este conjunto?")) return;
