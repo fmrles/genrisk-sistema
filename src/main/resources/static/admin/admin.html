@@ -871,32 +871,84 @@
   </div>
 
   <div class="modal fade" id="modalVerReglas" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg"> <div class="modal-content">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
         <div class="modal-header bg-purple text-white">
-          <h5 class="modal-title">Reglas del Conjunto</h5>
+          <h5 class="modal-title">Gestión de Reglas</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
         
-          <div class="table-responsive">
-            <table class="table table-bordered table-striped" id="tablaReglasDetalle">
-              <thead class="table-light">
-                <tr>
-                  <th>Variable</th>
-                  <th>Condición</th>
-                  <th>Valor Corte</th>
-                  <th>Valor Dicot.</th>
-                  <th>Etiqueta/Categoría</th>
-                </tr>
-              </thead>
-              <tbody id="bodyReglas">
-                </tbody>
-            </table>
+          <div id="vistaTablaReglas">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0 text-secondary">Reglas actuales en este conjunto</h6>
+                  <button class="btn btn-sm btn-success" onclick="mostrarFormularioRegla()">
+                      <i class="bi bi-plus-lg me-1"></i>Agregar Nueva Regla
+                  </button>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle" id="tablaReglasDetalle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Variable</th>
+                      <th>Condición</th>
+                      <th>Valor Corte</th>
+                      <th>Valor Dicot.</th>
+                      <th>Etiqueta</th>
+                    </tr>
+                  </thead>
+                  <tbody id="bodyReglas">
+                    </tbody>
+                </table>
+              </div>
           </div>
 
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <div id="vistaFormularioRegla" class="d-none bg-light p-3 rounded border">
+              <h6 class="fw-bold text-purple mb-3">Definir Nueva Regla</h6>
+              <form id="formNuevaRegla">
+                  <div class="row">
+                      <div class="col-md-6 mb-3">
+                          <label class="form-label fw-bold small">Variable (Atributo)</label>
+                          <input type="text" class="form-control" id="reglaVariable" placeholder="Ej: edad, peso, sexo" required>
+                      </div>
+                      <div class="col-md-3 mb-3">
+                          <label class="form-label fw-bold small">Operador</label>
+                          <select class="form-select" id="reglaOperador">
+                              <option value=">=">>= (Mayor o igual)</option>
+                              <option value="<="><= (Menor o igual)</option>
+                              <option value="=">= (Igual)</option>
+                              <option value=">">> (Mayor)</option>
+                              <option value="<">< (Menor)</option>
+                          </select>
+                      </div>
+                      <div class="col-md-3 mb-3">
+                          <label class="form-label fw-bold small">Valor Corte</label>
+                          <input type="number" class="form-control" id="reglaValor" placeholder="Ej: 60" required>
+                      </div>
+                  </div>
+
+                  <div class="row">
+                      <div class="col-md-4 mb-3">
+                          <label class="form-label fw-bold small">Valor Si Cumple (Num)</label>
+                          <input type="number" class="form-control" id="reglaValorSi" value="1" required>
+                      </div>
+                      <div class="col-md-4 mb-3">
+                          <label class="form-label fw-bold small">Valor No Cumple (Num)</label>
+                          <input type="number" class="form-control" id="reglaValorNo" value="0" required>
+                      </div>
+                      <div class="col-md-4 mb-3">
+                          <label class="form-label fw-bold small">Etiqueta/Categoría</label>
+                          <input type="text" class="form-control" id="reglaCategoria" placeholder="Ej: Adulto Mayor">
+                      </div>
+                  </div>
+
+                  <div class="d-flex justify-content-end gap-2 mt-2">
+                      <button type="button" class="btn btn-secondary" onclick="cancelarRegla()">Cancelar</button>
+                      <button type="submit" class="btn btn-purple">Guardar Regla</button>
+                  </div>
+              </form>
+          </div>
         </div>
       </div>
     </div>
