@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 12-12-2025 a las 01:37:26
+-- Tiempo de generación: 18-12-2025 a las 05:49:10
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -105,7 +105,8 @@ INSERT INTO `datos_generales` (`itemformu`, `formulario_id`, `edad`, `sexo`, `pe
 (3, 203, 33, 'Masculino', 70, 26, 165, 'Urbana', 'Superior', 'Ejecutivo', NULL, NULL, NULL, NULL, NULL, NULL),
 (3, 209, 47, 'Masculino', 81, 25, 171, 'Rural', 'Superior', 'Ingeniero Agrónomo', NULL, NULL, NULL, NULL, NULL, NULL),
 (3, 213, 41, 'Masculino', 77, 24, 174, 'Rural', 'Media', 'Granjero', NULL, NULL, NULL, NULL, NULL, NULL),
-(3, 217, 45, 'Masculino', 80.5, 26.1, 175, 'Urbana', 'Superior', 'Ingeniero', NULL, NULL, NULL, NULL, NULL, NULL);
+(3, 217, 45, 'Masculino', 80.5, 26.1, 175, 'Urbana', 'Superior', 'Ingeniero', NULL, NULL, NULL, NULL, NULL, NULL),
+(3, 220, 22, 'Hombre', NULL, NULL, NULL, 'Rural', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -443,7 +444,9 @@ INSERT INTO `formulario` (`id_formulario`, `estado_formulario`, `tipo_formulario
 (213, 'Activo', 'Control', '2025-10-11', 'pac8', 11),
 (216, 'Activo', 'Caso', '2025-11-05', 'pac99', 15),
 (217, 'En Progreso', 'Caso', '2025-11-05', 'CA0003', 10),
-(218, 'Activo', 'Control', '2025-12-01', 'CA0002', 15);
+(218, 'Activo', 'Control', '2025-12-01', 'CA0002', 15),
+(219, 'En proceso', 'Inicial', '2025-12-14', 'CR0001', 10),
+(220, 'En proceso', 'Inicial', '2025-12-14', 'CR0002', 10);
 
 -- --------------------------------------------------------
 
@@ -589,7 +592,7 @@ INSERT INTO `miembro_equipo` (`id_miembro`, `nombre_miembro`, `correo_miembro`, 
 (11, 'Esteban Pardo', 'epardo@example.com', '$2a$12$HQHa/Y162evUDdHiFcnw3ec0Mt2lgz0Hg1CQI4I.n.aRM9Gz7I0XS', 'Investigador'),
 (12, 'Paula Reyes', 'preyess@gmail.com', '$2a$12$bNXtNjj5YW3YwX4zKELNs.HBTsRcx50SbBCRPT0aGSRxqxAWDxEBy', 'Informatico'),
 (15, 'Francisco Morales', 'francisco@genrisk.cl', '$2a$10$nNfWdJIgpkNwPZNDRSUibOLuaWXddybwqHG6JG/JXanR.Fle46wLa', 'Investigador'),
-(16, 'César Aguirre', 'cesarAg@gmail.com', '$2a$10$xQgbpX8kLXPG5BkqtVB8yOCDezWyrjo1rfAGvanq2lBomUNN3Ctca', 'Reclutador'),
+(16, 'Cesar Sepulveda', 'cesarAg@gmail.com', '$2a$10$xQgbpX8kLXPG5BkqtVB8yOCDezWyrjo1rfAGvanq2lBomUNN3Ctca', 'Informatico'),
 (17, 'Gonzalo Matus', 'matusgonzalo1544@gmail.com', '$2a$10$GtBEnZEA7aJsOqIZ491j1exv78WgEOgsO/6xDfa02VsSykEYUp5Yy', 'Informatico');
 
 -- --------------------------------------------------------
@@ -819,7 +822,7 @@ ALTER TABLE `dicot_valor`
 -- AUTO_INCREMENT de la tabla `formulario`
 --
 ALTER TABLE `formulario`
-  MODIFY `id_formulario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=219;
+  MODIFY `id_formulario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=221;
 
 --
 -- AUTO_INCREMENT de la tabla `genotipificacion`
