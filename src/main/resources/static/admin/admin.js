@@ -557,22 +557,24 @@ window.eliminarMiembro = async function(id) {
 
 // ==================== DICOTOMIZAR ====================
 async function cargarConjuntosDicot() {
-  try {
-    const res = await fetch(`${API_URL}/dicot-conjuntos`);
-    const conjuntos = await res.json();
-    
-    const select = document.getElementById("selectConjuntoDicot");
-    select.innerHTML = '<option value="">Seleccionar conjunto...</option>';
-    
-    conjuntos.forEach(c => {
-      const opt = document.createElement("option");
-      opt.value = c.idDicotconjunto;
-      opt.textContent = `${c.nombre} - ${c.descripcion}`;
-      select.appendChild(opt);
-    });
-  } catch (err) {
-    console.error("Error cargando conjuntos", err);
-  }
+  try {
+    const res = await fetch(`${API_URL}/dicot-conjuntos`);
+    const conjuntos = await res.json();
+    
+    const select = document.getElementById("selectConjuntoDicot");
+    select.innerHTML = '<option value="">Seleccionar conjunto...</option>';
+    
+    conjuntos.forEach(c => {
+      const id = c.idDicotConjunto || c.idDicotconjunto || c.id_dicotconjunto || c.id;
+      
+      const opt = document.createElement("option");
+      opt.value = id;
+      opt.textContent = `${c.nombre}`;
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    console.error("Error cargando conjuntos", err);
+  }
 }
 
 document.getElementById("btnDicotomizar")?.addEventListener("click", async () => {
@@ -682,8 +684,66 @@ document.getElementById("formNuevoConjunto")?.addEventListener("submit", async (
   }
 });
 
-function verReglas(conjuntoId) {
-  alert(`Ver reglas del conjunto ${conjuntoId} - Funcionalidad en desarrollo`);
+// ==================== VER REGLAS ====================
+window.verReglas = async function(conjuntoId) {
+  const tbody = document.getElementById("bodyReglas");
+  
+  tbody.innerHTML = '<tr><td colspan="5" class="text-center">Cargando datos...</td></tr>';
+
+  const modalEl = document.getElementById('modalVerReglas');
+  const modal = new bootstrap.Modal(modalEl);
+  modal.show();
+
+  try {
+    const res = await fetch(`${API_URL}/dicot-reglas`);
+
+    if (!res.ok) {
+      throw new Error("Error al consultar las reglas (DicotReglaController).");
+    }
+
+    const todasLasReglas = await res.json();
+
+    const reglasDelConjunto = todasLasReglas.filter(r => r.dicotConjuntoID === conjuntoId);
+
+    tbody.innerHTML = "";
+
+    if (reglasDelConjunto.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="text-center text-muted">
+            <i class="bi bi-folder-x me-2"></i>Este conjunto no tiene reglas asignadas.
+          </td>
+        </tr>`;
+      return;
+    }
+
+    reglasDelConjunto.forEach(r => {
+      const variable = r.atributoObj || "---";
+      const operador = r.operador || "=";
+      const valor = r.valorInf || r.valorSup || 0;
+      const resultado = r.valorSiCumple;
+      const categoria = r.valorCategoria || "";
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+          <td><strong>${variable}</strong></td>
+          <td class="text-center"><span class="badge bg-info text-dark">${operador}</span></td>
+          <td class="text-center">${valor}</td>
+          <td class="text-center fw-bold">${resultado}</td>
+          <td>${categoria}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+  } catch (err) {
+    console.error(err);
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" class="text-center text-danger">
+          <strong>Error:</strong> ${err.message}
+        </td>
+      </tr>`;
+  }
 }
 
 async function eliminarConjunto(id) {
