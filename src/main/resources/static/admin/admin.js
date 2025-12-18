@@ -913,73 +913,89 @@ document.getElementById("btnExportarPdf")?.addEventListener("click", async () =>
 
 // ==================== LISTAR DATOS ====================
 document.getElementById("selectTablaListar")?.addEventListener("change", async function() {
-  const tabla = this.value;
-  const contenedor = document.getElementById("contenedorTablaListar");
-  
-  if (!tabla) {
-    contenedor.innerHTML = '<p class="text-muted">Selecciona una tabla para ver los datos</p>';
-    return;
-  }
+  const tabla = this.value;
+  const contenedor = document.getElementById("contenedorTablaListar");
+  
+  if (!tabla) {
+    contenedor.innerHTML = '<p class="text-muted">Selecciona una tabla para ver los datos</p>';
+    return;
+  }
 
-  try {
-    let endpoint = '';
-    switch(tabla) {
-      case 'pacientes':
-        endpoint = '/pacientes';
-        break;
-      case 'formularios':
-        endpoint = '/formularios';
-        break;
-      case 'datos_generales':
-        endpoint = '/datos-generales';
-        break;
-      case 'habitos':
-        endpoint = '/habitos-paciente';
-        break;
-      case 'datos_clinicos':
-        endpoint = '/datos-clinicos';
-        break;
-    }
+  try {
+    let endpoint = '';
 
-    const res = await fetch(`${API_URL}${endpoint}`);
-    const datos = await res.json();
-    
-    if (datos.length === 0) {
-      contenedor.innerHTML = '<p class="text-muted">No hay datos disponibles</p>';
-      return;
-    }
+    switch(tabla) {
+      case 'pacientes':       endpoint = '/pacientes'; break;
+      case 'formularios':     endpoint = '/formularios'; break;
+      case 'datos_generales': endpoint = '/datos-generales'; break;
+      case 'habitos':         endpoint = '/habitos-paciente'; break;
+      case 'datos_clinicos':  endpoint = '/datos-clinicos'; break;
+      case 'histopatologia':  endpoint = '/histopatologia'; break;
+      case 'fact_ambientales': endpoint = '/factores-dietarios-hambientales'; break;  
+    }
 
-    // Crear tabla dinámica
-    const headers = Object.keys(datos[0]).filter(k => !k.startsWith('id') || k === 'idPaciente' || k === 'idFormulario' || k === 'idMiembro');
-    let html = '<table class="table table-striped table-hover"><thead class="table-purple"><tr>';
-    headers.forEach(h => {
-      html += `<th>${h}</th>`;
-    });
-    html += '</tr></thead><tbody>';
-    
-    datos.forEach(row => {
-      html += '<tr>';
-      headers.forEach(h => {
-        const value = row[h];
-        let displayValue = 'N/A';
-        if (value !== null && value !== undefined) {
-          if (typeof value === 'object') {
-            displayValue = JSON.stringify(value);
-          } else {
-            displayValue = value;
-          }
-        }
-        html += `<td>${displayValue}</td>`;
-      });
-      html += '</tr>';
-    });
-    
-    html += '</tbody></table>';
-    contenedor.innerHTML = html;
-  } catch (err) {
-    console.error(err);
-    contenedor.innerHTML = '<div class="alert alert-danger">Error al cargar los datos: ' + err.message + '</div>';
-  }
+    const res = await fetch(`${API_URL}${endpoint}`);
+    
+    if (res.status === 404) {
+        throw new Error(`Ruta incorrecta: ${endpoint}. <br>Abre tu archivo Controller en Java y verifica el @RequestMapping.`);
+    }
+    if (!res.ok) throw new Error(`Error ${res.status}: No se pudo cargar la tabla`);
+
+    const datos = await res.json();
+    
+    if (!datos || datos.length === 0) {
+      contenedor.innerHTML = '<div class="alert alert-warning">No hay datos registrados en esta tabla</div>';
+      return;
+    }
+
+    const headers = Object.keys(datos[0]); 
+    
+    let html = '<table class="table table-striped table-hover table-bordered table-sm" style="font-size: 0.85rem;">';
+    html += '<thead class="table-purple"><tr>';
+    
+    headers.forEach(h => {
+      let titulo = h.replace(/([A-Z])/g, ' $1').toUpperCase(); 
+      html += `<th>${titulo}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+    
+    datos.forEach(row => {
+      html += '<tr>';
+      headers.forEach(h => {
+        let value = row[h];
+        let displayValue = '---';
+
+        if (value !== null && value !== undefined) {
+          if (typeof value === 'object') {
+            if (value.formularioId) {
+                displayValue = `<span class="badge bg-secondary">Form: ${value.formularioId}</span>`;
+            } else if (value.idFormulario) {
+                displayValue = value.idFormulario;
+            } else if (value.idPaciente) {
+                displayValue = value.idPaciente;
+            } else if (value.id) {
+                displayValue = value.id;
+            } else {
+                displayValue = JSON.stringify(value).substring(0, 15) + '...';
+            }
+          } else {
+            displayValue = value;
+          }
+        }
+        html += `<td>${displayValue}</td>`;
+      });
+      html += '</tr>';
+    });
+    
+    html += '</tbody></table>';
+    contenedor.innerHTML = html;
+
+  } catch (err) {
+    console.error(err);
+    contenedor.innerHTML = `<div class="alert alert-danger">
+      <strong><i class="bi bi-exclamation-triangle me-2"></i>Error:</strong> ${err.message}
+    </div>`;
+  }
 });
 
 // ==================== CERRAR SESIÓN ====================
