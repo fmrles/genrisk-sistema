@@ -604,90 +604,106 @@ document.getElementById("btnDicotomizar")?.addEventListener("click", async () =>
 
 // ==================== VARIABLES DICOTOMIZACIÓN ====================
 async function cargarConjuntosVariables() {
-  try {
-    const res = await fetch(`${API_URL}/dicot-conjuntos`);
-    const conjuntos = await res.json();
-    
-    const tbody = document.querySelector("#tablaConjuntos tbody");
-    tbody.innerHTML = "";
-    
-    if (conjuntos.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="4" class="text-center">No hay conjuntos registrados</td></tr>';
-      return;
-    }
-    
-    conjuntos.forEach(c => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${c.idDicotconjunto}</td>
-        <td>${c.nombre}</td>
-        <td>${c.descripcion}</td>
-        <td>
-          <button class="btn btn-sm btn-primary" onclick="verReglas(${c.idDicotconjunto})">
-            <i class="bi bi-eye"></i> Ver Reglas
-          </button>
-          <button class="btn btn-sm btn-danger" onclick="eliminarConjunto(${c.idDicotconjunto})">
-            <i class="bi bi-trash"></i>
-          </button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
-  } catch (err) {
-    console.error("Error cargando conjuntos", err);
-  }
+  try {
+    const res = await fetch(`${API_URL}/dicot-conjuntos`);
+    const conjuntos = await res.json();
+    
+    const tbody = document.querySelector("#tablaConjuntos tbody");
+    tbody.innerHTML = "";
+    
+    if (!conjuntos || conjuntos.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" class="text-center">No hay conjuntos registrados</td></tr>';
+      return;
+    }
+    
+    conjuntos.forEach(c => {
+      const id = c.idDicotConjunto || c.idDicotconjunto || c.id_dicotconjunto || c.id;
+      
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${id !== undefined ? id : '<span class="text-danger">Error ID</span>'}</td>
+        <td>${c.nombre || 'Sin nombre'}</td>
+        <td>${c.descripcion || 'Sin descripción'}</td>
+        <td class="text-center">
+          <button class="btn btn-sm btn-outline-primary me-2" onclick="verReglas(${id})" title="Ver Reglas">
+            <i class="bi bi-eye"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-danger" onclick="eliminarConjunto(${id})" title="Eliminar">
+            <i class="bi bi-trash"></i>
+          </button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    console.error("Error cargando conjuntos", err);
+    document.querySelector("#tablaConjuntos tbody").innerHTML = 
+      '<tr><td colspan="4" class="text-center text-danger">Error de conexión</td></tr>';
+  }
+}
+
+window.abrirModalConjunto = function() {
+  const form = document.getElementById("formNuevoConjunto");
+  if(form) form.reset();
+  
+  const modal = new bootstrap.Modal(document.getElementById('modalConjunto'));
+  modal.show();
 }
 
 document.getElementById("formNuevoConjunto")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  
-  const data = {
-    nombre: document.getElementById("nombreConjunto").value,
-    descripcion: document.getElementById("descripcionConjunto").value
-  };
+  e.preventDefault();
+  
+  const data = {
+    nombre: document.getElementById("nombreConjunto").value,
+    descripcion: document.getElementById("descripcionConjunto").value
+  };
 
-  try {
-    const res = await fetch(`${API_URL}/dicot-conjuntos`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
+  try {
+    const res = await fetch(`${API_URL}/dicot-conjuntos`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
 
-    if (res.ok) {
-      alert("Conjunto creado con éxito");
-      e.target.reset();
-      cargarConjuntosVariables();
-    } else {
-      alert("Error al crear conjunto");
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Error de conexión");
-  }
+    if (res.ok) {
+      alert("Conjunto creado con éxito");
+      
+      const modalEl = document.getElementById('modalConjunto');
+      const modalInstance = bootstrap.Modal.getInstance(modalEl);
+      modalInstance.hide();
+      
+      cargarConjuntosVariables();
+    } else {
+      alert("Error al crear conjunto");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error de conexión");
+  }
 });
 
 function verReglas(conjuntoId) {
-  alert(`Ver reglas del conjunto ${conjuntoId} - Funcionalidad en desarrollo`);
+  alert(`Ver reglas del conjunto ${conjuntoId} - Funcionalidad en desarrollo`);
 }
 
 async function eliminarConjunto(id) {
-  if (!confirm("¿Estás seguro de eliminar este conjunto?")) return;
-  
-  try {
-    const res = await fetch(`${API_URL}/dicot-conjuntos/${id}`, {
-      method: "DELETE"
-    });
+  if (!confirm("¿Estás seguro de eliminar este conjunto?")) return;
+  
+  try {
+    const res = await fetch(`${API_URL}/dicot-conjuntos/${id}`, {
+      method: "DELETE"
+    });
 
-    if (res.ok) {
-      alert("Conjunto eliminado");
-      cargarConjuntosVariables();
-    } else {
-      alert("Error al eliminar");
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Error de conexión");
-  }
+    if (res.ok) {
+      alert("Conjunto eliminado");
+      cargarConjuntosVariables();
+    } else {
+      alert("Error al eliminar");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error de conexión");
+  }
 }
 
 // ==================== EXPORTAR DATOS ====================
