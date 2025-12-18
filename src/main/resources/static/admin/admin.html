@@ -907,46 +907,73 @@
           <div id="vistaFormularioRegla" class="d-none bg-light p-3 rounded border">
               <h6 class="fw-bold text-purple mb-3">Definir Nueva Regla</h6>
               <form id="formNuevaRegla">
-                  <div class="row">
-                      <div class="col-md-6 mb-3">
-                          <label class="form-label fw-bold small">Variable (Atributo)</label>
-                          <input type="text" class="form-control" id="reglaVariable" placeholder="Ej: edad, peso, sexo" required>
-                      </div>
-                      <div class="col-md-3 mb-3">
-                          <label class="form-label fw-bold small">Operador</label>
-                          <select class="form-select" id="reglaOperador">
-                              <option value=">=">>= (Mayor o igual)</option>
-                              <option value="<="><= (Menor o igual)</option>
-                              <option value="=">= (Igual)</option>
-                              <option value=">">> (Mayor)</option>
-                              <option value="<">< (Menor)</option>
-                          </select>
-                      </div>
-                      <div class="col-md-3 mb-3">
-                          <label class="form-label fw-bold small">Valor Corte</label>
-                          <input type="number" class="form-control" id="reglaValor" placeholder="Ej: 60" required>
-                      </div>
-                  </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold small">Variable</label>
+                        <select class="form-select" id="reglaVariable" required onchange="configurarInput()">
+                            <option value="">Seleccionar variable...</option>
+                            <option value="edad">Edad</option>
+                            <option value="peso">Peso (Kg)</option>
+                            <option value="estatura">Estatura (cm)</option>
+                            <option value="imc">IMC</option>
+                            <option value="cantPromTabaco">Cigarros por día</option>
+                            <option value="tiempoTabaco">Tiempo Fumando (Años)</option>
+                            <option value="sexo">Sexo (0=Mujer, 1=Hombre)</option>
+                            <option value="zonaResidencial">Zona Residencial</option>
+                        </select>
+                        <small id="infoVariable" class="text-muted" style="font-size: 0.7rem;">Selecciona una variable</small>
+                    </div>
 
-                  <div class="row">
-                      <div class="col-md-4 mb-3">
-                          <label class="form-label fw-bold small">Valor Si Cumple (Num)</label>
-                          <input type="number" class="form-control" id="reglaValorSi" value="1" required>
-                      </div>
-                      <div class="col-md-4 mb-3">
-                          <label class="form-label fw-bold small">Valor No Cumple (Num)</label>
-                          <input type="number" class="form-control" id="reglaValorNo" value="0" required>
-                      </div>
-                      <div class="col-md-4 mb-3">
-                          <label class="form-label fw-bold small">Etiqueta/Categoría</label>
-                          <input type="text" class="form-control" id="reglaCategoria" placeholder="Ej: Adulto Mayor">
-                      </div>
-                  </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-bold small">Operador</label>
+                        <select class="form-select" id="reglaOperador" required>
+                            <option value=">=">>= (Mayor o igual)</option>
+                            <option value="<="><= (Menor o igual)</option>
+                            <option value="=">= (Igual)</option>
+                            <option value=">">> (Mayor)</option>
+                            <option value="<">< (Menor)</option>
+                        </select>
+                    </div>
 
-                  <div class="d-flex justify-content-end gap-2 mt-2">
-                      <button type="button" class="btn btn-secondary" onclick="cancelarRegla()">Cancelar</button>
-                      <button type="submit" class="btn btn-purple">Guardar Regla</button>
-                  </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-bold small">Valor Corte</label>
+                        <input type="number" class="form-control" id="reglaValor" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-bold small">Si Cumple (Riesgo)</label>
+                        <select class="form-select border-success" id="reglaValorSi" onchange="invertirValor('si')">
+                            <option value="1" selected>1 (Riesgo)</option>
+                            <option value="0">0 (Normal)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-bold small">No Cumple</label>
+                        <select class="form-select" id="reglaValorNo" onchange="invertirValor('no')">
+                            <option value="0" selected>0 (Normal)</option>
+                            <option value="1">1 (Riesgo)</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-bold small">Etiqueta</label>
+                        <select class="form-select" id="reglaCategoria">
+                            <option value="">(Ninguna)</option>
+                            <option value="Riesgo Alto">Riesgo Alto</option>
+                            <option value="Riesgo Bajo">Riesgo Bajo</option>
+                            <option value="Normal">Normal</option>
+                            <option value="Alerta">Alerta</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-2">
+                    <button type="button" class="btn btn-secondary" onclick="cancelarRegla()">Cancelar</button>
+                    <button type="submit" class="btn btn-purple">Guardar Regla</button>
+                </div>
               </form>
           </div>
         </div>
