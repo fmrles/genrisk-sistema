@@ -2,7 +2,7 @@ if (!localStorage.getItem("usuario")) {
   window.location.href = "/login/login.html";
 }
 
-const API_URL = "http://localhost:8080";
+const API_URL = "";
 
 // Variable global para almacenar el último formulario ID
 let ultimoFormularioId = null;

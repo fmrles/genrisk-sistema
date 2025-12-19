@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 18-12-2025 a las 05:49:10
+-- Tiempo de generación: 19-12-2025 a las 07:44:58
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -57,6 +57,7 @@ CREATE TABLE `datos_clinicos` (
 --
 
 INSERT INTO `datos_clinicos` (`itemformu`, `formulario_id`, `adeno_gastrico`, `fecha_adeno_gastrico`, `ant_fam_cancer_gast`, `medicamentos`, `otras_enfermedades`, `ant_fam_otro_cancer`, `cirugia_gastrica_previa`, `hpylori_prueba`, `hpylori_resultado`, `hpylori_tiempo_test`, `positivo_pasado_hpylori`, `anio_positivopasado_hpylori`, `trata_erradicacion`, `anio_trataerradica`, `esquema_trataerradica`, `antibioticos_ibp`, `repeticion_examen`, `fecha_repetiexamen`, `tipo_exa_pasado_hpy`, `resultados_examen`) VALUES
+(1, 219, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (2, 101, NULL, NULL, 'NO', 'IBP', 'NO', 'NO', 'NO', 'Test de Aliento', 'Negativo', '10', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (2, 102, NULL, NULL, 'NO', 'Ninguno', 'Anemia', 'NO', 'NO', 'Antigeno', 'Positivo', '8', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (2, 103, 'NO', '2024-12-05', 'SÍ', 'Ninguno', 'NO', 'NO', 'NO', 'Test de Aliento', 'Negativo', '10', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -65,7 +66,8 @@ INSERT INTO `datos_clinicos` (`itemformu`, `formulario_id`, `adeno_gastrico`, `f
 (2, 203, NULL, NULL, 'NO', 'NO', 'NO', 'NO', 'NO', 'Test de Aliento', 'Negativo', '12', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (2, 209, 'SÍ', '2023-08-14', 'NO', 'Ninguno', 'Lupus', 'Cáncer de Estómago', 'NO', 'Test de Aliento', 'Negativo', '10', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (2, 213, NULL, NULL, 'NO', 'NO', 'NO', 'NO', 'NO', 'Endoscopia', 'Positivo', '24', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(2, 217, 'NO', NULL, 'SÍ', 'Ninguno', NULL, NULL, NULL, 'Test de Aliento', 'Positivo', '6', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+(2, 217, 'NO', NULL, 'SÍ', 'Ninguno', NULL, NULL, NULL, 'Test de Aliento', 'Positivo', '6', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(2, 224, 'No', NULL, 'No', 'Ninguno', 'Diabetes', 'Ninguno', 'No', 'Test de Aliento', 'Negativo', '<1 año', NULL, NULL, 'No', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -97,6 +99,7 @@ CREATE TABLE `datos_generales` (
 --
 
 INSERT INTO `datos_generales` (`itemformu`, `formulario_id`, `edad`, `sexo`, `peso`, `imc`, `estatura`, `zona_residencial`, `educacion`, `ocupacion`, `nacionalidad`, `direccion`, `comuna`, `ciudad`, `prevision_salud`, `anios_resi_actual`) VALUES
+(1, 219, 87, 'Mujer', 58, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (3, 101, 30, 'Femenino', 67, 23, 165, 'Urbana', 'Superior', 'Ingeniera Civil Informática', NULL, NULL, NULL, NULL, NULL, NULL),
 (3, 102, 35, 'Femenino', 61, 23, 161, 'Urbana', 'Superior', 'Arquitecta', NULL, NULL, NULL, NULL, NULL, NULL),
 (3, 103, 29, 'Femenino', 58, 23, 160, 'Urbana', 'Superior', 'Enfermera', NULL, NULL, NULL, NULL, NULL, NULL),
@@ -106,7 +109,8 @@ INSERT INTO `datos_generales` (`itemformu`, `formulario_id`, `edad`, `sexo`, `pe
 (3, 209, 47, 'Masculino', 81, 25, 171, 'Rural', 'Superior', 'Ingeniero Agrónomo', NULL, NULL, NULL, NULL, NULL, NULL),
 (3, 213, 41, 'Masculino', 77, 24, 174, 'Rural', 'Media', 'Granjero', NULL, NULL, NULL, NULL, NULL, NULL),
 (3, 217, 45, 'Masculino', 80.5, 26.1, 175, 'Urbana', 'Superior', 'Ingeniero', NULL, NULL, NULL, NULL, NULL, NULL),
-(3, 220, 22, 'Hombre', NULL, NULL, NULL, 'Rural', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+(3, 220, 22, 'Hombre', NULL, NULL, NULL, 'Rural', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(3, 224, 25, 'Mujer', 70, 25.7, 165, 'Urbana', 'Medio', 'Barista', NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -374,7 +378,151 @@ INSERT INTO `dicot_valor` (`id_dicotvalor`, `categoria`, `valordicico`, `formula
 (181, 'edad', 1, 209, 30),
 (182, 'estado_consumo_tabaco', 0, 209, 31),
 (183, 'edad', 1, 213, 30),
-(184, 'estado_consumo_tabaco', 0, 213, 31);
+(184, 'estado_consumo_tabaco', 0, 213, 31),
+(185, 'edad', 0, 101, 1),
+(186, 'estadoConsumoTabaco', 0, 101, 2),
+(187, 'estadoConsumoAlcohol', 1, 101, 3),
+(188, 'sexo', 1, 101, 4),
+(189, 'zonaResidencial', 0, 101, 5),
+(190, 'edad', 0, 102, 1),
+(191, 'estadoConsumoTabaco', 1, 102, 2),
+(192, 'estadoConsumoAlcohol', 0, 102, 3),
+(193, 'sexo', 1, 102, 4),
+(194, 'zonaResidencial', 0, 102, 5),
+(195, 'edad', 0, 103, 1),
+(196, 'estadoConsumoTabaco', 0, 103, 2),
+(197, 'estadoConsumoAlcohol', 1, 103, 3),
+(198, 'sexo', 1, 103, 4),
+(199, 'zonaResidencial', 0, 103, 5),
+(200, 'edad', 0, 201, 1),
+(201, 'estadoConsumoTabaco', 0, 201, 2),
+(202, 'estadoConsumoAlcohol', 0, 201, 3),
+(203, 'sexo', 1, 201, 4),
+(204, 'zonaResidencial', 1, 201, 5),
+(205, 'edad', 0, 202, 1),
+(206, 'estadoConsumoTabaco', 1, 202, 2),
+(207, 'estadoConsumoAlcohol', 1, 202, 3),
+(208, 'sexo', 1, 202, 4),
+(209, 'zonaResidencial', 0, 202, 5),
+(210, 'edad', 0, 203, 1),
+(211, 'estadoConsumoTabaco', 0, 203, 2),
+(212, 'estadoConsumoAlcohol', 0, 203, 3),
+(213, 'sexo', 0, 203, 4),
+(214, 'zonaResidencial', 0, 203, 5),
+(215, 'edad', 0, 209, 1),
+(216, 'estadoConsumoTabaco', 0, 209, 2),
+(217, 'estadoConsumoAlcohol', 1, 209, 3),
+(218, 'sexo', 0, 209, 4),
+(219, 'zonaResidencial', 1, 209, 5),
+(220, 'edad', 0, 213, 1),
+(221, 'estadoConsumoTabaco', 0, 213, 2),
+(222, 'estadoConsumoAlcohol', 1, 213, 3),
+(223, 'sexo', 0, 213, 4),
+(224, 'zonaResidencial', 1, 213, 5),
+(225, 'edad', 0, 217, 1),
+(226, 'estadoConsumoTabaco', 1, 217, 2),
+(227, 'estadoConsumoAlcohol', 1, 217, 3),
+(228, 'sexo', 0, 217, 4),
+(229, 'zonaResidencial', 0, 217, 5),
+(230, 'edad', 0, 220, 1),
+(231, 'sexo', 0, 220, 4),
+(232, 'zonaResidencial', 1, 220, 5),
+(233, 'edad', 0, 101, 21),
+(234, 'estado', 0, 101, 22),
+(235, 'sexo', 0, 101, 24),
+(236, 'zona', 0, 101, 25),
+(237, 'imc', 0, 101, 26),
+(238, 'edad', 0, 102, 21),
+(239, 'estado', 0, 102, 22),
+(240, 'sexo', 0, 102, 24),
+(241, 'zona', 0, 102, 25),
+(242, 'imc', 0, 102, 26),
+(243, 'edad', 0, 103, 21),
+(244, 'estado', 0, 103, 22),
+(245, 'sexo', 0, 103, 24),
+(246, 'zona', 0, 103, 25),
+(247, 'imc', 0, 103, 26),
+(248, 'edad', 0, 201, 21),
+(249, 'estado', 0, 201, 22),
+(250, 'sexo', 0, 201, 24),
+(251, 'zona', 0, 201, 25),
+(252, 'imc', 1, 201, 26),
+(253, 'edad', 0, 202, 21),
+(254, 'estado', 0, 202, 22),
+(255, 'sexo', 0, 202, 24),
+(256, 'zona', 0, 202, 25),
+(257, 'imc', 0, 202, 26),
+(258, 'edad', 0, 203, 21),
+(259, 'estado', 0, 203, 22),
+(260, 'sexo', 0, 203, 24),
+(261, 'zona', 0, 203, 25),
+(262, 'imc', 1, 203, 26),
+(263, 'edad', 0, 209, 21),
+(264, 'estado', 0, 209, 22),
+(265, 'sexo', 0, 209, 24),
+(266, 'zona', 0, 209, 25),
+(267, 'imc', 1, 209, 26),
+(268, 'edad', 0, 213, 21),
+(269, 'estado', 0, 213, 22),
+(270, 'sexo', 0, 213, 24),
+(271, 'zona', 0, 213, 25),
+(272, 'imc', 0, 213, 26),
+(273, 'edad', 0, 217, 21),
+(274, 'estado', 0, 217, 22),
+(275, 'sexo', 0, 217, 24),
+(276, 'zona', 0, 217, 25),
+(277, 'imc', 1, 217, 26),
+(278, 'edad', 0, 220, 21),
+(279, 'sexo', 0, 220, 24),
+(280, 'zona', 0, 220, 25),
+(281, 'edad', 0, 101, 1),
+(282, 'estadoConsumoTabaco', 0, 101, 2),
+(283, 'estadoConsumoAlcohol', 1, 101, 3),
+(284, 'sexo', 1, 101, 4),
+(285, 'zonaResidencial', 0, 101, 5),
+(286, 'edad', 0, 102, 1),
+(287, 'estadoConsumoTabaco', 1, 102, 2),
+(288, 'estadoConsumoAlcohol', 0, 102, 3),
+(289, 'sexo', 1, 102, 4),
+(290, 'zonaResidencial', 0, 102, 5),
+(291, 'edad', 0, 103, 1),
+(292, 'estadoConsumoTabaco', 0, 103, 2),
+(293, 'estadoConsumoAlcohol', 1, 103, 3),
+(294, 'sexo', 1, 103, 4),
+(295, 'zonaResidencial', 0, 103, 5),
+(296, 'edad', 0, 201, 1),
+(297, 'estadoConsumoTabaco', 0, 201, 2),
+(298, 'estadoConsumoAlcohol', 0, 201, 3),
+(299, 'sexo', 1, 201, 4),
+(300, 'zonaResidencial', 1, 201, 5),
+(301, 'edad', 0, 202, 1),
+(302, 'estadoConsumoTabaco', 1, 202, 2),
+(303, 'estadoConsumoAlcohol', 1, 202, 3),
+(304, 'sexo', 1, 202, 4),
+(305, 'zonaResidencial', 0, 202, 5),
+(306, 'edad', 0, 203, 1),
+(307, 'estadoConsumoTabaco', 0, 203, 2),
+(308, 'estadoConsumoAlcohol', 0, 203, 3),
+(309, 'sexo', 0, 203, 4),
+(310, 'zonaResidencial', 0, 203, 5),
+(311, 'edad', 0, 209, 1),
+(312, 'estadoConsumoTabaco', 0, 209, 2),
+(313, 'estadoConsumoAlcohol', 1, 209, 3),
+(314, 'sexo', 0, 209, 4),
+(315, 'zonaResidencial', 1, 209, 5),
+(316, 'edad', 0, 213, 1),
+(317, 'estadoConsumoTabaco', 0, 213, 2),
+(318, 'estadoConsumoAlcohol', 1, 213, 3),
+(319, 'sexo', 0, 213, 4),
+(320, 'zonaResidencial', 1, 213, 5),
+(321, 'edad', 0, 217, 1),
+(322, 'estadoConsumoTabaco', 1, 217, 2),
+(323, 'estadoConsumoAlcohol', 1, 217, 3),
+(324, 'sexo', 0, 217, 4),
+(325, 'zonaResidencial', 0, 217, 5),
+(326, 'edad', 0, 220, 1),
+(327, 'sexo', 0, 220, 4),
+(328, 'zonaResidencial', 1, 220, 5);
 
 -- --------------------------------------------------------
 
@@ -404,6 +552,7 @@ CREATE TABLE `fact_dietario_ambiental` (
 --
 
 INSERT INTO `fact_dietario_ambiental` (`itemformu`, `formulario_id`, `agua_consumo_zona`, `tratamiento_agua`, `fumigaciones`, `exposicion_pesticidas`, `combus_lena_diario`, `exposicion_quimicos`, `dieta_agregasal`, `dieta_frutas_verduras`, `dieta_frituras`, `dieta_carnes_cecinas`, `ali_condimentado`, `infusiones_bebidas`) VALUES
+(1, 219, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (5, 101, 'Red pública', 'Ninguno', 'Nunca', 'No', 'Nunca/Rara vez', 'SÍ', '≥3/sem', '3-4 porcio', 'No', '1-2/sem', NULL, NULL),
 (5, 102, 'Red pública', 'Filtro', 'Nunca', 'No', 'Nunca/Rara vez', 'No', 'No', '3-4 porcio', 'No', '<1/sem', NULL, NULL),
 (5, 103, 'Red pública', 'Hervir', 'Nunca', 'No', '1-2/sem', 'Sí', '≥3/sem', '<2 porcion', 'Sí', '≥3/sem', NULL, NULL),
@@ -446,7 +595,12 @@ INSERT INTO `formulario` (`id_formulario`, `estado_formulario`, `tipo_formulario
 (217, 'En Progreso', 'Caso', '2025-11-05', 'CA0003', 10),
 (218, 'Activo', 'Control', '2025-12-01', 'CA0002', 15),
 (219, 'En proceso', 'Inicial', '2025-12-14', 'CR0001', 10),
-(220, 'En proceso', 'Inicial', '2025-12-14', 'CR0002', 10);
+(220, 'En proceso', 'Inicial', '2025-12-14', 'CR0002', 10),
+(221, 'En Progreso', 'CASO', '2025-12-18', 'CA0004', 10),
+(223, 'En progreso', 'CASO', '2025-12-18', 'CA0005', 10),
+(224, 'En progreso', 'CONTROL', '2025-12-19', 'CR0005', 10),
+(225, 'En progreso', 'CONTROL', '2025-12-19', 'CR0006', 10),
+(226, 'En progreso', 'CONTROL', '2025-12-19', 'CR0007', 10);
 
 -- --------------------------------------------------------
 
@@ -508,6 +662,7 @@ CREATE TABLE `habitos_paciente` (
 --
 
 INSERT INTO `habitos_paciente` (`itemformu`, `formulario_id`, `estado_consumo_tabaco`, `cant_prom_tabaco`, `ex_consumidor_tabaco`, `estado_consumo_alcohol`, `frecuencia_alcohol`, `cantidad_alcohol`, `anios_consumo_alcohol`, `ex_consumidor_alcohol`, `tiempo_tabaco`) VALUES
+(1, 219, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (4, 101, 'No fumador', NULL, NULL, 'Bebedor', 'Ocasional', 2, 10, NULL, NULL),
 (4, 102, 'Fumador', 10, NULL, 'No bebedor', NULL, NULL, NULL, NULL, NULL),
 (4, 103, 'Exfumador', 5, 5, 'Bebedor', 'Mensual', 3, 8, NULL, NULL),
@@ -516,7 +671,8 @@ INSERT INTO `habitos_paciente` (`itemformu`, `formulario_id`, `estado_consumo_ta
 (4, 203, 'No fumador', NULL, NULL, 'No bebedor', NULL, NULL, NULL, NULL, NULL),
 (4, 209, 'Exfumador', 8, 3, 'Bebedor', 'Diario', 2, 10, NULL, NULL),
 (4, 213, 'No fumador', NULL, NULL, 'Bebedor', 'Ocasional', 1, 5, NULL, NULL),
-(4, 217, 'Fumador', NULL, NULL, 'Bebedor', NULL, NULL, 20, NULL, NULL);
+(4, 217, 'Fumador', NULL, NULL, 'Bebedor', NULL, NULL, 20, NULL, NULL),
+(4, 224, 'Nunca fumó', 2, NULL, 'Bebedor', 'Semanal', 3, 2, NULL, '1 año');
 
 -- --------------------------------------------------------
 
@@ -592,8 +748,9 @@ INSERT INTO `miembro_equipo` (`id_miembro`, `nombre_miembro`, `correo_miembro`, 
 (11, 'Esteban Pardo', 'epardo@example.com', '$2a$12$HQHa/Y162evUDdHiFcnw3ec0Mt2lgz0Hg1CQI4I.n.aRM9Gz7I0XS', 'Investigador'),
 (12, 'Paula Reyes', 'preyess@gmail.com', '$2a$12$bNXtNjj5YW3YwX4zKELNs.HBTsRcx50SbBCRPT0aGSRxqxAWDxEBy', 'Informatico'),
 (15, 'Francisco Morales', 'francisco@genrisk.cl', '$2a$10$nNfWdJIgpkNwPZNDRSUibOLuaWXddybwqHG6JG/JXanR.Fle46wLa', 'Investigador'),
-(16, 'Cesar Sepulveda', 'cesarAg@gmail.com', '$2a$10$xQgbpX8kLXPG5BkqtVB8yOCDezWyrjo1rfAGvanq2lBomUNN3Ctca', 'Informatico'),
-(17, 'Gonzalo Matus', 'matusgonzalo1544@gmail.com', '$2a$10$GtBEnZEA7aJsOqIZ491j1exv78WgEOgsO/6xDfa02VsSykEYUp5Yy', 'Informatico');
+(16, 'Cesar Sepulveda', 'cesarAg@gmail.com', '$2a$10$xQgbpX8kLXPG5BkqtVB8yOCDezWyrjo1rfAGvanq2lBomUNN3Ctca', 'Digitador'),
+(17, 'Gonzalo Matus', 'matusgonzalo1544@gmail.com', '$2a$10$sgmk5sXWuUKzPCTvyKL3X.VWq5clwzSHTs9lwUab7WG7pCTWbfnZi', 'Informatico'),
+(18, 'Gastón Márquez', 'gmarquez@gmail.com', '$2a$10$lww.HTB8hz8GD6eJpQTfp.zQaRMig2LGGJ7EAlnoJuIX4iXzAFq86', 'Investigador');
 
 -- --------------------------------------------------------
 
@@ -648,10 +805,15 @@ INSERT INTO `paciente` (`id_paciente`, `nombre_paciente`, `correo_paciente`, `di
 ('CA0002', 'Paciente segundo caso', 'evelyn@example.com', 'Av. O´higgins 1548', 'caso', NULL),
 ('CA0003', 'Juan Pérez (Prueba Caso)', 'juan.perez@test.cl', 'Calle Falsa 123', 'Caso', NULL),
 ('CA0004', 'Cristopher Arias', 'cristopher@example.com', 'Av. Ohiggins 1028', 'Caso', '2025-11-28'),
+('CA0005', 'Almendra Erices', 'almendra@gmail.com', 'Andrés Bello 646', 'Caso', '2025-12-18'),
 ('CR0001', 'Evelyn Matus', 'evelyn@example.com', 'Av. O´higgins 1548', 'Control', NULL),
 ('CR0002', 'Paciente segundo control', 'evelyn@example.com', 'Av. O´higgins 1548', 'control', NULL),
 ('CR0003', 'Andrea Astorga', 'andrea@example.com', 'Av. Ohiggins 1028', 'Control', '2025-11-28'),
 ('CR0004', 'Alex Ortiz', 'alex@example.com', 'Los Copihues 458', 'Control', '2025-11-30'),
+('CR0005', 'Laura Villanueva', 'laura@gmail.com', 'Los Copihues 677', 'Control', '2025-12-19'),
+('CR0006', 'Bernardita Matamala', 'berni@csv.cl', 'Alonso de Ercilla 452', 'Control', '2025-12-19'),
+('CR0007', 'Pablo Matus Herrera', 'pmatus@gmail.com', 'Carrera 1096', 'Control', '2025-12-19'),
+('CR0008', 'Erna Herrera', 'erna@outlook.es', '', 'Control', '2025-12-19'),
 ('pac1', 'Evelyn Matus', 'evelyn@example.com', 'Av. O´higgins 1548', 'Control', NULL),
 ('pac2', 'Margaret Subercaseaux', 'margaret@example.com', 'Av. Ecuador 799', 'Control', NULL),
 ('pac3', 'Elizabeth Hererra', 'elizabeth@example.com', 'Av. Brasil 1087', 'Caso', NULL),
@@ -685,7 +847,8 @@ INSERT INTO `recuperacion_clave` (`id_recuperacion`, `clave_momentanea`, `miembr
 (9, '66fefcfc-b8ea-428b-83ce-7bba93db6a4a', 17, '2025-12-11 21:09:21'),
 (10, '69a19ff7-ce64-47a7-b7d8-7eb7b0951e65', 17, '2025-12-11 21:12:18'),
 (11, '29ec4dbc-5b9b-4a5e-a6ed-0db4ab115748', 17, '2025-12-11 21:18:14'),
-(12, '33e20347-3bd8-4259-b3cb-3fcafc76afad', 17, '2025-12-11 21:27:56');
+(12, '33e20347-3bd8-4259-b3cb-3fcafc76afad', 17, '2025-12-11 21:27:56'),
+(17, 'd864357a-9d9d-4b55-a59a-8d3ab95ff70e', 17, '2025-12-19 02:51:17');
 
 --
 -- Índices para tablas volcadas
@@ -816,13 +979,13 @@ ALTER TABLE `dicot_regla`
 -- AUTO_INCREMENT de la tabla `dicot_valor`
 --
 ALTER TABLE `dicot_valor`
-  MODIFY `id_dicotvalor` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=185;
+  MODIFY `id_dicotvalor` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=334;
 
 --
 -- AUTO_INCREMENT de la tabla `formulario`
 --
 ALTER TABLE `formulario`
-  MODIFY `id_formulario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=221;
+  MODIFY `id_formulario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=227;
 
 --
 -- AUTO_INCREMENT de la tabla `genotipificacion`
@@ -840,13 +1003,13 @@ ALTER TABLE `ingresa_datos`
 -- AUTO_INCREMENT de la tabla `miembro_equipo`
 --
 ALTER TABLE `miembro_equipo`
-  MODIFY `id_miembro` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id_miembro` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT de la tabla `recuperacion_clave`
 --
 ALTER TABLE `recuperacion_clave`
-  MODIFY `id_recuperacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id_recuperacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- Restricciones para tablas volcadas
