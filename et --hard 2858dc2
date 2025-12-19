@@ -1,0 +1,192 @@
+[33m374d6e9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mrama_sprint_3[m[33m, [m[1;31morigin/rama_sprint_3[m[33m)[m Merge branch 'rama_sprint_3' of https://github.com/fmrles/genrisk-sistema into rama_sprint_3
+[33m75a6d36[m limpieza de codigo de admin.html
+[33m28a102c[m cambio de puerto
+[33md2a9bd8[m Merge branch 'rama_sprint_3' of https://github.com/fmrles/genrisk-sistema into rama_sprint_3
+[33mb476304[m Merge branch 'rama_sprint_3' of https://github.com/fmrles/genrisk-sistema into rama_sprint_3
+[33m7e5a4e4[m cambios escenciales para creación de nuevo formulario
+[33m150714a[m Merge rama_sprint_3 - conflictos resueltos
+[33m7d36716[m Merge branch 'rama_sprint_3' of
+[33m6a5a510[m admi modificado
+[33m973a8c9[m limpieza de código
+[33md2f0d3e[m Merge branch 'rama_sprint_3' of https://github.com/fmrles/genrisk-sistema into rama_sprint_3
+[33m2858dc2[m se implementa la logica para hacer exportaciones a word por id de paciente
+[33mc4e4b2d[m se arregla el apartado de exportación a word para que se seleccione el id del paciente que se quiere exportar
+[33md6231a2[m hispatologia correciones
+[33mee1c503[m hispatologia modificado
+[33mcaaff79[m docotomizar alineado
+[33m0fce1df[m texto alineado
+[33m80d654d[m Tester de claves para miembro equipo
+[33m353ead0[m Tester de Histopatologia para verificar rellenado de datos cuando el paciente es caso
+[33mcfcb254[m Tester de habitos paciente
+[33maae187c[m datos ambintales
+[33m087e5d8[m Tester para verificar la correcta relación de datos con un formulario ya creado
+[33m29a7973[m Tester de formulario para verificar correcta creación y uso de endpoints
+[33m4fcd45e[m se soluciona problema al dicotomizar y agregar reglas
+[33mad802d6[m se soluciona problema de ids y se hace las nuevas tablas a listar
+[33m1bc4fca[m se realizan cambios estéticos en el apartado de listar y se agregan nuevos valores a la lista
+[33md7b102a[m Correcciones estéticas y lógicas para correcto funcionamiento de rellenado de datos
+[33m92b8f69[m Corrección para búsqueda de formulario según paciente
+[33m13e0eb0[m Merge branch 'rama_sprint_3' of https://github.com/fmrles/genrisk-sistema into rama_sprint_3
+[33m317647d[m se arreglan algunas funciones y se agrega un diccionario de datos para las distintas validaciones que requiere agregar una regla
+[33m6336fff[m mejora del html para normalizar los datos de entrada al agregar una regla
+[33mefea216[m Merge branch 'rama_sprint_3' of https://github.com/fmrles/genrisk-sistema into rama_sprint_3
+[33m7c0a17e[m Se agrega nuevo rol en miembro_equipo
+[33mce82759[m se agregan nuevas funciones para poder agregar reglas a los conjuntos
+[33mfc885a8[m se implementa nuevo botón para añadir reglas a un conjunto
+[33m9f6d98f[m se implementa una función para ver reglas
+[33m0362dce[m se agrega una vista para ver conjuntos de reglas
+[33mb0cd067[m Merge branch 'rama_sprint_3' of https://github.com/fmrles/genrisk-sistema into rama_sprint_3
+[33mc091952[m se soluciona el problema de IDs del apartado de editar variables dicotomización
+[33m48b5f7e[m se hacer arreglos estéticos sobre el apartado de editar variables dicotomización
+[33mb4cc5a7[m Se vuelve a la configuración original por eliminación de despliegue de forma parcial
+[33m1e8bd5f[m cambios necesarios para dockerizacion
+[33m8a8545b[m corrección sintáctica
+[33m122e3ea[m BDD para dockerizar
+[33m68755f4[m Archivo dockerfile para desplejar proyecto a servidor
+[33m4b0084c[m Versión preliminar de docker-compose
+[33m84f435b[m cambio estético en la sidebar
+[33m8f405b8[m se cambia el codigo de editar miembros para arreglar bug que no muestra id y solucionar problemas de edición
+[33m473823b[m se realiza nuevo html para el apartado de editar miembros
+[33m54003c3[m se soluciona problema de puertos
+[33mbc7534e[m Merge branch 'rama_sprint_3' of https://github.com/fmrles/genrisk-sistema into rama_sprint_3
+[33m94788f6[m Implementación de importación de word para datos de pacientes
+[33m5a4aa7a[m Modificación del formato del word exportado
+[33meaed14a[m distintas correciones en seleccionar paciente + formulario
+[33m70eaab0[m ventana emergente de formulario + distintas correciones
+[33m5bd7c3f[m Tipo de Formulario debe autoseleccionarse como Control/Caso
+[33m10efcb1[m Tipo de Formulario debe autoseleccionarse como Control/Caso
+[33mfa17c18[m exportacion de datos alineada
+[33m60a6495[m ajuste estetico
+[33m10f211e[m editar miembro/ estetica
+[33m555cba5[m modificaciones en editar miembros
+[33m2e1e51f[m modificacion del hmtl
+[33mbe046d3[m creacion/modificacion en formulario
+[33m1dccd45[m nuevo paciente(ordenado)
+[33m7c44687[m delgadez en boton
+[33m23a560d[m ajustes en el css
+[33m25b0742[m desbloqueo
+[33m2cc8bd4[m botones alineados y cambios esteticos
+[33m48cee87[m Bloqueo de formulario hasta seleccionar paciente y ajustes de botones
+[33m383bb03[m ajustes visuales en ingreso de paciente
+[33mc64761e[m Merge branch 'rama_sprint_3' of https://github.com/fmrles/genrisk-sistema into rama_sprint_3
+[33m4bfa7bf[m Nuevo front para reestablecer la contraseña desde la interfaz del usuario
+[33m94435b0[m Nuevos métodos que realizan el cuerpo del correo automático y reestablecimiento de la clave
+[33mf8a60c3[m Nuevo repositorio de la entidad RecuperacionClave
+[33mc75559d[m Nueva entidad que representa la clave momentanea del miembro_equipo
+[33m4d3cdc7[m Nuevos endpoints para reestablecer contraseña
+[33m00f4f11[m Nueva clase que redirige a .html de seteo de clave
+[33m3a16c0a[m Nueva clase que realiza el envió de correo automático
+[33mb554932[m Se agregan dependencias para funcionalidades mail
+[33me01a2d6[m Cambios para funcionalidad mail
+[33md32bc21[m se arregla problema de puertos y compatibilidad con nuevas versiones integradas
+[33md3d3f1b[m se agrego la opción de que se pueda ver la clave
+[33md3cb51e[m Refactor code structure for improved readability and maintainability
+[33m5543840[m se agrego la opción de que se pueda ver la clave
+[33mcd5cc33[m se arregla el problema de que no recibia el usuario actual en el frontend
+[33mca39a5d[m Ajustes para seteo de clave de miembroEquipo
+[33m09b2b1d[m Correcciones
+[33mfe64cd6[m Corrección en testeo JUnit
+[33md37ec05[m Incorpora relación entre miembroEquipo (1:N) Formulario
+[33mfc3d5ce[m Implementación de lógica para encriptación de claves en bdd (hasheo)
+[33mc4f3c47[m Implementación de métodos UserDetails para aplicar BCrypt
+[33mbb5a18d[m modificaciones para cumplir con la logica de dicotomizacion nueva
+[33m6a0732d[m .
+[33m8d4cacb[m Ajustes en redirección de login
+[33m14f3e26[m Implementación preliminar de frontend (versión administrador)
+[33m63901b0[m Pequeño ajuste en roles
+[33mdf4b745[m Correcciones en exportación a PDF de datos HPylori
+[33m00c4355[m Correcciones e implementaciones para correcta exportación de datos en word por cada paciente
+[33m5a6d570[m Leve corrección estética
+[33m5d6b618[m Correcciones para correcto funcionamiento de exportaciones en PDF
+[33m6deeadd[m Añadir nuevo atributo de tabla BDD "DatosGenerales"
+[33mb97797a[m Correcciones en exportaciones a PDF de pacientes
+[33m8fdb0b1[m Correcciones en datos de prueba para testeos JUnit
+[33m953b6ca[m Correcciones momentaneas para compilación de exportaciones
+[33mbfd0e80[m Correcciones de atributos en ítems según formulario definitivo
+[33m7ce4f1e[m mejoras en la exportacion de datos dicotomizados
+[33md46890e[m mejoras en la validacion de datosgenerales
+[33m386c5ae[m mejora par validar que no se cree un registro de histopatologia para pacientes controles
+[33mf539a4d[m implementacion de validaciones en miembroequipo
+[33m2f17244[m implementacion de validaciones en histopatologia
+[33mb31ea17[m implementacion de validaciones en habitospacientes
+[33ma2d7f42[m implementacion de validaciones en genotipificacion
+[33mca42241[m implementacion de validaciones en factdietariosambientales
+[33m55db085[m Implementacion de validaciones en DatosClinicos
+[33m60666ea[m implementacion correcta de validaciones
+[33me5e7bd6[m Implementacion de validaciones en Controlador de paciente
+[33ma7db2a9[m Implementacion de validaciones en Controlador de datos generales
+[33me3ff793[m Implementacion de validaciones de datos en Paciente
+[33m0b8e7d5[m Implementacion de validaciones en datos de DatosGenerales
+[33m3361db3[m se agrego dependencia de validaciones
+[33ma7cc09b[m cambio menor
+[33mbd22ff3[m prueba rama
+[33m78b10e1[m[33m ([m[1;31morigin/rama_prueba[m[33m)[m cambios menores
+[33maa369ae[m Impleementacion pruebas unitarias para DicotomizacionService, PacienteService, EstadisticaService
+[33m1b98119[m Se implemento pruebas unitarias para PacienteRepository
+[33mdb186e1[m Se implementa Front-End para el login y una pantalla de inicio, además de un style
+[33mdcb19f7[m se implementaron nuevas clases para loggear un usuario, además se configuraron las clases MiembroEquipoRepository y MiembroEquipoService
+[33m6f1a99f[m se añadió una nueva dependencia de seguridad
+[33maddf19f[m Implementacion de primeros testeos
+[33m06ceb6a[m Exportaciones para reclutadores
+[33mc6c8763[m Merge branch 'rama_prueba' of https://github.com/fmrles/genrisk-sistema into rama_prueba
+[33mf30b741[m Nuevo método get para reclutadores
+[33ma7419a4[m Implementación de funcionalidad para exportar paciente y sus datos para reclutadores
+[33mc044fb7[m Merge branch 'rama_prueba' of https://github.com/fmrles/genrisk-sistema into rama_prueba
+[33m08fc81e[m Implementacion endpoint para exportar excel por conjunto de dicotomizacion
+[33m7877a81[m Merge branch 'rama_prueba' of https://github.com/fmrles/genrisk-sistema into rama_prueba
+[33ma557ab8[m Método para get de PacienteReclutador
+[33mfe84923[m Creación de pacienteDTO para reclutadores
+[33m4ce8d48[m Ajustes para adaptar métodos
+[33me8b255d[m Método para listar solo los datos id y tipo de paciente junto con su formulario
+[33m55beccb[m Implementacion endpoint para exportar datos dicotomizados de un paciente en especifico
+[33mcbd2390[m Optimizacion de columnas de valores dicotimizadas
+[33m1114823[m Optimizacion de exportaciones word y pdf
+[33m3f17cd5[m Implementacion Endpoint para recuperar todos los datos de un paciente en especifico
+[33m3c57bdc[m implementacion en codigo para id incrementales segun tipo de paciente
+[33m379a323[m Implementacion de exportacion de datos dicotomizados en formato .xlsx (excel)
+[33m017b3e7[m Correciones menores
+[33m649da09[m Modificacion en tipo de atributo para ser fiel a la base de datos
+[33m9fde6b9[m Modificacion en entidad y tabla de  DicotRegla para optimizar el servicio de dicotomizacion
+[33ma99a4c3[m Eliminación de métodos sin usar y datos residuales
+[33m11c36e4[m Ajustes para exportar tablas en PDF (funciona pero se debe debuggear)
+[33m54880a8[m Merge branch 'rama_prueba' of https://github.com/fmrles/genrisk-sistema into rama_prueba
+[33m6ef25ae[m Adaptabilidad para todas las tablas de formulario por separado; todos los datos del paciente en su propio word
+[33m86db29b[m Seteo de error
+[33mfc7b991[m Implementacion metodos estadisticos para definir los rangos de dicotomizacion
+[33mebd9970[m correccion en nombre de metodo
+[33m864a9cf[m cambios en application properties
+[33mfca7b40[m Incorporacion de lógica, dependencias y más para exportaciones en PDF y Word
+[33m1a2818b[m Merge branch 'rama_prueba' of https://github.com/fmrles/genrisk-sistema into rama_prueba
+[33m88f9495[m actualización de fk en genotipificacion
+[33mc545c81[m implementacion logica de dicotomizacion
+[33m7e2390e[m implementacion de Service y Controller para las entidades que faltaban ademas de modificaciones a entidades
+[33m5e48e27[m arrreglo final a la duplicidad de paciente_id
+[33m6a8aeb2[m elimine la duplicacion de paciente_id
+[33m13e221a[m modificacion de importaciones
+[33m921b698[m Implemento Service y Controller para Paciente
+[33m2fe963f[m Implemento Service y Controller para DatosGenerales
+[33m94eaf7b[m Implementa Service y Controller para Formulario
+[33mfb7988b[m Seteo en tipo de dato
+[33mc34f090[m Seteo en tipo de dato
+[33ma97147e[m Eliminación de Interfaces genéricas
+[33me2d434d[m .
+[33m2c991f6[m .
+[33me484af6[m Creación de servicio MiembroEquipo
+[33m85df6dc[m Creación de operaciones CRUD
+[33mc648fad[m Manejo de error
+[33m5c4af80[m Clase vacía para crear conexiones de paciente
+[33m1d2a98a[m Anexo de otras dependencias
+[33mb900218[m Conexión con Servidor de MiembroEquipo
+[33m0487dda[m Testeo de compilación
+[33mf7830a4[m Cambio por error de tipeo
+[33m2dc9a63[m Anexo de todas las Entidades y sus Interfaces
+[33m474d6d9[m Creacion de Interfaces
+[33m0467a26[m Repositorio de Paciente
+[33m372a986[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m Clases de Interfaces
+[33m0d2ece9[m Creación de carpeta y clases de interfaces
+[33m545b4ce[m agregar entity "Paciente"
+[33mb2a06d1[m Merge pull request #1 from fmrles/Francisco
+[33mcae2cee[m Mapeo inicial de entidades (MiembroEquipo, DicotConjunto) y repositorios para conexión con BDD.
+[33m9ed78c9[m Mapeo inicial de entidades (MiembroEquipo, DicotConjunto) y repositorios para conexión con BDD.
+[33m43917a7[m conectando con la base
+[33mfee7283[m first commit
