@@ -329,8 +329,7 @@ document.getElementById("formDatosClinicos")?.addEventListener("submit", async (
   }
 });
 
-// ==================== DIETARIOS ====================
-// ==================== DIETARIOS / AMBIENTALES ====================
+// ==================== DIETARIOS / AMBIENTALES (CORREGIDO) ====================
 document.getElementById("formDietarios")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -339,22 +338,22 @@ document.getElementById("formDietarios")?.addEventListener("submit", async (e) =
     return;
   }
 
- const dataDietarios = {
-  id: {
-  itemFormu: 5,
-  formularioId: ultimoFormularioId,
-  },
-  aguaConsumoZona: document.getElementById("aguaConsumoZona")?.value || null,
-  tratamientoAgua: document.getElementById("tratamientoAgua")?.value || null,
-  fumigaciones: document.getElementById("fumigaciones")?.value || null,
-  exposicionPesticidas: document.getElementById("exposicionPesticidas")?.value || null,
-  combustionLenaDiario: document.getElementById("combusLena")?.value || null,
-  exposicionQuimicos: document.getElementById("exposicionQuimicos")?.value || null,
-  dietaFrutasVerduras: document.getElementById("dietaFrutasVerduras")?.value || null,
-  alimentosCondimentados: document.getElementById("allCondimentado")?.value || null,
-  infusionesBebidas: document.getElementById("infusionesBebida")?.value || null
-};
-
+  // ✅ CORRECCIÓN: IDs actualizados para coincidir con el HTML
+  const dataDietarios = {
+    id: {
+      itemFormu: 5,
+      formularioId: ultimoFormularioId,
+    },
+    aguaConsumoZona: document.getElementById("aguaConsumoZona")?.value || null,
+    tratamientoAgua: document.getElementById("tratamientoAgua")?.value || null,
+    fumigaciones: document.getElementById("fumigaciones")?.value || null,
+    exposicionPesticidas: document.getElementById("exposicionPesticidas")?.value || null,
+    combustionLenaDiario: document.getElementById("combusLenia")?.value || null,  // ← CORREGIDO
+    exposicionQuimicos: document.getElementById("exposicionQuimicos")?.value || null,
+    dietaFrutasVerduras: document.getElementById("dietaFrutasVerduras")?.value || null,
+    alimentosCondimentados: document.getElementById("allCondimentado")?.value || null,  // ← CORREGIDO
+    infusionesBebidas: document.getElementById("infusionesBebidas")?.value || null  // ← CORREGIDO (quitar la última "s" si tu backend espera "infusionesBebida")
+  };
 
   try {
     const res = await fetch(`${API_URL}/factores-dietarios-ambientales`, {
@@ -365,7 +364,6 @@ document.getElementById("formDietarios")?.addEventListener("submit", async (e) =
 
     if (res.ok) {
       alert("Datos dietarios y ambientales guardados con éxito");
-
       // Avanzar a Histopatología
       const nextTabElement = document.getElementById("histopatologia-tab");
       if (nextTabElement) {
@@ -381,50 +379,47 @@ document.getElementById("formDietarios")?.addEventListener("submit", async (e) =
   }
 });
 
-// ==================== HISTOPATOLOGÍA (ÚLTIMO PASO) ====================
-// El botón aquí será para "Ingresar Formulario Completo" (Guardar Final)
-document.getElementById("formHistopatologia")
-  .addEventListener("submit", async (e) => {
-    e.preventDefault();
+// ==================== HISTOPATOLOGÍA (CORREGIDO) ====================
+document.getElementById("formHistopatologia")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    if (!ultimoFormularioId) {
-      alert("Primero debes crear o seleccionar un formulario");
-      return;
+  if (!ultimoFormularioId) {
+    alert("Primero debes crear o seleccionar un formulario");
+    return;
+  }
+
+  const dataHistopatologia = {
+    id: {
+      itemFormu: 1,
+      formularioId: ultimoFormularioId
+    },
+    tipo: document.getElementById("tipoMuestra")?.value || null,
+    estadoClinico: document.getElementById("estadoClinico")?.value || null,
+    localiTumoral: document.getElementById("localizacionTumoral")?.value || null
+  };
+
+  try {
+    const res = await fetch(`${API_URL}/histopatologia`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dataHistopatologia)
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
     }
 
-    const dataHistopatologia = {
-      id: {
-        itemFormu: 1, // SIEMPRE 1 en histopatología
-        formularioId: ultimoFormularioId
-      },
-      tipo: document.getElementById("tipoMuestra").value || null,
-      estadoClinico: document.getElementById("estadoClinico").value || null,
-      localiTumoral: document.getElementById("localizacionTumoral").value || null
-    };
-
-    try {
-      const res = await fetch(
-        "http://localhost:8081/histopatologia",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(dataHistopatologia)
-        }
-      );
-
-      if (!res.ok) {
-        const err = await res.text();
-        throw new Error(err);
-      }
-
-      alert("Formulario completo guardado correctamente ");
-
-    } catch (error) {
-      console.error(error);
-      alert("Error al guardar histopatología ");
-    }
+    alert(" Formulario completo guardado correctamente");
+    
+    // Opcional: Limpiar formulario o redirigir
+    // document.getElementById("formHistopatologia").reset();
+    
+  } catch (error) {
+    console.error(error);
+    alert(" Error al guardar histopatología: " + error.message);
+  }
 });
-
 
 // ==================== GESTIÓN DE MIEMBROS ====================
 
