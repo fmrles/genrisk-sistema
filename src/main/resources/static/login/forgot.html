@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Contraseña - GenRisk</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="style.css"> <!-- Reusa el mismo style.css del login -->
+</head>
+<body>
+
+<div class="container login-container">
+    <div class="row min-vh-100 align-items-center">
+        <div class="col-md-6 d-none d-md-flex justify-content-center align-items-center">
+            <!-- Puedes reutilizar la misma imagen o icono del login si quieres -->
+            <div class="login-icon-placeholder">
+                <i class="bi bi-shield-lock display-1 text-purple"></i>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-12">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <h3 class="text-center mb-4 text-purple fw-bold">Recuperar Contraseña</h3>
+                    
+                    <form id="forgotForm">
+                        <div class="mb-4">
+                            <label for="email" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control form-control-lg" id="email" 
+                                   placeholder="Ingresa tu correo registrado" required>
+                        </div>
+
+                        <button type="submit" id="submitBtn" class="btn btn-purple btn-lg w-100">
+                            Enviar Enlace de Recuperación
+                        </button>
+                    </form>
+
+                    <!-- Área para mensajes -->
+                    <div id="message" class="mt-4" style="display: none;"></div>
+
+                    <div class="text-center mt-4">
+                        <a href="/login/login.html" class="text-decoration-none text-purple">
+                            <i class="bi bi-arrow-left"></i> Volver al Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('forgotForm');
+    const messageDiv = document.getElementById('message');
+    const submitBtn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Deshabilitar botón mientras procesa
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Enviando...';
+        messageDiv.style.display = 'none';
+
+        const email = document.getElementById('email').value.trim();
+
+        try {
+            const response = await fetch('/api/auth/olvidar-contrasenia', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ correo: email })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Siempre se muestra como éxito (seguridad: no revelamos si el correo existe)
+                showMessage(
+                    data.mensaje || 
+                    'Si el correo está registrado, recibirá un enlace de recuperación en su bandeja de entrada. Revise también la carpeta de spam.',
+                    'success'
+                );
+                form.reset();
+            } else {
+                // Solo errores reales (ej. formato inválido)
+                showMessage(data.error || 'Error al procesar la solicitud.', 'danger');
+            }
+        } catch (error) {
+            showMessage('Error de conexión. Intenta nuevamente más tarde.', 'danger');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Enviar Enlace de Recuperación';
+        }
+    });
+
+    function showMessage(text, type) {
+        messageDiv.innerHTML = `
+            <div class="alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show" role="alert">
+                ${text}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        messageDiv.style.display = 'block';
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
