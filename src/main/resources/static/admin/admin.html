@@ -459,41 +459,125 @@
               </div>
 
               <!-- TAB: DIETARIOS/AMBIENTALES -->
-              <div class="tab-pane fade" id="dietarios" role="tabpanel">
-                <div class="card shadow border-0">
-                  <div class="card-body">
-                    <form id="formDietarios">
-                      <div class="alert alert-info">
-                        <i class="bi bi-info-circle me-2"></i>
-                        Sección en desarrollo para factores dietarios y ambientales
-                      </div>
-                      <div class="row">
-                        <div class="col-md-6 mb-3">
-                          <label class="form-label fw-bold">Consumo de Sal</label>
-                          <select class="form-select" id="consumoSal">
-                            <option value="">Seleccionar...</option>
-                            <option value="Alto">Alto</option>
-                            <option value="Moderado">Moderado</option>
-                            <option value="Bajo">Bajo</option>
-                          </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                          <label class="form-label fw-bold">Consumo de Frutas/Verduras</label>
-                          <select class="form-select" id="consumoFrutasVerduras">
-                            <option value="">Seleccionar...</option>
-                            <option value="Frecuente">Frecuente</option>
-                            <option value="Moderado">Moderado</option>
-                            <option value="Escaso">Escaso</option>
-                          </select>
-                        </div>
-                      </div>
-                      <button type="submit" class="btn btn-purple w-100 mt-3">
-                        <i class="bi bi-arrow-right-circle me-2"></i>Siguiente
-                      </button>
-                    </form>
-                  </div>
-                </div>
-              </div>
+<div class="tab-pane fade" id="dietarios" role="tabpanel">
+  <div class="card shadow border-0">
+    <div class="card-body">
+      <form id="formDietarios">
+
+        <div class="alert alert-info">
+          <i class="bi bi-info-circle me-2"></i>
+          Factores dietarios y ambientales del paciente
+        </div>
+
+        <div class="row">
+
+          <!-- Agua de consumo -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Fuente de agua de consumo</label>
+            <select class="form-select" id="aguaConsumoZona">
+              <option value="">Seleccionar...</option>
+              <option>Red pública</option>
+              <option>Pozo</option>
+              <option>Camión aljibe</option>
+            </select>
+          </div>
+
+          <!-- Tratamiento de agua -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Tratamiento del agua</label>
+            <select class="form-select" id="tratamientoAgua">
+              <option value="">Seleccionar...</option>
+              <option>Ninguno</option>
+              <option>Filtro</option>
+              <option>Hervir</option>
+              <option>Cloro</option>
+            </select>
+          </div>
+
+          <!-- Fumigaciones -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Fumigaciones cercanas</label>
+            <select class="form-select" id="fumigaciones">
+              <option value="">Seleccionar...</option>
+              <option>Nunca</option>
+              <option>Ocasional</option>
+              <option>Frecuente</option>
+            </select>
+          </div>
+
+          <!-- Exposición a pesticidas -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Exposición a pesticidas</label>
+            <select class="form-select" id="exposicionPesticidas">
+              <option value="">Seleccionar...</option>
+              <option>Sí</option>
+              <option>No</option>
+            </select>
+          </div>
+
+          <!-- Combustión leña -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Uso de combustión a leña</label>
+            <select class="form-select" id="combusLenia">
+              <option value="">Seleccionar...</option>
+              <option>Nunca/Rara vez</option>
+              <option>1-2/sem</option>
+              <option>≥3/sem</option>
+            </select>
+          </div>
+
+          <!-- Exposición a químicos -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Exposición a químicos</label>
+            <select class="form-select" id="exposicionQuimicos">
+              <option value="">Seleccionar...</option>
+              <option>Sí</option>
+              <option>No</option>
+            </select>
+          </div>
+
+          <!-- Dieta frutas y verduras -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Consumo de frutas y verduras</label>
+            <select class="form-select" id="dietaFrutasVerduras">
+              <option value="">Seleccionar...</option>
+              <option>&lt;2 porciones</option>
+              <option>3-4 porciones</option>
+              <option>&gt;5 porciones</option>
+            </select>
+          </div>
+
+          <!-- Alimentos condimentados -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Alimentos muy condimentados</label>
+            <select class="form-select" id="allCondimentado">
+              <option value="">Seleccionar...</option>
+              <option>Sí</option>
+              <option>No</option>
+            </select>
+          </div>
+
+          <!-- Infusiones / bebidas -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Infusiones / bebidas</label>
+            <select class="form-select" id="infusionesBebidas">
+              <option value="">Seleccionar...</option>
+              <option>Sí</option>
+              <option>No</option>
+            </select>
+          </div>
+
+        </div>
+
+        <button type="submit" class="btn btn-purple w-100 mt-3">
+          <i class="bi bi-save me-2"></i>Guardar Dietarios / Ambientales
+        </button>
+
+      </form>
+    </div>
+  </div>
+</div>
+
 
               <!-- TAB: HISTOPATOLOGÍA -->
               <div class="tab-pane fade" id="histopatologia" role="tabpanel">

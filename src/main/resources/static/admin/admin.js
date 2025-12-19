@@ -2,7 +2,7 @@ if (!localStorage.getItem("usuario")) {
   window.location.href = "/login/login.html";
 }
 
-const API_URL = "http://localhost:8080";
+const API_URL = "http://localhost:8081";
 
 // Variable global para almacenar el último formulario ID
 let ultimoFormularioId = null;
@@ -330,15 +330,55 @@ document.getElementById("formDatosClinicos")?.addEventListener("submit", async (
 });
 
 // ==================== DIETARIOS ====================
+// ==================== DIETARIOS / AMBIENTALES ====================
 document.getElementById("formDietarios")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  alert("Funcionalidad en desarrollo");
-    
-    // Avanzar a la pestaña "Histopatología"
-    const nextTabElement = document.getElementById('histopatologia-tab');
-    if (nextTabElement) {
-      new bootstrap.Tab(nextTabElement).show();
-    }
+  e.preventDefault();
+
+  if (!ultimoFormularioId) {
+    alert("Primero debes crear o seleccionar un formulario");
+    return;
+  }
+
+ const dataDietarios = {
+  id: {
+  itemFormu: 5,
+  formularioId: ultimoFormularioId,
+  },
+  aguaConsumoZona: document.getElementById("aguaConsumoZona")?.value || null,
+  tratamientoAgua: document.getElementById("tratamientoAgua")?.value || null,
+  fumigaciones: document.getElementById("fumigaciones")?.value || null,
+  exposicionPesticidas: document.getElementById("exposicionPesticidas")?.value || null,
+  combustionLenaDiario: document.getElementById("combusLena")?.value || null,
+  exposicionQuimicos: document.getElementById("exposicionQuimicos")?.value || null,
+  dietaFrutasVerduras: document.getElementById("dietaFrutasVerduras")?.value || null,
+  alimentosCondimentados: document.getElementById("allCondimentado")?.value || null,
+  infusionesBebidas: document.getElementById("infusionesBebida")?.value || null
+};
+
+
+  try {
+    const res = await fetch(`${API_URL}/factores-dietarios-ambientales`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dataDietarios)
+    });
+
+    if (res.ok) {
+      alert("Datos dietarios y ambientales guardados con éxito");
+
+      // Avanzar a Histopatología
+      const nextTabElement = document.getElementById("histopatologia-tab");
+      if (nextTabElement) {
+        new bootstrap.Tab(nextTabElement).show();
+      }
+    } else {
+      const error = await res.json();
+      alert("Error al guardar dietarios: " + JSON.stringify(error));
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error de conexión al guardar dietarios");
+  }
 });
 
 // ==================== HISTOPATOLOGÍA (ÚLTIMO PASO) ====================
