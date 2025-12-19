@@ -578,39 +578,70 @@
   </div>
 </div>
 
+<!-- TAB: HISTOPATOLOGÍA -->
+<div class="tab-pane fade" id="histopatologia" role="tabpanel">
+  <div class="card shadow border-0">
+    <div class="card-body">
 
-              <!-- TAB: HISTOPATOLOGÍA -->
-              <div class="tab-pane fade" id="histopatologia" role="tabpanel">
-                <div class="card shadow border-0">
-                  <div class="card-body">
-                    <form id="formHistopatologia">
-                      <div class="alert alert-info">
-                        <i class="bi bi-info-circle me-2"></i>
-                        Sección en desarrollo para datos histopatológicos
-                      </div>
-                      <div class="mb-3">
-                        <label class="form-label fw-bold">Tipo de Muestra</label>
-                        <input type="text" class="form-control" id="tipoMuestra">
-                      </div>
-                      <div class="mb-3">
-                        <label class="form-label fw-bold">Clasificación Histológica</label>
-                        <input type="text" class="form-control" id="clasificacionHisto">
-                      </div>
+      <form id="formHistopatologia">
 
-                      <!-- Botón final para guardar todo -->
-                      <button type="submit" class="btn btn-success w-100 mt-3" id="btnGuardarFormularioCompleto">
-                        <i class="bi bi-check-circle me-2"></i>Ingresar Formulario Completo
-                      </button>
-                    </form>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div> <!-- FIN: panelIngresoDatos -->
-
-               
+        <div class="alert alert-info">
+          <i class="bi bi-info-circle me-2"></i>
+          Datos histopatológicos del paciente
         </div>
+
+        <div class="row">
+
+          <!-- Tipo -->
+          <div class="col-md-4 mb-3">
+            <label class="form-label fw-bold">Tipo de Muestra</label>
+            <select class="form-select" id="tipoMuestra" required>
+              <option value="">Seleccionar...</option>
+              <option value="Intestinal">Intestinal</option>
+              <option value="Mixto">Mixto</option>
+              <option value="Difuso">Difuso</option>
+            </select>
+          </div>
+
+          <!-- Estado clínico -->
+          <div class="col-md-4 mb-3">
+            <label class="form-label fw-bold">Estado Clínico</label>
+            <select class="form-select" id="estadoClinico" required>
+              <option value="">Seleccionar...</option>
+              <option value="IIB">IIB</option>
+              <option value="IIIA">IIIA</option>
+              <option value="IIIB">IIIB</option>
+            </select>
+          </div>
+
+          <!-- Localización -->
+          <div class="col-md-4 mb-3">
+            <label class="form-label fw-bold">Localización Tumoral</label>
+            <select class="form-select" id="localizacionTumoral">
+              <option value="">Seleccionar...</option>
+              <option value="Antro">Antro</option>
+              <option value="Cuerpo">Cuerpo</option>
+              <option value="Cardias">Cardias</option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- Botón final (NO se borra) -->
+        <button
+          type="submit"
+          class="btn btn-success w-100 mt-3"
+          id="btnGuardarFormularioCompleto"
+        >
+          <i class="bi bi-check-circle me-2"></i>Ingresar Formulario Completo
+        </button>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
 
              <!-- SECCION: EDITAR MIEMBROS -->
        <div id="section-roles" class="content-section d-none">
