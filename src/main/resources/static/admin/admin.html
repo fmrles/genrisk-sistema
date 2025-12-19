@@ -561,32 +561,47 @@
           </div>
         </div>
 
+<!-- SECCIÓN: DICOTOMIZAR -->
+<div id="section-dicotomizar" class="content-section d-none">
+  <h2 class="mb-4 text-purple fw-bold">Dicotomizar Datos</h2>
 
-              <!-- SECCIÓN: DICOTOMIZAR -->
-              <div id="section-dicotomizar" class="content-section d-none">
-                  <h2 class="mb-4 text-purple fw-bold">Dicotomizar Datos</h2>
-                  <div class="card shadow border-0">
-                      <div class="card-body">
-                          <div class="mb-4">
-                              <label class="form-label fw-bold">Seleccionar Conjunto de Reglas</label>
-                              <select class="form-select" id="selectConjuntoDicot">
-                                  <option value="">Cargando conjuntos...</option>
-                                </select>
-                            </div>
-                          <button class="btn btn-purple btn-lg w-100" id="btnDicotomizar">
-                              <i class="bi bi-gear-fill me-2"></i>Ejecutar Dicotomización
-                            </button>
-                         
-                          <div id="resultadoDicot" class="mt-4 d-none">
-                              <div class="alert alert-success">
-                                  <i class="bi bi-check-circle me-2"></i>
-                                  <span id="mensajeResultadoDicot"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                 
-                </div>
+  <div class="card shadow border-0">
+    <div class="card-body">
+
+      <!-- Selector centrado -->
+      <div class="row justify-content-center mb-4">
+        <div class="col-md-6">
+          <label class="form-label fw-bold text-center w-100">
+            Seleccionar Conjunto de Reglas
+          </label>
+          <select class="form-select" id="selectConjuntoDicot">
+            <option value="">Cargando conjuntos...</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Botón centrado -->
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <button class="btn btn-purple btn-lg w-100" id="btnDicotomizar">
+            <i class="bi bi-gear-fill me-2"></i>
+            Ejecutar Dicotomización
+          </button>
+        </div>
+      </div>
+
+      <!-- Resultado -->
+      <div id="resultadoDicot" class="mt-4 d-none">
+        <div class="alert alert-success text-center">
+          <i class="bi bi-check-circle me-2"></i>
+          <span id="mensajeResultadoDicot"></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 
               <!-- SECCIÓN: EDITAR VARIABLES DICOTOMIZACIÓN -->
               <div id="section-variables" class="content-section d-none">
@@ -722,35 +737,43 @@
                     </div>
                 </div>
 
-              <!-- SECCIÓN: LISTAR DATOS -->
-              <div id="section-listar" class="content-section d-none">
-                  <h2 class="mb-4 text-purple fw-bold">Listar Datos</h2>
-                  <div class="card shadow border-0">
-                      <div class="card-body">
-                          <div class="mb-3">
-                              <label class="form-label fw-bold">Seleccionar Tabla</label>
-                              <select class="form-select" id="selectTablaListar">
-                                <option value="">Seleccionar...</option>
-                                <option value="pacientes">Pacientes</option>
-                                <option value="formularios">Formularios</option>
-                                <option value="datos_generales">Datos Generales</option>
-                                <option value="habitos">Hábitos</option>
-                                <option value="datos_clinicos">Datos Clínicos</option>
-                                <option value="fact_ambientales">Factores Ambientales</option>
-                                <option value="histopatologia">Histopatología</option>
-                                </select>
-                            </div>
-                          <div class="table-responsive" id="contenedorTablaListar">
-                              <p class="text-muted">Selecciona una tabla para ver los datos</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+   <!-- SECCIÓN: LISTAR DATOS -->
+<div id="section-listar" class="content-section d-none">
+  <h2 class="mb-4 text-purple fw-bold">Listar Datos</h2>
 
-           
+  <div class="card shadow border-0">
+    <div class="card-body">
+
+      <!-- Selector centrado -->
+      <div class="row justify-content-center mb-4">
+        <div class="col-md-6">
+          <label class="form-label fw-bold text-center w-100">
+            Seleccionar Tabla
+          </label>
+          <select class="form-select" id="selectTablaListar">
+            <option value="">Seleccionar...</option>
+            <option value="pacientes">Pacientes</option>
+            <option value="formularios">Formularios</option>
+            <option value="datos_generales">Datos Generales</option>
+            <option value="habitos">Hábitos</option>
+            <option value="datos_clinicos">Datos Clínicos</option>
+            <option value="fact_ambientales">Factores Ambientales</option>
+            <option value="histopatologia">Histopatología</option>
+          </select>
+        </div>
       </div>
-        </div>
+
+      <!-- Contenedor de tabla -->
+      <div class="table-responsive mt-3" id="contenedorTablaListar">
+        <p class="text-muted text-center">
+          Selecciona una tabla para ver los datos
+        </p>
+      </div>
+
+    </div>
   </div>
+</div>
+
 
 
   <!-- MODAL: NUEVO PACIENTE -->
