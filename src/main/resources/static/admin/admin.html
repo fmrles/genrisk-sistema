@@ -644,33 +644,39 @@
             </div>
           </div>
         </div>
+<!-- SECCIÓN: DICOTOMIZAR -->
+<div id="section-dicotomizar" class="content-section d-none">
+  <h2 class="mb-4 text-purple fw-bold">Dicotomizar Datos</h2>
 
+  <div class="card shadow border-0">
+    <div class="card-body">
 
-              <!-- SECCIÓN: DICOTOMIZAR -->
-              <div id="section-dicotomizar" class="content-section d-none">
-                  <h2 class="mb-4 text-purple fw-bold">Dicotomizar Datos</h2>
-                  <div class="card shadow border-0">
-                      <div class="card-body">
-                          <div class="mb-4">
-                              <label class="form-label fw-bold">Seleccionar Conjunto de Reglas</label>
-                              <select class="form-select" id="selectConjuntoDicot">
-                                  <option value="">Cargando conjuntos...</option>
-                                </select>
-                            </div>
-                          <button class="btn btn-purple btn-lg w-100" id="btnDicotomizar">
-                              <i class="bi bi-gear-fill me-2"></i>Ejecutar Dicotomización
-                            </button>
-                         
-                          <div id="resultadoDicot" class="mt-4 d-none">
-                              <div class="alert alert-success">
-                                  <i class="bi bi-check-circle me-2"></i>
-                                  <span id="mensajeResultadoDicot"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                 
-                </div>
+      <!-- Select alineado -->
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <label class="form-label fw-bold">Seleccionar Conjunto de Reglas</label>
+          <select class="form-select" id="selectConjuntoReglas">
+            <option value="">Seleccionar conjunto...</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Botón -->
+      <button class="btn btn-purple btn-lg w-100" id="btnDicotomizar">
+        <i class="bi bi-gear-fill me-2"></i>Ejecutar Dicotomización
+      </button>
+
+      <!-- Resultado -->
+      <div id="resultadoDicot" class="mt-4 d-none">
+        <div class="alert alert-success">
+          <i class="bi bi-check-circle me-2"></i>
+          <span id="mensajeResultadoDicot"></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
 
               <!-- SECCIÓN: EDITAR VARIABLES DICOTOMIZACIÓN -->
               <div id="section-variables" class="content-section d-none">
