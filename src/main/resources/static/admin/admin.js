@@ -903,6 +903,84 @@ document.getElementById("btnExportarPdf")?.addEventListener("click", async () =>
   }
 });
 
+// ==================== EXPORTAR A WORD ====================
+async function descargarFichaWord(idPaciente) {
+
+    if (!confirm(`¿Descargar ficha en Word para el paciente ${idPaciente}?`)) return;
+
+    try {
+        const url = `${API_URL}/api/export/paciente/${idPaciente}/word`;
+        
+        console.log("Descargando desde:", url);
+
+        const res = await fetch(url);
+
+        if (!res.ok) {
+            throw new Error(`Error ${res.status}: No se encontró el reporte o falló el servidor.`);
+        }
+
+        const blob = await res.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = `Ficha_${idPaciente}.docx`;
+        document.body.appendChild(a);
+        a.click();
+        
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(downloadUrl);
+
+    } catch (err) {
+        console.error(err);
+        alert("Error: " + err.message);
+    }
+}
+
+// ==================== LÓGICA EXPORTAR WORD ====================
+async function cargarListaPacientesWord() {
+    const select = document.getElementById("selectPacienteWord");
+    if (!select) return;
+
+    try {
+        const res = await fetch(`${API_URL}/pacientes`);
+        if (!res.ok) throw new Error("No se pudo cargar la lista");
+        
+        const pacientes = await res.json();
+
+        select.innerHTML = '<option value="">-- Selecciona un paciente --</option>';
+
+        pacientes.forEach(p => {
+            const id = p.idPaciente || p.id; 
+            const nombre = p.nombrePaciente || p.nombre || "Sin Nombre";
+            
+            const option = document.createElement("option");
+            option.value = id;
+            option.textContent = `${id} - ${nombre}`;
+            select.appendChild(option);
+        });
+
+    } catch (err) {
+        console.error(err);
+        select.innerHTML = '<option value="">Error al cargar lista</option>';
+    }
+}
+
+document.addEventListener("DOMContentLoaded", cargarListaPacientesWord);
+cargarListaPacientesWord();
+
+document.getElementById("btnDescargarWord")?.addEventListener("click", () => {
+    const select = document.getElementById("selectPacienteWord");
+    const idPaciente = select.value;
+
+    if (!idPaciente) {
+        alert("Por favor selecciona un paciente de la lista.");
+        return;
+    }
+
+    descargarFichaWord(idPaciente);
+});
+
 // ==================== LISTAR DATOS ====================
 document.getElementById("selectTablaListar")?.addEventListener("change", async function() {
   const tabla = this.value;
@@ -915,7 +993,6 @@ document.getElementById("selectTablaListar")?.addEventListener("change", async f
 
   try {
     let endpoint = '';
-
     switch(tabla) {
       case 'pacientes':       endpoint = '/pacientes'; break;
       case 'formularios':     endpoint = '/formularios'; break;
@@ -923,14 +1000,11 @@ document.getElementById("selectTablaListar")?.addEventListener("change", async f
       case 'habitos':         endpoint = '/habitos-paciente'; break;
       case 'datos_clinicos':  endpoint = '/datos-clinicos'; break;
       case 'histopatologia':  endpoint = '/histopatologia'; break;
-      case 'fact_ambientales': endpoint = '/factores-dietarios-hambientales'; break;  
+      case 'fact_ambientales': endpoint = '/factores-dietarios-hambientales'; break;
     }
 
     const res = await fetch(`${API_URL}${endpoint}`);
-    
-    if (res.status === 404) {
-        throw new Error(`Ruta incorrecta: ${endpoint}. <br>Abre tu archivo Controller en Java y verifica el @RequestMapping.`);
-    }
+    if (res.status === 404) throw new Error(`Ruta no encontrada: ${endpoint}`);
     if (!res.ok) throw new Error(`Error ${res.status}: No se pudo cargar la tabla`);
 
     const datos = await res.json();
@@ -950,7 +1024,7 @@ document.getElementById("selectTablaListar")?.addEventListener("change", async f
       html += `<th>${titulo}</th>`;
     });
     html += '</tr></thead><tbody>';
-    
+
     datos.forEach(row => {
       html += '<tr>';
       headers.forEach(h => {
@@ -959,17 +1033,11 @@ document.getElementById("selectTablaListar")?.addEventListener("change", async f
 
         if (value !== null && value !== undefined) {
           if (typeof value === 'object') {
-            if (value.formularioId) {
-                displayValue = `<span class="badge bg-secondary">Form: ${value.formularioId}</span>`;
-            } else if (value.idFormulario) {
-                displayValue = value.idFormulario;
-            } else if (value.idPaciente) {
-                displayValue = value.idPaciente;
-            } else if (value.id) {
-                displayValue = value.id;
-            } else {
-                displayValue = JSON.stringify(value).substring(0, 15) + '...';
-            }
+            if (value.formularioId) displayValue = `<span class="badge bg-secondary">Form: ${value.formularioId}</span>`;
+            else if (value.idFormulario) displayValue = value.idFormulario;
+            else if (value.idPaciente) displayValue = value.idPaciente;
+            else if (value.id) displayValue = value.id;
+            else displayValue = JSON.stringify(value).substring(0, 15) + '...';
           } else {
             displayValue = value;
           }
@@ -984,9 +1052,7 @@ document.getElementById("selectTablaListar")?.addEventListener("change", async f
 
   } catch (err) {
     console.error(err);
-    contenedor.innerHTML = `<div class="alert alert-danger">
-      <strong><i class="bi bi-exclamation-triangle me-2"></i>Error:</strong> ${err.message}
-    </div>`;
+    contenedor.innerHTML = `<div class="alert alert-danger">Error: ${err.message}</div>`;
   }
 });
 
@@ -1394,4 +1460,10 @@ function limpiarTodasLasPestanas() {
       alert("Error de conexión con el servidor");
     }
   });
+});
+
+// une el botón con la función de descarga
+document.getElementById("btnExportarWord")?.addEventListener("click", () => {
+    const id = document.getElementById("inputPacienteExportar").value;
+    descargarFichaWord(id);
 });
