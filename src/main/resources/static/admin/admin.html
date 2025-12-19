@@ -134,11 +134,9 @@
                   <input type="text" class="form-control" id="miembroAsignadoForm" disabled>
                 </div>
 
-                <!-- (opcional) si quieres tenerlos como inputs reales -->
                 <input type="hidden" id="pacienteIdHidden">
                 <input type="hidden" id="miembroIdHidden">
 
-                <!-- Selector de formulario existente -->
               <div class="row mb-4">
                 <div class="col-12">
                   <label class="form-label fw-bold">Formulario existente del paciente</label>
@@ -149,7 +147,6 @@
                 </div>
               </div>
 
-              <!-- Contenedor del botón Crear (se oculta si ya existe formulario) -->
               <div id="contenedorCrearFormulario">
                 <button type="button" id="btnCrearFormulario" class="btn btn-purple btn-lg w-100 mt-3">
                   <i class="bi bi-check-circle me-2"></i>Crear Formulario Nuevo
@@ -664,25 +661,32 @@
               </div>
             </div>
 
-            <!-- MÁS OPCIONES -->
             <div class="col-md-4">
               <div class="card shadow border-0 h-100">
-                <div class="card-header bg-info text-white">
+                <div class="card-header bg-primary text-white">
                   <h5 class="mb-0">
-                    <i class="bi bi-file-earmark-word me-2"></i>Más Opciones
+                    <i class="bi bi-file-earmark-word me-2"></i>Exportar Ficha Clínica
                   </h5>
                 </div>
 
                 <div class="card-body d-flex flex-column">
-                  <p>Más opciones de exportación disponibles próximamente</p>
+                  <p class="card-text text-muted">
+                    Selecciona un paciente de la lista para generar su documento Word.
+                  </p>
 
-                  <button class="btn btn-secondary w-100 mt-auto" disabled>
-                    <i class="bi bi-gear me-2"></i>Próximamente
+                  <div class="mb-3">
+                    <label for="selectPacienteWord" class="form-label fw-bold">Paciente</label>
+                    <select class="form-select" id="selectPacienteWord">
+                      <option value="">Cargando lista...</option>
+                    </select>
+                  </div>
+
+                  <button id="btnDescargarWord" class="btn btn-primary w-100 mt-auto">
+                    <i class="bi bi-cloud-download me-2"></i> Descargar Word
                   </button>
                 </div>
               </div>
             </div>
-
           </div>
         </div>
 
