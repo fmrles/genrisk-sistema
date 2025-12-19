@@ -81,60 +81,93 @@ async function cargarPacientes() {
   }
 }
 
-
- 
-
 // ==================== NUEVO PACIENTE ====================
 document.getElementById("formNuevoPaciente").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  
-  const data = {
-    idPaciente: document.getElementById("nombrePaciente").value.substring(0, 2).toUpperCase() + Math.floor(Math.random() * 10000),
-    nombrePaciente: document.getElementById("nombrePaciente").value,
-    direccionPaciente: document.getElementById("direccionPaciente").value,
-    correoPaciente: document.getElementById("correoPaciente").value,
-    tipoPaciente: document.getElementById("tipoPacienteModal").value,
-    fechaInclusion: document.getElementById("fechaInclusion").value
-  };
+  e.preventDefault();
 
-  try {
-    const res = await fetch(`${API_URL}/pacientes`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-    
-    if (res.ok) {
-      const paciente = await res.json();
-      alert(`Paciente creado con éxito. ID: ${paciente.idPaciente}`);
-      e.target.reset();
-      
-      // Cerrar modal
-      const modal = bootstrap.Modal.getInstance(document.getElementById('modalNuevoPaciente'));
-      modal.hide();
-      
-      // Recargar lista de pacientes
-      await cargarPacientes();
+  const data = {
+    // NO envíes idPaciente → el backend lo genera automáticamente
+    nombrePaciente: document.getElementById("nombrePaciente").value.trim(),
+    direccionPaciente: document.getElementById("direccionPaciente").value.trim(),
+    correoPaciente: document.getElementById("correoPaciente").value.trim(),
+    tipoPaciente: document.getElementById("tipoPacienteModal").value,
+    fechaInclusion: document.getElementById("fechaInclusion").value  // Formato: YYYY-MM-DD
+  };
 
-      // Seleccionar el paciente recién creado y habilitar los campos
+  try {
+    const res = await fetch(`${API_URL}/pacientes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+      const paciente = await res.json();
+      alert(`Paciente creado con éxito. ID: ${paciente.idPaciente}`);
+      e.target.reset();
+
+      // Cerrar modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('modalNuevoPaciente'));
+      modal.hide();
+
+      // Recargar lista de pacientes
+      await cargarPacientes();
+
+      // Seleccionar automáticamente el nuevo paciente
       const selectPacienteIngreso = document.getElementById('selectPacienteIngreso');
       if (selectPacienteIngreso) {
-          selectPacienteIngreso.value = paciente.idPaciente;
-          const idDisplay = document.getElementById('idPacienteDisplay');
-          if (idDisplay) { idDisplay.value = paciente.idPaciente; }
-          toggleFormFields(true); // Habilitar formulario
+        // Forzar recarga del select si es necesario
+        selectPacienteIngreso.value = paciente.idPaciente;
+
+        const idDisplay = document.getElementById('idPacienteDisplay');
+        if (idDisplay) idDisplay.value = paciente.idPaciente;
+
+        toggleFormFields(true); // Habilitar campos para ingreso de datos
       }
-    } else {
-      const error = await res.json();
-      alert("Error al crear paciente: " + (error.message || "Error desconocido"));
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Error de conexión al crear paciente");
-  }
+    } else {
+      // Mejor manejo de errores: mostrar mensaje real del backend
+      let errorMsg = "Error desconocido";
+      try {
+        const errorBody = await res.json();
+        errorMsg = errorBody.message || errorBody.error || JSON.stringify(errorBody);
+      } catch {
+        errorMsg = await res.text();
+      }
+      alert("Error al crear paciente: " + errorMsg);
+    }
+  } catch (err) {
+    console.error("Error de conexión:", err);
+    alert("Error de conexión con el servidor");
+  }
 });
 
+// ==================== CARGAR MIEMBROS DEL EQUIPO ====================
+async function cargarMiembrosEquipo() {
+  try {
+    const response = await fetch(`${API_URL}/miembro-equipo`);
+    if (!response.ok) throw new Error("Error al cargar miembros");
 
+    const miembros = await response.json();
+
+    const selectMiembro = document.getElementById("selectMiembroAsignado"); 
+    if (!selectMiembro) {
+      console.warn("No se encontró el select de miembros (id: selectMiembroAsignado)");
+      return;
+    }
+
+    selectMiembro.innerHTML = '<option value="">-- Seleccione miembro --</option>';
+    miembros.forEach(miembro => {
+      const opt = document.createElement("option");
+      opt.value = miembro.idMiembro;
+      opt.textContent = `${miembro.nombreMiembro || miembro.correoMiembro} (${miembro.rolMiembro})`;
+      selectMiembro.appendChild(opt);
+    });
+  } catch (err) {
+    console.error(err);
+    alert("Error al cargar miembros del equipo. Revisa la consola.");
+  }
+}
+ 
 // ==================== DATOS GENERALES ====================
 document.getElementById("btnSiguienteDatosGenerales")
   ?.addEventListener("click", async (e) => {
@@ -1331,67 +1364,91 @@ function limpiarTodasLasPestanas() {
     }
   });
 
-  // ==================== BOTÓN CREAR FORMULARIO NUEVO ====================
-  btnCrearFormulario?.addEventListener("click", async () => {
-    const pacienteId = document.getElementById("selectPacienteIngreso").value;
-    const tipoFormulario = document.getElementById("tipoFormulario").value;
+  // ==================== CREAR FORMULARIO NUEVO ====================
+  document.getElementById("btnCrearFormulario")?.addEventListener("click", async () => {
+    // Obtener pacienteId directamente del select principal
+    const selectPaciente = document.getElementById("selectPacienteIngreso");
+    const pacienteId = selectPaciente?.value;
 
-    if (!pacienteId || !tipoFormulario) {
-      alert("Selecciona un paciente y tipo de formulario válido");
-      return;
-    }
+    // Obtener tipo de formulario
+    const tipoFormulario = document.getElementById("tipoFormulario")?.value;
 
+    // Obtener fecha del formulario
+    const fechaFormulario = document.getElementById("fechaFormulario")?.value || new Date().toISOString().split('T')[0];
+
+    // Obtener miembroId del localStorage (el usuario logueado)
     const usuarioStr = localStorage.getItem("usuario");
-    const usuario = usuarioStr ? JSON.parse(usuarioStr).usuario || JSON.parse(usuarioStr) : null;
+    const usuarioObj = usuarioStr ? JSON.parse(usuarioStr) : null;
+    const usuario = usuarioObj?.usuario || usuarioObj;
     const miembroId = usuario?.id || usuario?.idMiembroEquipo || usuario?.idMiembro || null;
 
-    console.log("Usuario en localStorage:", usuario);
-    console.log("Miembro ID detectado:", miembroId);
+    console.log("Datos para crear formulario:", { pacienteId, tipoFormulario, fechaFormulario, miembroId });
 
+    // Validaciones
+    if (!pacienteId) {
+      alert("Por favor, selecciona un paciente del listado superior.");
+      return;
+    }
+    if (!tipoFormulario) {
+      alert("Por favor, selecciona un Tipo de Formulario.");
+      return;
+    }
     if (!miembroId) {
-      alert("No se detectó usuario logueado");
+      alert("No se detectó usuario logueado. Por favor, cierra sesión e inicia de nuevo.");
       return;
     }
 
-    const nuevoFormulario = {
-      estadoFormulario: "En Progreso",
-      tipoFormulario: tipoFormulario.toUpperCase(),
-      fechaFormulario: new Date().toISOString().split('T')[0], // Hoy: 2025-12-18
+    const data = {
+      tipoFormulario: tipoFormulario,
+      estadoFormulario: "En progreso",
+      fechaFormulario: fechaFormulario,
       paciente: { idPaciente: pacienteId },
-      miembroEquipo: { idMiembroEquipo: miembroId }
+      miembroEquipo: { idMiembroEquipo: parseInt(miembroId) }
     };
+
+    console.log("Enviando formulario:", data);
 
     try {
       const response = await fetch(`${API_URL}/formularios`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nuevoFormulario)
+        body: JSON.stringify(data)
       });
 
       if (response.ok) {
-        const formCreado = await response.json();
-        ultimoFormularioId = formCreado.idFormulario;
-
-        alert(`Formulario creado correctamente para (ID: ${ultimoFormularioId})`);
+        const formulario = await response.json();
+        ultimoFormularioId = formulario.idFormulario;
+        
+        alert(`¡Formulario creado exitosamente! ID: ${formulario.idFormulario}`);
 
         // Actualizar UI
         formularioCreado = true;
         habilitarFormularioCompleto();
 
+        // Recargar formularios existentes
+        await cargarFormulariosDelPaciente(pacienteId);
 
-        await cargarFormulariosDelPaciente(pacienteId); // Refresca lista
-        document.getElementById("selectFormularioExistente").value = ultimoFormularioId;
-        cargarDatosFormulario(ultimoFormularioId); // Carga pestañas vacías listas para rellenar
+        // Seleccionar el nuevo formulario
+        const selectExistente = document.getElementById("selectFormularioExistente");
+        if (selectExistente) {
+          selectExistente.value = formulario.idFormulario;
+        }
 
+        // Cargar datos del formulario (para mostrar el ID en el panel)
+        await cargarDatosFormulario(formulario.idFormulario);
+
+        // Ir a pestaña generales
         const tabGenerales = document.getElementById("generales-tab");
         if (tabGenerales) new bootstrap.Tab(tabGenerales).show();
+
       } else {
-        const error = await response.text();
-        alert("Error al crear formulario: " + error);
+        const errorText = await response.text();
+        console.error("Error del servidor:", errorText);
+        alert("Error al crear formulario: " + errorText);
       }
     } catch (err) {
-      console.error(err);
-      alert("Error de conexión con el servidor");
+      console.error("Error de conexión:", err);
+      alert("Error de conexión. Revisa la consola (F12)");
     }
   });
 });
