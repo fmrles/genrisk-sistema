@@ -664,27 +664,30 @@
               </div>
             </div>
 
-            <!-- MÁS OPCIONES -->
+            <!-- word -->
             <div class="col-md-4">
               <div class="card shadow border-0 h-100">
-                <div class="card-header bg-info text-white">
-                  <h5 class="mb-0">
-                    <i class="bi bi-file-earmark-word me-2"></i>Más Opciones
-                  </h5>
+              <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                  <i class="bi bi-file-earmark-word me-2"></i>Exportar Ficha Clínica
+                </h5>
+              </div>
+              <div class="card-body d-flex flex-column">
+                <p>Genera el documento Word (.docx) del paciente.</p>
+      
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Seleccionar Paciente</label>
+                  <select class="form-select" id="selectPacienteWord">
+                      <option value="">Cargando lista...</option>
+                  </select>
                 </div>
 
-                <div class="card-body d-flex flex-column">
-                  <p>Más opciones de exportación disponibles próximamente</p>
-
-                  <button class="btn btn-secondary w-100 mt-auto" disabled>
-                    <i class="bi bi-gear me-2"></i>Próximamente
-                  </button>
-                </div>
+                <button class="btn btn-primary w-100 mt-auto" id="btnDescargarWord">
+                  <i class="bi bi-cloud-download me-2"></i>Descargar Word
+                </button>
               </div>
             </div>
-
           </div>
-        </div>
 
               <!-- SECCIÓN: EDITAR DATOS -->
               <div id="section-editar" class="content-section d-none">
