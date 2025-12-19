@@ -1005,32 +1005,54 @@ async function descargarFichaWord(idPaciente) {
     }
 }
 
-// ==================== LÓGICA EXPORTAR WORD ====================
+// ==================== EXPORTAR WORD ====================
+
+async function descargarFichaWord(idPaciente) {
+    if (!confirm(`¿Descargar ficha Word para el paciente ${idPaciente}?`)) return;
+
+    try {
+        const url = `${API_URL}/api/export/paciente/${idPaciente}/word`;
+        
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Error al generar el documento");
+
+        const blob = await res.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = `Ficha_Clinica_${idPaciente}.docx`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(downloadUrl);
+
+    } catch (err) {
+        alert("Error: " + err.message);
+    }
+}
+
 async function cargarListaPacientesWord() {
     const select = document.getElementById("selectPacienteWord");
     if (!select) return;
 
     try {
         const res = await fetch(`${API_URL}/pacientes`);
-        if (!res.ok) throw new Error("No se pudo cargar la lista");
+        if (!res.ok) throw new Error("Error de conexión");
         
         const pacientes = await res.json();
-
         select.innerHTML = '<option value="">-- Selecciona un paciente --</option>';
 
         pacientes.forEach(p => {
             const id = p.idPaciente || p.id; 
             const nombre = p.nombrePaciente || p.nombre || "Sin Nombre";
-            
-            const option = document.createElement("option");
-            option.value = id;
-            option.textContent = `${id} - ${nombre}`;
-            select.appendChild(option);
+            const opt = document.createElement("option");
+            opt.value = id;
+            opt.textContent = `${id} - ${nombre}`;
+            select.appendChild(opt);
         });
-
     } catch (err) {
         console.error(err);
-        select.innerHTML = '<option value="">Error al cargar lista</option>';
+        select.innerHTML = '<option value="">Error al cargar</option>';
     }
 }
 
@@ -1039,15 +1061,15 @@ cargarListaPacientesWord();
 
 document.getElementById("btnDescargarWord")?.addEventListener("click", () => {
     const select = document.getElementById("selectPacienteWord");
-    const idPaciente = select.value;
+    const idPaciente = select ? select.value : "";
 
     if (!idPaciente) {
         alert("Por favor selecciona un paciente de la lista.");
         return;
     }
-
     descargarFichaWord(idPaciente);
 });
+
 
 // ==================== LISTAR DATOS ====================
 document.getElementById("selectTablaListar")?.addEventListener("change", async function() {
