@@ -383,48 +383,48 @@ document.getElementById("formDietarios")?.addEventListener("submit", async (e) =
 
 // ==================== HISTOPATOLOGÍA (ÚLTIMO PASO) ====================
 // El botón aquí será para "Ingresar Formulario Completo" (Guardar Final)
-document.getElementById("formHistopatologia")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  
-  if (!ultimoFormularioId) {
-    alert("Debe completar los pasos anteriores.");
-    return;
-  }
+document.getElementById("formHistopatologia")
+  .addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  alert("Funcionalidad en desarrollo: Aquí se debería guardar Histopatología y finalizar el formulario.");
+    if (!ultimoFormularioId) {
+      alert("Primero debes crear o seleccionar un formulario");
+      return;
+    }
 
-  // Lógica para actualizar el estado del formulario a "Activo" o "Completo"
-  try {
-    const res = await fetch(`${API_URL}/formularios/${ultimoFormularioId}/estado`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ estadoFormulario: "Activo" }) // o "Completo"
-    });
-    if (res.ok) {
-      alert(`Formulario ${ultimoFormularioId} ingresado y completado con éxito.`);
-      
-      // Limpiar y reiniciar formulario
-      ultimoFormularioId = null;
-      document.getElementById("formDatosGenerales").reset();
-      document.getElementById("formHabitos").reset();
-      document.getElementById("formDatosClinicos").reset();
-      document.getElementById("formDietarios").reset();
-      document.getElementById("formHistopatologia").reset();
-      document.getElementById('idPacienteDisplay').value = '';
-      document.getElementById('selectPacienteIngreso').value = '';
+    const dataHistopatologia = {
+      id: {
+        itemFormu: 1, // SIEMPRE 1 en histopatología
+        formularioId: ultimoFormularioId
+      },
+      tipo: document.getElementById("tipoMuestra").value || null,
+      estadoClinico: document.getElementById("estadoClinico").value || null,
+      localiTumoral: document.getElementById("localizacionTumoral").value || null
+    };
 
-      // Volver a la primera pestaña e inhabilitar
-      new bootstrap.Tab(document.getElementById('generales-tab')).show();
-      toggleFormFields(false);
+    try {
+      const res = await fetch(
+        "http://localhost:8081/histopatologia",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dataHistopatologia)
+        }
+      );
 
-    } else {
-      alert("Error al finalizar el formulario.");
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Error de conexión al finalizar el formulario.");
-  }
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err);
+      }
+
+      alert("Formulario completo guardado correctamente ");
+
+    } catch (error) {
+      console.error(error);
+      alert("Error al guardar histopatología ");
+    }
 });
+
 
 // ==================== GESTIÓN DE MIEMBROS ====================
 
