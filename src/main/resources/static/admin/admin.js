@@ -1,5 +1,5 @@
 if (!localStorage.getItem("usuario")) {
-  window.location.href = "/login/login.html";
+  window.location.href = "/login/login.html";
 }
 
 const API_URL = "http://localhost:8080";
@@ -14,127 +14,200 @@ let panelDatos;
 
 // ==================== NAVEGACIÓN ENTRE SECCIONES ====================
 document.querySelectorAll('.list-group-item').forEach(item => {
-  item.addEventListener('click', function(e) {
-    e.preventDefault();
-    
-    // Remover active de todos
-    document.querySelectorAll('.list-group-item').forEach(i => i.classList.remove('active'));
-    this.classList.add('active');
-    
-    // Ocultar todas las secciones
-    document.querySelectorAll('.content-section').forEach(section => {
-      section.classList.add('d-none');
-    });
-    
-    // Mostrar sección seleccionada
-    const section = this.getAttribute('data-section');
-    document.getElementById(`section-${section}`).classList.remove('d-none');
-    
-    // Cargar datos según la sección
-    switch(section) {
-      case 'ingreso':
-        cargarPacientes();
+  item.addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    // Remover active de todos
+    document.querySelectorAll('.list-group-item').forEach(i => i.classList.remove('active'));
+    this.classList.add('active');
+    
+    // Ocultar todas las secciones
+    document.querySelectorAll('.content-section').forEach(section => {
+      section.classList.add('d-none');
+    });
+    
+    // Mostrar sección seleccionada
+    const section = this.getAttribute('data-section');
+    document.getElementById(`section-${section}`).classList.remove('d-none');
+    
+    // Cargar datos según la sección
+    switch(section) {
+      case 'ingreso':
+        cargarPacientes();
         // Al volver a la sección, re-evaluar la inhabilitación
         // Se asume que selectPacienteIngreso ya existe
         const pacienteSelect = document.getElementById('selectPacienteIngreso');
         if (pacienteSelect) {
             toggleFormFields(pacienteSelect.value !== '');
         }
-        break;
-      case 'roles':
-        cargarMiembros();
-        break;
-      case 'dicotomizar':
-        cargarConjuntosDicot();
-        break;
-      case 'variables':
-        cargarConjuntosVariables();
-        break;
-      case 'editar':
-        cargarPacientesEditar();
-        break;
-    }
-  });
+        break;
+      case 'roles':
+        cargarMiembros();
+        break;
+      case 'dicotomizar':
+        cargarConjuntosDicot();
+        break;
+      case 'variables':
+        cargarConjuntosVariables();
+        break;
+      case 'editar':
+        cargarPacientesEditar();
+        break;
+    }
+  });
 });
 
 // ==================== CARGAR PACIENTES ====================
 async function cargarPacientes() {
-  try {
-    const res = await fetch(`${API_URL}/pacientes`);
-    const pacientes = await res.json();
-    
-    const selects = ['selectPacienteIngreso', 'selectPacienteEditar'];
-    selects.forEach(selectId => {
-      const select = document.getElementById(selectId);
-      if (select) {
-        select.innerHTML = '<option value="">Seleccionar paciente...</option>';
-        pacientes.forEach(p => {
-          const opt = document.createElement("option");
-          opt.value = p.idPaciente;
-          opt.textContent = `${p.idPaciente} - ${p.nombrePaciente} (${p.tipoPaciente})`;
-          select.appendChild(opt);
-        });
-      }
-    });
-  } catch (err) {
-    console.error("Error cargando pacientes", err);
-  }
+  try {
+    const res = await fetch(`${API_URL}/pacientes`);
+    const pacientes = await res.json();
+    
+    const selects = ['selectPacienteIngreso', 'selectPacienteEditar'];
+    selects.forEach(selectId => {
+      const select = document.getElementById(selectId);
+      if (select) {
+        select.innerHTML = '<option value="">Seleccionar paciente...</option>';
+        pacientes.forEach(p => {
+          const opt = document.createElement("option");
+          opt.value = p.idPaciente;
+          opt.textContent = `${p.idPaciente} - ${p.nombrePaciente} (${p.tipoPaciente})`;
+          select.appendChild(opt);
+        });
+      }
+    });
+  } catch (err) {
+    console.error("Error cargando pacientes", err);
+  }
 }
-
-
- 
 
 // ==================== NUEVO PACIENTE ====================
 document.getElementById("formNuevoPaciente").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  
-  const data = {
-    idPaciente: document.getElementById("nombrePaciente").value.substring(0, 2).toUpperCase() + Math.floor(Math.random() * 10000),
-    nombrePaciente: document.getElementById("nombrePaciente").value,
-    direccionPaciente: document.getElementById("direccionPaciente").value,
-    correoPaciente: document.getElementById("correoPaciente").value,
-    tipoPaciente: document.getElementById("tipoPacienteModal").value,
-    fechaInclusion: document.getElementById("fechaInclusion").value
-  };
+  e.preventDefault();
+<<<<<<< HEAD
 
-  try {
-    const res = await fetch(`${API_URL}/pacientes`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-    
-    if (res.ok) {
-      const paciente = await res.json();
-      alert(`Paciente creado con éxito. ID: ${paciente.idPaciente}`);
-      e.target.reset();
-      
-      // Cerrar modal
-      const modal = bootstrap.Modal.getInstance(document.getElementById('modalNuevoPaciente'));
-      modal.hide();
-      
-      // Recargar lista de pacientes
-      await cargarPacientes();
+  const data = {
+    // NO envíes idPaciente → el backend lo genera automáticamente
+    nombrePaciente: document.getElementById("nombrePaciente").value.trim(),
+    direccionPaciente: document.getElementById("direccionPaciente").value.trim(),
+    correoPaciente: document.getElementById("correoPaciente").value.trim(),
+    tipoPaciente: document.getElementById("tipoPacienteModal").value,
+    fechaInclusion: document.getElementById("fechaInclusion").value  // Formato: YYYY-MM-DD
+  };
+=======
+  
+  const data = {
+    idPaciente: document.getElementById("nombrePaciente").value.substring(0, 2).toUpperCase() + Math.floor(Math.random() * 10000),
+    nombrePaciente: document.getElementById("nombrePaciente").value,
+    direccionPaciente: document.getElementById("direccionPaciente").value,
+    correoPaciente: document.getElementById("correoPaciente").value,
+    tipoPaciente: document.getElementById("tipoPacienteModal").value,
+    fechaInclusion: document.getElementById("fechaInclusion").value
+  };
 
-      // Seleccionar el paciente recién creado y habilitar los campos
+  try {
+    const res = await fetch(`${API_URL}/pacientes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+    
+    if (res.ok) {
+      const paciente = await res.json();
+      alert(`Paciente creado con éxito. ID: ${paciente.idPaciente}`);
+      e.target.reset();
+      
+      // Cerrar modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('modalNuevoPaciente'));
+      modal.hide();
+      
+      // Recargar lista de pacientes
+      await cargarPacientes();
+>>>>>>> 973a8c9fb9030f8cfb83154abdab02873d478159
+
+  try {
+    const res = await fetch(`${API_URL}/pacientes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+      const paciente = await res.json();
+      alert(`Paciente creado con éxito. ID: ${paciente.idPaciente}`);
+      e.target.reset();
+
+      // Cerrar modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('modalNuevoPaciente'));
+      modal.hide();
+
+      // Recargar lista de pacientes
+      await cargarPacientes();
+
+      // Seleccionar automáticamente el nuevo paciente
       const selectPacienteIngreso = document.getElementById('selectPacienteIngreso');
       if (selectPacienteIngreso) {
-          selectPacienteIngreso.value = paciente.idPaciente;
-          const idDisplay = document.getElementById('idPacienteDisplay');
-          if (idDisplay) { idDisplay.value = paciente.idPaciente; }
-          toggleFormFields(true); // Habilitar formulario
+        // Forzar recarga del select si es necesario
+        selectPacienteIngreso.value = paciente.idPaciente;
+
+        const idDisplay = document.getElementById('idPacienteDisplay');
+        if (idDisplay) idDisplay.value = paciente.idPaciente;
+
+        toggleFormFields(true); // Habilitar campos para ingreso de datos
       }
-    } else {
-      const error = await res.json();
-      alert("Error al crear paciente: " + (error.message || "Error desconocido"));
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Error de conexión al crear paciente");
-  }
+    } else {
+<<<<<<< HEAD
+      // Mejor manejo de errores: mostrar mensaje real del backend
+      let errorMsg = "Error desconocido";
+      try {
+        const errorBody = await res.json();
+        errorMsg = errorBody.message || errorBody.error || JSON.stringify(errorBody);
+      } catch {
+        errorMsg = await res.text();
+      }
+      alert("Error al crear paciente: " + errorMsg);
+    }
+  } catch (err) {
+    console.error("Error de conexión:", err);
+    alert("Error de conexión con el servidor");
+=======
+      const error = await res.json();
+      alert("Error al crear paciente: " + (error.message || "Error desconocido"));
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error de conexión al crear paciente");
+>>>>>>> 973a8c9fb9030f8cfb83154abdab02873d478159
+  }
 });
 
+// ==================== CARGAR MIEMBROS DEL EQUIPO ====================
+async function cargarMiembrosEquipo() {
+  try {
+    const response = await fetch(`${API_URL}/miembro-equipo`);
+    if (!response.ok) throw new Error("Error al cargar miembros");
 
+    const miembros = await response.json();
+
+    const selectMiembro = document.getElementById("selectMiembroAsignado"); 
+    if (!selectMiembro) {
+      console.warn("No se encontró el select de miembros (id: selectMiembroAsignado)");
+      return;
+    }
+
+    selectMiembro.innerHTML = '<option value="">-- Seleccione miembro --</option>';
+    miembros.forEach(miembro => {
+      const opt = document.createElement("option");
+      opt.value = miembro.idMiembro;
+      opt.textContent = `${miembro.nombreMiembro || miembro.correoMiembro} (${miembro.rolMiembro})`;
+      selectMiembro.appendChild(opt);
+    });
+  } catch (err) {
+    console.error(err);
+    alert("Error al cargar miembros del equipo. Revisa la consola.");
+  }
+}
+ 
 // ==================== DATOS GENERALES ====================
 document.getElementById("btnSiguienteDatosGenerales")
   ?.addEventListener("click", async (e) => {
@@ -222,78 +295,78 @@ document.getElementById("btnSiguienteDatosGenerales")
 
 // ==================== HÁBITOS ====================
 document.getElementById("formHabitos")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  
-  if (!ultimoFormularioId) {
-    alert("Primero debes guardar los datos generales para crear un formulario");
-    return;
-  }
+  e.preventDefault();
+  
+  if (!ultimoFormularioId) {
+    alert("Primero debes guardar los datos generales para crear un formulario");
+    return;
+  }
 
-  try {
-    const data = {
-      idHabPaciente: {
-        itemFormu: 4, // Valor corregido según la base de datos (4 para Habitos)
-        formularioId: ultimoFormularioId
-      },
-      estadoConsumoTabaco: document.getElementById("estadoConsumoTabaco").value || null,
+  try {
+    const data = {
+      idHabPaciente: {
+        itemFormu: 4, // Valor corregido según la base de datos (4 para Habitos)
+        formularioId: ultimoFormularioId
+      },
+      estadoConsumoTabaco: document.getElementById("estadoConsumoTabaco").value || null,
       cantPromTabaco: parseInt(document.getElementById("cantPromTabaco")?.value) || null,
       exConsumidorTabaco: parseInt(document.getElementById("exConsumidorTabaco")?.value) || null,
       tiempoTabaco: document.getElementById("tiempoTabaco").value || null,
-      estadoConsumoAlcohol: document.getElementById("estadoConsumoAlcohol").value || null,
-      frecuenciaAlcohol: document.getElementById("frecuenciaAlcohol").value || null,
+      estadoConsumoAlcohol: document.getElementById("estadoConsumoAlcohol").value || null,
+      frecuenciaAlcohol: document.getElementById("frecuenciaAlcohol").value || null,
       cantidadAlcohol: parseInt(document.getElementById("cantidadAlcohol")?.value) || null,
-      aniosConsumoAlcohol: parseInt(document.getElementById("aniosConsumoAlcohol").value) || null,
+      aniosConsumoAlcohol: parseInt(document.getElementById("aniosConsumoAlcohol").value) || null,
       exConsumidorAlcohol: parseInt(document.getElementById("exConsumidorAlcohol")?.value) || null
-    };
+    };
 
-    const res = await fetch(`${API_URL}/habitos-paciente`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
+    const res = await fetch(`${API_URL}/habitos-paciente`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
 
-    if (res.ok) {
-      alert("Hábitos guardados con éxito");
-      // Avanzar a la pestaña "Datos Clínicos"
-      const nextTabElement = document.getElementById('clinicos-tab');
-      if (nextTabElement) {
-        new bootstrap.Tab(nextTabElement).show();
-      }
-    } else {
-      const error = await res.json();
-      alert("Error al guardar hábitos: " + JSON.stringify(error));
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Error de conexión: " + err.message);
-  }
+    if (res.ok) {
+      alert("Hábitos guardados con éxito");
+      // Avanzar a la pestaña "Datos Clínicos"
+      const nextTabElement = document.getElementById('clinicos-tab');
+      if (nextTabElement) {
+        new bootstrap.Tab(nextTabElement).show();
+      }
+    } else {
+      const error = await res.json();
+      alert("Error al guardar hábitos: " + JSON.stringify(error));
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error de conexión: " + err.message);
+  }
 });
 
 // ==================== DATOS CLÍNICOS ====================
 document.getElementById("formDatosClinicos")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  
-  if (!ultimoFormularioId) {
-    alert("Primero debes guardar los datos generales para crear un formulario");
-    return;
-  }
+  e.preventDefault();
+  
+  if (!ultimoFormularioId) {
+    alert("Primero debes guardar los datos generales para crear un formulario");
+    return;
+  }
 
-  try {
-    const data = {
-      idDatosCli: {
-        itemFormu: 2, // Valor fijo según la base de datos
-        formularioId: ultimoFormularioId
-      },
-      adenoGastrico: document.getElementById("adenoGastrico").value || null,
-      fechaAdenoGastrico: document.getElementById("fechaAdenoGastrico").value || null,
-      antFamCancerGast: document.getElementById("antFamCancerGast").value || null,
-      medicamentos: document.getElementById("medicamentos").value || null,
-      otrasEnfermedades: document.getElementById("otrasEnfermedades").value || null,
+  try {
+    const data = {
+      idDatosCli: {
+        itemFormu: 2, // Valor fijo según la base de datos
+        formularioId: ultimoFormularioId
+      },
+      adenoGastrico: document.getElementById("adenoGastrico").value || null,
+      fechaAdenoGastrico: document.getElementById("fechaAdenoGastrico").value || null,
+      antFamCancerGast: document.getElementById("antFamCancerGast").value || null,
+      medicamentos: document.getElementById("medicamentos").value || null,
+      otrasEnfermedades: document.getElementById("otrasEnfermedades").value || null,
       antFamOtroCancer: document.getElementById("antFamOtroCancer")?.value || null,
-      cirugiaGastricaPrevia: document.getElementById("cirugiaGastrica").value || null,
-      hpyloriPrueba: document.getElementById("hpyloriPrueba").value || null,
-      hpyloriResultado: document.getElementById("hpyloriResultado").value || null,
-      hpyloriTiempoTest: document.getElementById("hpyloriTiempoTest").value || null,
+      cirugiaGastricaPrevia: document.getElementById("cirugiaGastrica").value || null,
+      hpyloriPrueba: document.getElementById("hpyloriPrueba").value || null,
+      hpyloriResultado: document.getElementById("hpyloriResultado").value || null,
+      hpyloriTiempoTest: document.getElementById("hpyloriTiempoTest").value || null,
       positivoPasadoHpylori: document.getElementById("positivoPasadoHpylori")?.value || null,
       anioPositivopasadoHpylori: parseInt(document.getElementById("anioPositivopasadoHpylori")?.value) || null,
       trataErradicacion: document.getElementById("trataErradicacion")?.value || null,
@@ -304,86 +377,121 @@ document.getElementById("formDatosClinicos")?.addEventListener("submit", async (
       fechaRepetiexamen: document.getElementById("fechaRepetiexamen")?.value || null,
       tipoExaPasadoHpy: document.getElementById("tipoExaPasadoHpy")?.value || null,
       resultadosExamen: document.getElementById("resultadosExamen")?.value || null
-    };
+    };
 
-    const res = await fetch(`${API_URL}/datos-clinicos`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
+    const res = await fetch(`${API_URL}/datos-clinicos`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
 
-    if (res.ok) {
-      alert("Datos clínicos guardados con éxito");
-      // Avanzar a la pestaña "Dietarios/Ambientales"
-      const nextTabElement = document.getElementById('dietarios-tab');
-      if (nextTabElement) {
-        new bootstrap.Tab(nextTabElement).show();
-      }
-    } else {
-      const error = await res.json();
-      alert("Error al guardar datos clínicos: " + JSON.stringify(error));
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Error de conexión: " + err.message);
-  }
+    if (res.ok) {
+      alert("Datos clínicos guardados con éxito");
+      // Avanzar a la pestaña "Dietarios/Ambientales"
+      const nextTabElement = document.getElementById('dietarios-tab');
+      if (nextTabElement) {
+        new bootstrap.Tab(nextTabElement).show();
+      }
+    } else {
+      const error = await res.json();
+      alert("Error al guardar datos clínicos: " + JSON.stringify(error));
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error de conexión: " + err.message);
+  }
 });
 
-// ==================== DIETARIOS ====================
+// ==================== DIETARIOS / AMBIENTALES (CORREGIDO) ====================
 document.getElementById("formDietarios")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  alert("Funcionalidad en desarrollo");
-    
-    // Avanzar a la pestaña "Histopatología"
-    const nextTabElement = document.getElementById('histopatologia-tab');
-    if (nextTabElement) {
-      new bootstrap.Tab(nextTabElement).show();
-    }
+  e.preventDefault();
+
+  if (!ultimoFormularioId) {
+    alert("Primero debes crear o seleccionar un formulario");
+    return;
+  }
+
+  // ✅ CORRECCIÓN: IDs actualizados para coincidir con el HTML
+  const dataDietarios = {
+    id: {
+      itemFormu: 5,
+      formularioId: ultimoFormularioId,
+    },
+    aguaConsumoZona: document.getElementById("aguaConsumoZona")?.value || null,
+    tratamientoAgua: document.getElementById("tratamientoAgua")?.value || null,
+    fumigaciones: document.getElementById("fumigaciones")?.value || null,
+    exposicionPesticidas: document.getElementById("exposicionPesticidas")?.value || null,
+    combustionLenaDiario: document.getElementById("combusLenia")?.value || null,  // ← CORREGIDO
+    exposicionQuimicos: document.getElementById("exposicionQuimicos")?.value || null,
+    dietaFrutasVerduras: document.getElementById("dietaFrutasVerduras")?.value || null,
+    alimentosCondimentados: document.getElementById("allCondimentado")?.value || null,  // ← CORREGIDO
+    infusionesBebidas: document.getElementById("infusionesBebidas")?.value || null  // ← CORREGIDO (quitar la última "s" si tu backend espera "infusionesBebida")
+  };
+
+  try {
+    const res = await fetch(`${API_URL}/factores-dietarios-ambientales`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dataDietarios)
+    });
+
+    if (res.ok) {
+      alert("Datos dietarios y ambientales guardados con éxito");
+      // Avanzar a Histopatología
+      const nextTabElement = document.getElementById("histopatologia-tab");
+      if (nextTabElement) {
+        new bootstrap.Tab(nextTabElement).show();
+      }
+    } else {
+      const error = await res.json();
+      alert("Error al guardar dietarios: " + JSON.stringify(error));
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error de conexión al guardar dietarios");
+  }
 });
 
-// ==================== HISTOPATOLOGÍA (ÚLTIMO PASO) ====================
-// El botón aquí será para "Ingresar Formulario Completo" (Guardar Final)
+// ==================== HISTOPATOLOGÍA (CORREGIDO) ====================
 document.getElementById("formHistopatologia")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  
-  if (!ultimoFormularioId) {
-    alert("Debe completar los pasos anteriores.");
-    return;
-  }
+  e.preventDefault();
 
-  alert("Funcionalidad en desarrollo: Aquí se debería guardar Histopatología y finalizar el formulario.");
+  if (!ultimoFormularioId) {
+    alert("Primero debes crear o seleccionar un formulario");
+    return;
+  }
 
-  // Lógica para actualizar el estado del formulario a "Activo" o "Completo"
-  try {
-    const res = await fetch(`${API_URL}/formularios/${ultimoFormularioId}/estado`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ estadoFormulario: "Activo" }) // o "Completo"
-    });
-    if (res.ok) {
-      alert(`Formulario ${ultimoFormularioId} ingresado y completado con éxito.`);
-      
-      // Limpiar y reiniciar formulario
-      ultimoFormularioId = null;
-      document.getElementById("formDatosGenerales").reset();
-      document.getElementById("formHabitos").reset();
-      document.getElementById("formDatosClinicos").reset();
-      document.getElementById("formDietarios").reset();
-      document.getElementById("formHistopatologia").reset();
-      document.getElementById('idPacienteDisplay').value = '';
-      document.getElementById('selectPacienteIngreso').value = '';
+  const dataHistopatologia = {
+    id: {
+      itemFormu: 1,
+      formularioId: ultimoFormularioId
+    },
+    tipo: document.getElementById("tipoMuestra")?.value || null,
+    estadoClinico: document.getElementById("estadoClinico")?.value || null,
+    localiTumoral: document.getElementById("localizacionTumoral")?.value || null
+  };
 
-      // Volver a la primera pestaña e inhabilitar
-      new bootstrap.Tab(document.getElementById('generales-tab')).show();
-      toggleFormFields(false);
+  try {
+    const res = await fetch(`${API_URL}/histopatologia`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dataHistopatologia)
+    });
 
-    } else {
-      alert("Error al finalizar el formulario.");
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Error de conexión al finalizar el formulario.");
-  }
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    alert(" Formulario completo guardado correctamente");
+    
+    // Opcional: Limpiar formulario o redirigir
+    // document.getElementById("formHistopatologia").reset();
+    
+  } catch (error) {
+    console.error(error);
+    alert(" Error al guardar histopatología: " + error.message);
+  }
 });
 
 // ==================== GESTIÓN DE MIEMBROS ====================
@@ -578,30 +686,30 @@ async function cargarConjuntosDicot() {
 }
 
 document.getElementById("btnDicotomizar")?.addEventListener("click", async () => {
-  const conjuntoId = document.getElementById("selectConjuntoDicot").value;
-  
-  if (!conjuntoId) {
-    alert("Selecciona un conjunto de reglas");
-    return;
-  }
+  const conjuntoId = document.getElementById("selectConjuntoDicot").value;
+  
+  if (!conjuntoId) {
+    alert("Selecciona un conjunto de reglas");
+    return;
+  }
 
-  try {
-    const res = await fetch(`${API_URL}/dicotomizacion/ejecutar/${conjuntoId}`, {
-      method: "POST"
-    });
+  try {
+    const res = await fetch(`${API_URL}/dicotomizacion/ejecutar/${conjuntoId}`, {
+      method: "POST"
+    });
 
-    if (res.ok) {
-      const resultado = await res.json();
-      const mensajeDiv = document.getElementById("mensajeResultadoDicot");
-      mensajeDiv.textContent = `Dicotomización completada. Se generaron ${resultado.length || 0} valores dicotomizados.`;
-      document.getElementById("resultadoDicot").classList.remove("d-none");
-    } else {
-      alert("Error en la dicotomización");
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Error de conexión");
-  }
+    if (res.ok) {
+      const resultado = await res.json();
+      const mensajeDiv = document.getElementById("mensajeResultadoDicot");
+      mensajeDiv.textContent = `Dicotomización completada. Se generaron ${resultado.length || 0} valores dicotomizados.`;
+      document.getElementById("resultadoDicot").classList.remove("d-none");
+    } else {
+      alert("Error en la dicotomización");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error de conexión");
+  }
 });
 
 // ==================== VARIABLES DICOTOMIZACIÓN ====================
@@ -872,35 +980,35 @@ document.getElementById("formNuevaRegla").addEventListener("submit", async (e) =
 
 // ==================== EXPORTAR DATOS ====================
 document.getElementById("btnExportarExcel")?.addEventListener("click", async () => {
-  try {
-    const res = await fetch(`${API_URL}/api/export/dicotomizacion/excel`);
-    const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `genrisk_dicotomizacion_${new Date().toISOString().split('T')[0]}.xlsx`;
-    a.click();
-    alert("Archivo Excel descargado exitosamente");
-  } catch (err) {
-    console.error(err);
-    alert("Error al exportar a Excel");
-  }
+  try {
+    const res = await fetch(`${API_URL}/api/export/dicotomizacion/excel`);
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `genrisk_dicotomizacion_${new Date().toISOString().split('T')[0]}.xlsx`;
+    a.click();
+    alert("Archivo Excel descargado exitosamente");
+  } catch (err) {
+    console.error(err);
+    alert("Error al exportar a Excel");
+  }
 });
 
 document.getElementById("btnExportarPdf")?.addEventListener("click", async () => {
-  try {
-    const res = await fetch(`${API_URL}/api/export/pacientes/pdf`);
-    const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `genrisk_pacientes_${new Date().toISOString().split('T')[0]}.pdf`;
-    a.click();
-    alert("Archivo PDF descargado exitosamente");
-  } catch (err) {
-    console.error(err);
-    alert("Error al exportar a PDF");
-  }
+  try {
+    const res = await fetch(`${API_URL}/api/export/pacientes/pdf`);
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `genrisk_pacientes_${new Date().toISOString().split('T')[0]}.pdf`;
+    a.click();
+    alert("Archivo PDF descargado exitosamente");
+  } catch (err) {
+    console.error(err);
+    alert("Error al exportar a PDF");
+  }
 });
 
 // ==================== EXPORTAR A WORD ====================
@@ -1058,8 +1166,8 @@ document.getElementById("selectTablaListar")?.addEventListener("change", async f
 
 // ==================== CERRAR SESIÓN ====================
 function cerrarSesion() {
-  localStorage.clear();
-  window.location.href = "/login/login.html";
+  localStorage.clear();
+  window.location.href = "/login/login.html";
 }
 
 // Cargar pacientes al iniciar
@@ -1397,73 +1505,100 @@ function limpiarTodasLasPestanas() {
     }
   });
 
-  // ==================== BOTÓN CREAR FORMULARIO NUEVO ====================
-  btnCrearFormulario?.addEventListener("click", async () => {
-    const pacienteId = document.getElementById("selectPacienteIngreso").value;
-    const tipoFormulario = document.getElementById("tipoFormulario").value;
+  // ==================== CREAR FORMULARIO NUEVO ====================
+  document.getElementById("btnCrearFormulario")?.addEventListener("click", async () => {
+    // Obtener pacienteId directamente del select principal
+    const selectPaciente = document.getElementById("selectPacienteIngreso");
+    const pacienteId = selectPaciente?.value;
 
-    if (!pacienteId || !tipoFormulario) {
-      alert("Selecciona un paciente y tipo de formulario válido");
-      return;
-    }
+    // Obtener tipo de formulario
+    const tipoFormulario = document.getElementById("tipoFormulario")?.value;
 
+    // Obtener fecha del formulario
+    const fechaFormulario = document.getElementById("fechaFormulario")?.value || new Date().toISOString().split('T')[0];
+
+    // Obtener miembroId del localStorage (el usuario logueado)
     const usuarioStr = localStorage.getItem("usuario");
-    const usuario = usuarioStr ? JSON.parse(usuarioStr).usuario || JSON.parse(usuarioStr) : null;
+    const usuarioObj = usuarioStr ? JSON.parse(usuarioStr) : null;
+    const usuario = usuarioObj?.usuario || usuarioObj;
     const miembroId = usuario?.id || usuario?.idMiembroEquipo || usuario?.idMiembro || null;
 
-    console.log("Usuario en localStorage:", usuario);
-    console.log("Miembro ID detectado:", miembroId);
+    console.log("Datos para crear formulario:", { pacienteId, tipoFormulario, fechaFormulario, miembroId });
 
+    // Validaciones
+    if (!pacienteId) {
+      alert("Por favor, selecciona un paciente del listado superior.");
+      return;
+    }
+    if (!tipoFormulario) {
+      alert("Por favor, selecciona un Tipo de Formulario.");
+      return;
+    }
     if (!miembroId) {
-      alert("No se detectó usuario logueado");
+      alert("No se detectó usuario logueado. Por favor, cierra sesión e inicia de nuevo.");
       return;
     }
 
-    const nuevoFormulario = {
-      estadoFormulario: "En Progreso",
-      tipoFormulario: tipoFormulario.toUpperCase(),
-      fechaFormulario: new Date().toISOString().split('T')[0], // Hoy: 2025-12-18
+    const data = {
+      tipoFormulario: tipoFormulario,
+      estadoFormulario: "En progreso",
+      fechaFormulario: fechaFormulario,
       paciente: { idPaciente: pacienteId },
-      miembroEquipo: { idMiembroEquipo: miembroId }
+      miembroEquipo: { idMiembroEquipo: parseInt(miembroId) }
     };
+
+    console.log("Enviando formulario:", data);
 
     try {
       const response = await fetch(`${API_URL}/formularios`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nuevoFormulario)
+        body: JSON.stringify(data)
       });
 
       if (response.ok) {
-        const formCreado = await response.json();
-        ultimoFormularioId = formCreado.idFormulario;
-
-        alert(`Formulario creado correctamente para (ID: ${ultimoFormularioId})`);
+        const formulario = await response.json();
+        ultimoFormularioId = formulario.idFormulario;
+        
+        alert(`¡Formulario creado exitosamente! ID: ${formulario.idFormulario}`);
 
         // Actualizar UI
         formularioCreado = true;
         habilitarFormularioCompleto();
 
+        // Recargar formularios existentes
+        await cargarFormulariosDelPaciente(pacienteId);
 
-        await cargarFormulariosDelPaciente(pacienteId); // Refresca lista
-        document.getElementById("selectFormularioExistente").value = ultimoFormularioId;
-        cargarDatosFormulario(ultimoFormularioId); // Carga pestañas vacías listas para rellenar
+        // Seleccionar el nuevo formulario
+        const selectExistente = document.getElementById("selectFormularioExistente");
+        if (selectExistente) {
+          selectExistente.value = formulario.idFormulario;
+        }
 
+        // Cargar datos del formulario (para mostrar el ID en el panel)
+        await cargarDatosFormulario(formulario.idFormulario);
+
+        // Ir a pestaña generales
         const tabGenerales = document.getElementById("generales-tab");
         if (tabGenerales) new bootstrap.Tab(tabGenerales).show();
+
       } else {
-        const error = await response.text();
-        alert("Error al crear formulario: " + error);
+        const errorText = await response.text();
+        console.error("Error del servidor:", errorText);
+        alert("Error al crear formulario: " + errorText);
       }
     } catch (err) {
-      console.error(err);
-      alert("Error de conexión con el servidor");
+      console.error("Error de conexión:", err);
+      alert("Error de conexión. Revisa la consola (F12)");
     }
   });
 });
+<<<<<<< HEAD
+=======
 
 // une el botón con la función de descarga
 document.getElementById("btnExportarWord")?.addEventListener("click", () => {
     const id = document.getElementById("inputPacienteExportar").value;
     descargarFichaWord(id);
 });
+>>>>>>> 973a8c9fb9030f8cfb83154abdab02873d478159

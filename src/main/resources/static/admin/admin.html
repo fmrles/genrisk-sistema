@@ -2,65 +2,65 @@
 <html lang="es">
 
 <head>
-   
+   
   <meta charset="UTF-8" />
-   
+   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin - GenRisk Ñuble</title>
-   
+    <title>Admin - GenRisk Ñuble</title>
+   
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-   
+   
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-   
+   
   <link rel="stylesheet" href="admin.css">
 </head>
 
 <body>
   <div class="d-flex" id="wrapper">
-      <!-- Sidebar -->
-      <div class="bg-purple text-white" id="sidebar-wrapper">
-          <div class="sidebar-heading text-center py-4 fs-4 fw-bold border-bottom border-light">
-              GenRisk Ñuble
-            </div>
-          <div class="list-group list-group-flush my-3">
-              <a href="#" class="list-group-item bg-purple text-white active" data-section="ingreso">
-                  <i class="bi bi-clipboard-plus me-2"></i>Ingresar Datos
-                </a>
-              <a href="#" class="list-group-item bg-purple text-white" data-section="roles">
-                  <i class="bi bi-person-gear me-2"></i>Gestionar Miembros
-                </a>
-              <a href="#" class="list-group-item bg-purple text-white" data-section="dicotomizar">
-                  <i class="bi bi-diagram-3 me-2"></i>Dicotomizar
-                </a>
-              <a href="#" class="list-group-item bg-purple text-white" data-section="variables">
-                  <i class="bi bi-sliders me-2"></i>Editar Variables Dicotomización
-                </a>
-              <a href="#" class="list-group-item bg-purple text-white" data-section="exportar">
-                  <i class="bi bi-download me-2"></i>Exportar Datos
-                </a>
-              <a href="#" class="list-group-item bg-purple text-white" data-section="editar">
-                  <i class="bi bi-pencil-square me-2"></i>Editar Datos
-                </a>
-              <a href="#" class="list-group-item bg-purple text-white" data-section="listar">
-                  <i class="bi bi-list-ul me-2"></i>Listar Datos
-                </a>
-            </div>
-          <div class="p-3 border-top border-light">
-              <button class="btn btn-outline-light w-100" onclick="cerrarSesion()">
-                  <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
-                </button>
-            </div>
-        </div>
+      <!-- Sidebar -->
+      <div class="bg-purple text-white" id="sidebar-wrapper">
+          <div class="sidebar-heading text-center py-4 fs-4 fw-bold border-bottom border-light">
+              GenRisk Ñuble
+            </div>
+          <div class="list-group list-group-flush my-3">
+              <a href="#" class="list-group-item bg-purple text-white active" data-section="ingreso">
+                  <i class="bi bi-clipboard-plus me-2"></i>Ingresar Datos
+                </a>
+              <a href="#" class="list-group-item bg-purple text-white" data-section="roles">
+                  <i class="bi bi-person-gear me-2"></i>Gestionar Miembros
+                </a>
+              <a href="#" class="list-group-item bg-purple text-white" data-section="dicotomizar">
+                  <i class="bi bi-diagram-3 me-2"></i>Dicotomizar
+                </a>
+              <a href="#" class="list-group-item bg-purple text-white" data-section="variables">
+                  <i class="bi bi-sliders me-2"></i>Editar Variables Dicotomización
+                </a>
+              <a href="#" class="list-group-item bg-purple text-white" data-section="exportar">
+                  <i class="bi bi-download me-2"></i>Exportar Datos
+                </a>
+              <a href="#" class="list-group-item bg-purple text-white" data-section="editar">
+                  <i class="bi bi-pencil-square me-2"></i>Editar Datos
+                </a>
+              <a href="#" class="list-group-item bg-purple text-white" data-section="listar">
+                  <i class="bi bi-list-ul me-2"></i>Listar Datos
+                </a>
+            </div>
+          <div class="p-3 border-top border-light">
+              <button class="btn btn-outline-light w-100" onclick="cerrarSesion()">
+                  <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
+                </button>
+            </div>
+        </div>
 
-      <!-- Contenido Principal -->
-      <div id="page-content-wrapper" class="w-100">
-          <div class="container-fluid py-4">
-             
-              <!-- SECCIÓN: INGRESAR DATOS -->
-              <div id="section-ingreso" class="content-section">
-                  <h2 class="mb-4 text-purple fw-bold">Ingresar Datos del Paciente</h2>
+      <!-- Contenido Principal -->
+      <div id="page-content-wrapper" class="w-100">
+          <div class="container-fluid py-4">
+             
+              <!-- SECCIÓN: INGRESAR DATOS -->
+              <div id="section-ingreso" class="content-section">
+                  <h2 class="mb-4 text-purple fw-bold">Ingresar Datos del Paciente</h2>
 
-              <!-- Selección de Paciente -->
+              <!-- Selección de Paciente -->
           <div class="card shadow border-0 mb-4">
             <div class="card-header bg-purple text-white">
               <h5 class="mb-0">
@@ -456,76 +456,191 @@
               </div>
 
               <!-- TAB: DIETARIOS/AMBIENTALES -->
-              <div class="tab-pane fade" id="dietarios" role="tabpanel">
-                <div class="card shadow border-0">
-                  <div class="card-body">
-                    <form id="formDietarios">
-                      <div class="alert alert-info">
-                        <i class="bi bi-info-circle me-2"></i>
-                        Sección en desarrollo para factores dietarios y ambientales
-                      </div>
-                      <div class="row">
-                        <div class="col-md-6 mb-3">
-                          <label class="form-label fw-bold">Consumo de Sal</label>
-                          <select class="form-select" id="consumoSal">
-                            <option value="">Seleccionar...</option>
-                            <option value="Alto">Alto</option>
-                            <option value="Moderado">Moderado</option>
-                            <option value="Bajo">Bajo</option>
-                          </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                          <label class="form-label fw-bold">Consumo de Frutas/Verduras</label>
-                          <select class="form-select" id="consumoFrutasVerduras">
-                            <option value="">Seleccionar...</option>
-                            <option value="Frecuente">Frecuente</option>
-                            <option value="Moderado">Moderado</option>
-                            <option value="Escaso">Escaso</option>
-                          </select>
-                        </div>
-                      </div>
-                      <button type="submit" class="btn btn-purple w-100 mt-3">
-                        <i class="bi bi-arrow-right-circle me-2"></i>Siguiente
-                      </button>
-                    </form>
-                  </div>
-                </div>
-              </div>
+<div class="tab-pane fade" id="dietarios" role="tabpanel">
+  <div class="card shadow border-0">
+    <div class="card-body">
+      <form id="formDietarios">
 
-              <!-- TAB: HISTOPATOLOGÍA -->
-              <div class="tab-pane fade" id="histopatologia" role="tabpanel">
-                <div class="card shadow border-0">
-                  <div class="card-body">
-                    <form id="formHistopatologia">
-                      <div class="alert alert-info">
-                        <i class="bi bi-info-circle me-2"></i>
-                        Sección en desarrollo para datos histopatológicos
-                      </div>
-                      <div class="mb-3">
-                        <label class="form-label fw-bold">Tipo de Muestra</label>
-                        <input type="text" class="form-control" id="tipoMuestra">
-                      </div>
-                      <div class="mb-3">
-                        <label class="form-label fw-bold">Clasificación Histológica</label>
-                        <input type="text" class="form-control" id="clasificacionHisto">
-                      </div>
-
-                      <!-- Botón final para guardar todo -->
-                      <button type="submit" class="btn btn-success w-100 mt-3" id="btnGuardarFormularioCompleto">
-                        <i class="bi bi-check-circle me-2"></i>Ingresar Formulario Completo
-                      </button>
-                    </form>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div> <!-- FIN: panelIngresoDatos -->
-
-               
+        <div class="alert alert-info">
+          <i class="bi bi-info-circle me-2"></i>
+          Factores dietarios y ambientales del paciente
         </div>
 
-             <!-- SECCION: EDITAR MIEMBROS -->
+        <div class="row">
+
+          <!-- Agua de consumo -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Fuente de agua de consumo</label>
+            <select class="form-select" id="aguaConsumoZona">
+              <option value="">Seleccionar...</option>
+              <option>Red pública</option>
+              <option>Pozo</option>
+              <option>Camión aljibe</option>
+            </select>
+          </div>
+
+          <!-- Tratamiento de agua -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Tratamiento del agua</label>
+            <select class="form-select" id="tratamientoAgua">
+              <option value="">Seleccionar...</option>
+              <option>Ninguno</option>
+              <option>Filtro</option>
+              <option>Hervir</option>
+              <option>Cloro</option>
+            </select>
+          </div>
+
+          <!-- Fumigaciones -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Fumigaciones cercanas</label>
+            <select class="form-select" id="fumigaciones">
+              <option value="">Seleccionar...</option>
+              <option>Nunca</option>
+              <option>Ocasional</option>
+              <option>Frecuente</option>
+            </select>
+          </div>
+
+          <!-- Exposición a pesticidas -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Exposición a pesticidas</label>
+            <select class="form-select" id="exposicionPesticidas">
+              <option value="">Seleccionar...</option>
+              <option>Sí</option>
+              <option>No</option>
+            </select>
+          </div>
+
+          <!-- Combustión leña -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Uso de combustión a leña</label>
+            <select class="form-select" id="combusLenia">
+              <option value="">Seleccionar...</option>
+              <option>Nunca/Rara vez</option>
+              <option>1-2/sem</option>
+              <option>≥3/sem</option>
+            </select>
+          </div>
+
+          <!-- Exposición a químicos -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Exposición a químicos</label>
+            <select class="form-select" id="exposicionQuimicos">
+              <option value="">Seleccionar...</option>
+              <option>Sí</option>
+              <option>No</option>
+            </select>
+          </div>
+
+          <!-- Dieta frutas y verduras -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Consumo de frutas y verduras</label>
+            <select class="form-select" id="dietaFrutasVerduras">
+              <option value="">Seleccionar...</option>
+              <option>&lt;2 porciones</option>
+              <option>3-4 porciones</option>
+              <option>&gt;5 porciones</option>
+            </select>
+          </div>
+
+          <!-- Alimentos condimentados -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Alimentos muy condimentados</label>
+            <select class="form-select" id="allCondimentado">
+              <option value="">Seleccionar...</option>
+              <option>Sí</option>
+              <option>No</option>
+            </select>
+          </div>
+
+          <!-- Infusiones / bebidas -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Infusiones / bebidas</label>
+            <select class="form-select" id="infusionesBebidas">
+              <option value="">Seleccionar...</option>
+              <option>Sí</option>
+              <option>No</option>
+            </select>
+          </div>
+
+        </div>
+
+        <button type="submit" class="btn btn-purple w-100 mt-3">
+          <i class="bi bi-save me-2"></i>Guardar Dietarios / Ambientales
+        </button>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: HISTOPATOLOGÍA -->
+<div class="tab-pane fade" id="histopatologia" role="tabpanel">
+  <div class="card shadow border-0">
+    <div class="card-body">
+
+      <form id="formHistopatologia">
+
+        <div class="alert alert-info">
+          <i class="bi bi-info-circle me-2"></i>
+          Datos histopatológicos del paciente
+        </div>
+
+        <div class="row">
+
+          <!-- Tipo -->
+          <div class="col-md-4 mb-3">
+            <label class="form-label fw-bold">Tipo de Muestra</label>
+            <select class="form-select" id="tipoMuestra" required>
+              <option value="">Seleccionar...</option>
+              <option value="Intestinal">Intestinal</option>
+              <option value="Mixto">Mixto</option>
+              <option value="Difuso">Difuso</option>
+            </select>
+          </div>
+
+          <!-- Estado clínico -->
+          <div class="col-md-4 mb-3">
+            <label class="form-label fw-bold">Estado Clínico</label>
+            <select class="form-select" id="estadoClinico" required>
+              <option value="">Seleccionar...</option>
+              <option value="IIB">IIB</option>
+              <option value="IIIA">IIIA</option>
+              <option value="IIIB">IIIB</option>
+            </select>
+          </div>
+
+          <!-- Localización -->
+          <div class="col-md-4 mb-3">
+            <label class="form-label fw-bold">Localización Tumoral</label>
+            <select class="form-select" id="localizacionTumoral">
+              <option value="">Seleccionar...</option>
+              <option value="Antro">Antro</option>
+              <option value="Cuerpo">Cuerpo</option>
+              <option value="Cardias">Cardias</option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- Botón final (NO se borra) -->
+        <button
+          type="submit"
+          class="btn btn-success w-100 mt-3"
+          id="btnGuardarFormularioCompleto"
+        >
+          <i class="bi bi-check-circle me-2"></i>Ingresar Formulario Completo
+        </button>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+
+             <!-- SECCION: EDITAR MIEMBROS -->
        <div id="section-roles" class="content-section d-none">
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="text-purple fw-bold mb-0">Gestión de Miembros</h2>
@@ -557,36 +672,42 @@
             </div>
           </div>
         </div>
+<!-- SECCIÓN: DICOTOMIZAR -->
+<div id="section-dicotomizar" class="content-section d-none">
+  <h2 class="mb-4 text-purple fw-bold">Dicotomizar Datos</h2>
 
+  <div class="card shadow border-0">
+    <div class="card-body">
 
-              <!-- SECCIÓN: DICOTOMIZAR -->
-              <div id="section-dicotomizar" class="content-section d-none">
-                  <h2 class="mb-4 text-purple fw-bold">Dicotomizar Datos</h2>
-                  <div class="card shadow border-0">
-                      <div class="card-body">
-                          <div class="mb-4">
-                              <label class="form-label fw-bold">Seleccionar Conjunto de Reglas</label>
-                              <select class="form-select" id="selectConjuntoDicot">
-                                  <option value="">Cargando conjuntos...</option>
-                                </select>
-                            </div>
-                          <button class="btn btn-purple btn-lg w-100" id="btnDicotomizar">
-                              <i class="bi bi-gear-fill me-2"></i>Ejecutar Dicotomización
-                            </button>
-                         
-                          <div id="resultadoDicot" class="mt-4 d-none">
-                              <div class="alert alert-success">
-                                  <i class="bi bi-check-circle me-2"></i>
-                                  <span id="mensajeResultadoDicot"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                 
-                </div>
+      <!-- Select alineado -->
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <label class="form-label fw-bold">Seleccionar Conjunto de Reglas</label>
+          <select class="form-select" id="selectConjuntoReglas">
+            <option value="">Seleccionar conjunto...</option>
+          </select>
+        </div>
+      </div>
 
-              <!-- SECCIÓN: EDITAR VARIABLES DICOTOMIZACIÓN -->
-              <div id="section-variables" class="content-section d-none">
+      <!-- Botón -->
+      <button class="btn btn-purple btn-lg w-100" id="btnDicotomizar">
+        <i class="bi bi-gear-fill me-2"></i>Ejecutar Dicotomización
+      </button>
+
+      <!-- Resultado -->
+      <div id="resultadoDicot" class="mt-4 d-none">
+        <div class="alert alert-success">
+          <i class="bi bi-check-circle me-2"></i>
+          <span id="mensajeResultadoDicot"></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+              <!-- SECCIÓN: EDITAR VARIABLES DICOTOMIZACIÓN -->
+              <div id="section-variables" class="content-section d-none">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                   <h2 class="text-purple fw-bold mb-0">Variables de Dicotomización</h2>
                   <button class="btn btn-purple" onclick="abrirModalConjunto()">
@@ -617,7 +738,7 @@
                 </div>
               </div>
 
-              <!-- SECCIÓN: EXPORTAR DATOS -->
+              <!-- SECCIÓN: EXPORTAR DATOS -->
         <div id="section-exportar" class="content-section d-none">
           <h2 class="mb-4 text-purple fw-bold">Exportar Datos</h2>
 
@@ -690,12 +811,12 @@
           </div>
         </div>
 
-              <!-- SECCIÓN: EDITAR DATOS -->
-              <div id="section-editar" class="content-section d-none">
-                  <h2 class="mb-4 text-purple fw-bold">Editar Datos</h2>
-                  <div class="card shadow border-0">
-                      <div class="card-body">
-                          <div class="mb-4">
+              <!-- SECCIÓN: EDITAR DATOS -->
+              <div id="section-editar" class="content-section d-none">
+                  <h2 class="mb-4 text-purple fw-bold">Editar Datos</h2>
+                  <div class="card shadow border-0">
+                      <div class="card-body">
+                          <div class="mb-4">
                 <div class="row align-items-end">
 
                   <!-- BUSCAR PACIENTE -->
@@ -716,44 +837,47 @@
                 </div>
               </div>
 
-                          <div id="formularioEdicion" class="d-none">
-                              <div class="alert alert-warning">
-                                  <i class="bi bi-exclamation-triangle me-2"></i>
-                                  Sección en desarrollo
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                          <div id="formularioEdicion" class="d-none">
+                              <div class="alert alert-warning">
+                                  <i class="bi bi-exclamation-triangle me-2"></i>
+                                  Sección en desarrollo
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-              <!-- SECCIÓN: LISTAR DATOS -->
-              <div id="section-listar" class="content-section d-none">
-                  <h2 class="mb-4 text-purple fw-bold">Listar Datos</h2>
-                  <div class="card shadow border-0">
-                      <div class="card-body">
-                          <div class="mb-3">
-                              <label class="form-label fw-bold">Seleccionar Tabla</label>
-                              <select class="form-select" id="selectTablaListar">
-                                <option value="">Seleccionar...</option>
-                                <option value="pacientes">Pacientes</option>
-                                <option value="formularios">Formularios</option>
-                                <option value="datos_generales">Datos Generales</option>
-                                <option value="habitos">Hábitos</option>
-                                <option value="datos_clinicos">Datos Clínicos</option>
-                                <option value="fact_ambientales">Factores Ambientales</option>
-                                <option value="histopatologia">Histopatología</option>
-                                </select>
-                            </div>
-                          <div class="table-responsive" id="contenedorTablaListar">
-                              <p class="text-muted">Selecciona una tabla para ver los datos</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+              <!-- SECCIÓN: LISTAR DATOS -->
+              <div id="section-listar" class="content-section d-none">
+                  <h2 class="mb-4 text-purple fw-bold">Listar Datos</h2>
+                  <div class="card shadow border-0">
+                      <div class="card-body">
+                          <div class="row mb-3">
+  <div class="col-md-6">
+    <label class="form-label fw-bold">Seleccionar Tabla</label>
+    <select class="form-select" id="selectTablaListar">
+      <option value="">Seleccionar...</option>
+      <option value="pacientes">Pacientes</option>
+      <option value="formularios">Formularios</option>
+      <option value="datos_generales">Datos Generales</option>
+      <option value="habitos">Hábitos</option>
+      <option value="datos_clinicos">Datos Clínicos</option>
+      <option value="fact_ambientales">Factores Ambientales</option>
+      <option value="histopatologia">Histopatología</option>
+    </select>
+  </div>
+</div>
 
-           
+                          <div class="table-responsive" id="contenedorTablaListar">
+                              <p class="text-muted">Selecciona una tabla para ver los datos</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+           
       </div>
-        </div>
+        </div>
   </div>
 
 
