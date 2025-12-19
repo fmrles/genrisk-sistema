@@ -1601,4 +1601,53 @@ function limpiarTodasLasPestanas() {
   });
 });
 
+// ==================== IMPORTAR DATOS DESDE WORD ====================
+document.getElementById("btnImportarWord")?.addEventListener("click", async () => {
+    const input = document.getElementById("inputFileImportar");
+    const file = input.files[0];
+    const btn = document.getElementById("btnImportarWord");
+
+    if (!file) {
+        alert("Por favor selecciona un archivo Word (.docx) primero.");
+        return;
+    }
+
+    if (!file.name.endsWith(".docx") && !file.name.endsWith(".doc")) {
+        alert("El archivo debe ser un documento Word (.docx)");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const textoOriginal = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Procesando...';
+
+    try {
+        const res = await fetch(`${API_URL}/api/import/word`, {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            alert("✅ " + (data.mensaje || "Importación exitosa"));
+            input.value = "";
+            
+            if (typeof cargarPacientes === 'function') cargarPacientes();
+        } else {
+            throw new Error(data.error || "Error desconocido en el servidor");
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("Error al importar: " + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = textoOriginal;
+    }
+});
+
 // ojalá funcione
