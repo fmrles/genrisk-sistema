@@ -18,8 +18,8 @@ public class EstadisticaController {
 
     /**
      * Calcula estadísticas (media, mediana, etc.) para un atributo numérico de una entidad.
-     * Ejemplo de URL: GET http://localhost:8080/estadisticas/datos_generales/edad
-     * Ejemplo de URL: GET http://localhost:8080/estadisticas/habitos_paciente/aniosConsumoAlcohol
+     * Ejemplo de URL: GET http://localhost:8081/estadisticas/datos_generales/edad
+     * Ejemplo de URL: GET http://localhost:8081/estadisticas/habitos_paciente/aniosConsumoAlcohol
      */
     @GetMapping("/{entidadObj}/{atributoObj}")
     public ResponseEntity<EstadisticaResultado> getEstadisticas(
