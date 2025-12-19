@@ -1037,7 +1037,7 @@ async function cargarListaPacientesWord() {
 
     try {
         const res = await fetch(`${API_URL}/pacientes`);
-        if (!res.ok) throw new Error("Error de conexión");
+        if (!res.ok) throw new Error("Error API");
         
         const pacientes = await res.json();
         select.innerHTML = '<option value="">-- Selecciona un paciente --</option>';
@@ -1051,8 +1051,7 @@ async function cargarListaPacientesWord() {
             select.appendChild(opt);
         });
     } catch (err) {
-        console.error(err);
-        select.innerHTML = '<option value="">Error al cargar</option>';
+        console.warn("Error lista word:", err);
     }
 }
 
@@ -1081,8 +1080,11 @@ document.getElementById("selectTablaListar")?.addEventListener("change", async f
     return;
   }
 
+  contenedor.innerHTML = '<div class="text-center mt-3"><div class="spinner-border text-primary"></div><p>Cargando datos...</p></div>';
+
   try {
     let endpoint = '';
+    // Mapeamos la opción del select a la ruta de tu Backend (Java)
     switch(tabla) {
       case 'pacientes':       endpoint = '/pacientes'; break;
       case 'formularios':     endpoint = '/formularios'; break;
@@ -1090,11 +1092,12 @@ document.getElementById("selectTablaListar")?.addEventListener("change", async f
       case 'habitos':         endpoint = '/habitos-paciente'; break;
       case 'datos_clinicos':  endpoint = '/datos-clinicos'; break;
       case 'histopatologia':  endpoint = '/histopatologia'; break;
-      case 'fact_ambientales': endpoint = '/factores-dietarios-hambientales'; break;
+      case 'fact_ambientales': endpoint = '/factores-dietarios-hambientales'; break; 
+      default: throw new Error("Tabla no reconocida");
     }
 
     const res = await fetch(`${API_URL}${endpoint}`);
-    if (res.status === 404) throw new Error(`Ruta no encontrada: ${endpoint}`);
+    
     if (!res.ok) throw new Error(`Error ${res.status}: No se pudo cargar la tabla`);
 
     const datos = await res.json();
@@ -1104,17 +1107,21 @@ document.getElementById("selectTablaListar")?.addEventListener("change", async f
       return;
     }
 
+    // --- GENERACIÓN DINÁMICA DE LA TABLA ---
+    // 1. Obtenemos los encabezados del primer objeto
     const headers = Object.keys(datos[0]); 
     
     let html = '<table class="table table-striped table-hover table-bordered table-sm" style="font-size: 0.85rem;">';
-    html += '<thead class="table-purple"><tr>';
+    html += '<thead class="table-purple text-white"><tr>';
     
     headers.forEach(h => {
+      // Convertir "nombrePaciente" a "NOMBRE PACIENTE"
       let titulo = h.replace(/([A-Z])/g, ' $1').toUpperCase(); 
       html += `<th>${titulo}</th>`;
     });
     html += '</tr></thead><tbody>';
-
+    
+    // 2. Generamos las filas
     datos.forEach(row => {
       html += '<tr>';
       headers.forEach(h => {
@@ -1123,11 +1130,12 @@ document.getElementById("selectTablaListar")?.addEventListener("change", async f
 
         if (value !== null && value !== undefined) {
           if (typeof value === 'object') {
-            if (value.formularioId) displayValue = `<span class="badge bg-secondary">Form: ${value.formularioId}</span>`;
+            // Si el dato es un objeto (ej: Paciente dentro de Formulario), mostramos su ID
+            if (value.formularioId) displayValue = value.formularioId;
             else if (value.idFormulario) displayValue = value.idFormulario;
             else if (value.idPaciente) displayValue = value.idPaciente;
             else if (value.id) displayValue = value.id;
-            else displayValue = JSON.stringify(value).substring(0, 15) + '...';
+            else displayValue = '{Obj}';
           } else {
             displayValue = value;
           }
@@ -1173,19 +1181,36 @@ function toggleFormFields(enable) {
    
 }
 
-// 1. Inhabilitación inicial
-// Se ejecuta al final del script para asegurar que todos los elementos existan
+// ==================== Cargar Pacientes ====================
+async function cargarPacientesEditar() {
+    // Buscamos el selector del HTML (admin.html línea 451)
+    const select = document.getElementById("selectPacienteEditar");
+    
+    // Si no estamos en la pestaña correcta, salimos sin romper nada
+    if (!select) return;
 
+    try {
+        const res = await fetch(`${API_URL}/pacientes`);
+        if (!res.ok) return;
 
-// 2. MEJORA: Habilitar campos si hay un paciente seleccionado al cargar (esto se maneja en cargarPacientes/change event)
+        const pacientes = await res.json();
+        
+        // Llenamos el desplegable para buscar paciente
+        select.innerHTML = '<option value="">Seleccionar paciente para editar...</option>';
+        
+        pacientes.forEach(p => {
+            const option = document.createElement("option");
+            option.value = p.idPaciente;
+            // Mostramos ID y Nombre
+            option.textContent = `${p.idPaciente} - ${p.nombrePaciente}`;
+            select.appendChild(option);
+        });
 
-//aqui
+    } catch (err) {
+        console.error("Error al cargar lista de edición:", err);
+    }
+}
 
-
-// Estado
-
-
-//  Bloquear todo al inicio
 function bloquearTodo() {
   if (!panelDatos) return;
 
